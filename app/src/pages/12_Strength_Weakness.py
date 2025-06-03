@@ -9,6 +9,8 @@ SideBarLinks()
 
 st.title("Strengths vs. Weaknesses")
 
+
+# CHANGE CODE
 #data = {} 
 #try:
  # data = requests.get('http://web-api:4000/data').json()

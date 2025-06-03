@@ -10,95 +10,87 @@ from modules.nav import SideBarLinks
 SideBarLinks()
 
 # add the logo
-add_logo("assets/logo.png", height=400)
+#add_logo("assets/logo.png", height=400)
 
 # set up the page
-st.markdown("# Mapping Demo")
-st.sidebar.header("Country Profile")
-st.write(
-    """This Mapping Demo is from the Streamlit Documentation. It shows how to use
-[`st.pydeck_chart`](https://docs.streamlit.io/library/api-reference/charts/st.pydeck_chart)
-to display geospatial data."""
-)
+st.title("Country Profile")
 
 
-@st.cache_data
-def from_data_file(filename):
-    url = (
-        "http://raw.githubusercontent.com/streamlit/"
-        "example-data/master/hello/v1/%s" % filename
+# CHANGE CODE
+# Get NGO ID from session state
+ngo_id = st.session_state.get("selected_ngo_id")
+
+if ngo_id is None:
+    st.error("No NGO selected")
+    st.button(
+        "Return to NGO Directory",
+        on_click=lambda: st.switch_page("pages/14_NGO_Directory.py"),
     )
-    return pd.read_json(url)
+else:
+    # API endpoint
+    API_URL = f"http://web-api:4000/ngo/ngos/{ngo_id}"
 
+    try:
+        # Fetch NGO details
+        response = requests.get(API_URL)
 
-try:
-    ALL_LAYERS = {
-        "Bike Rentals": pdk.Layer(
-            "HexagonLayer",
-            data=from_data_file("bike_rental_stats.json"),
-            get_position=["lon", "lat"],
-            radius=200,
-            elevation_scale=4,
-            elevation_range=[0, 1000],
-            extruded=True,
-        ),
-        "Bart Stop Exits": pdk.Layer(
-            "ScatterplotLayer",
-            data=from_data_file("bart_stop_stats.json"),
-            get_position=["lon", "lat"],
-            get_color=[200, 30, 0, 160],
-            get_radius="[exits]",
-            radius_scale=0.05,
-        ),
-        "Bart Stop Names": pdk.Layer(
-            "TextLayer",
-            data=from_data_file("bart_stop_stats.json"),
-            get_position=["lon", "lat"],
-            get_text="name",
-            get_color=[0, 0, 0, 200],
-            get_size=15,
-            get_alignment_baseline="'bottom'",
-        ),
-        "Outbound Flow": pdk.Layer(
-            "ArcLayer",
-            data=from_data_file("bart_path_stats.json"),
-            get_source_position=["lon", "lat"],
-            get_target_position=["lon2", "lat2"],
-            get_source_color=[200, 30, 0, 160],
-            get_target_color=[200, 30, 0, 160],
-            auto_highlight=True,
-            width_scale=0.0001,
-            get_width="outbound",
-            width_min_pixels=3,
-            width_max_pixels=30,
-        ),
-    }
-    st.sidebar.markdown("### Map Layers")
-    selected_layers = [
-        layer
-        for layer_name, layer in ALL_LAYERS.items()
-        if st.sidebar.checkbox(layer_name, True)
-    ]
-    if selected_layers:
-        st.pydeck_chart(
-            pdk.Deck(
-                map_style="mapbox://styles/mapbox/light-v9",
-                initial_view_state={
-                    "latitude": 37.76,
-                    "longitude": -122.4,
-                    "zoom": 11,
-                    "pitch": 50,
-                },
-                layers=selected_layers,
+        if response.status_code == 200:
+            ngo = response.json()
+
+            # Display basic information
+            st.header(ngo["Name"])
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.subheader("Basic Information")
+                st.write(f"**Country:** {ngo['Country']}")
+                st.write(f"**Founded:** {ngo['Founding_Year']}")
+                st.write(f"**Focus Area:** {ngo['Focus_Area']}")
+                st.write(f"**Website:** [{ngo['Website']}]({ngo['Website']})")
+
+            # Display projects
+            if ngo.get("projects"):
+                st.subheader("Projects")
+                for project in ngo["projects"]:
+                    with st.expander(
+                        f"{project['Project_Name']} ({project['Focus_Area']})"
+                    ):
+                        budget = float(project["Budget"]) if project["Budget"] else 0.0
+                        st.write(f"**Budget:** ${budget:,.2f}")
+                        st.write(f"**Start Date:** {project['Start_Date']}")
+                        st.write(f"**End Date:** {project['End_Date']}")
+            else:
+                st.info("No projects found for this NGO")
+
+            # Display donors
+            if ngo.get("donors"):
+                st.subheader("Donors")
+                for donor in ngo["donors"]:
+                    with st.expander(f"{donor['Donor_Name']} ({donor['Donor_Type']})"):
+                        donation = (
+                            float(donor["Donation_Amount"])
+                            if donor["Donation_Amount"]
+                            else 0.0
+                        )
+                        st.write(f"**Donation Amount:** ${donation:,.2f}")
+            else:
+                st.info("No donors found for this NGO")
+
+        elif response.status_code == 404:
+            st.error("NGO not found")
+        else:
+            st.error(
+                f"Error fetching NGO data: {response.json().get('error', 'Unknown error')}"
             )
-        )
-    else:
-        st.error("Please choose at least one layer above.")
-except URLError as e:
-    st.error(
-        """
-        **This demo requires internet access.**
-        Connection error: %s
-    """
-        % e.reason
-    )
+
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error connecting to the API: {str(e)}")
+        st.info("Please ensure the API server is running")
+
+# Add a button to return to the NGO Directory
+if st.button("Return to NGO Directory"):
+    # Clear the selected NGO ID from session state
+    if "selected_ngo_id" in st.session_state:
+        del st.session_state["selected_ngo_id"]
+    st.switch_page("pages/14_NGO_Directory.py")

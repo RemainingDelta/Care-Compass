@@ -14,6 +14,7 @@ SideBarLinks()
 
 st.title("Country Comparator")
 
+
 #CHANGE CODE
 root = Tk()  
 root.geometry("200x200")  
