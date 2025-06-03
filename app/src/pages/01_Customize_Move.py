@@ -13,11 +13,12 @@ from modules.nav import SideBarLinks
 SideBarLinks()
 
 # set the header of the page
-st.header('World Bank Data')
+st.header('Customize Your Move!')
 
 # You can access the session state to make a more customized/personalized app experience
 st.write(f"### Hi, {st.session_state['first_name']}.")
 
+# CHANGE FOLLOWING CODE 
 # get the countries from the world bank data
 with st.echo(code_location='above'):
     countries:pd.DataFrame = wb.get_countries()
