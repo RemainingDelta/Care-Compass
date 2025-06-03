@@ -14,7 +14,7 @@ st.write('')
 st.write('')
 st.write('### What would you like to do today?')
 
-if st.button('See Scores Over Time in a Regression', 
+if st.button('See Features Over Time', 
              type='primary',
              use_container_width=True):
   st.switch_page('pages/21_Regression.py')
