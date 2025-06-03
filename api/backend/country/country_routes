@@ -1,0 +1,41 @@
+from flask import Blueprint, jsonify, request
+from backend.db_connection import db
+from mysql.connector import Error
+from flask import current_app
+
+
+countries = Blueprint("country", __name__)
+
+# Get list of all countries
+# Example: /country/countries 
+@countries.route("/countries", methods=["GET"])
+def get_all_countries():
+    pass
+
+
+# Get detailed country profile
+# Example: /countries/{country_id}/profile
+@countries.route("/countries/<int:country_id>/profile", methods=["GET"])
+def get_country_profile(country_id):
+    pass
+
+
+# Get factor scores for a country
+# Example: /countries/{country_id}/factors
+@countries.route("/countries/<int:country_id>/factors", methods=["GET"])
+def get_country_factors(country_id):
+    pass
+
+
+# Get top/bottom factors compared to other countries
+# Example: /countries/{country_id}/strengths-weaknesses
+@countries.route("/countries/<int:country_id>/strengths-weaknesses", methods=["GET"])
+def get_strengths_weaknesses(country_id):
+    pass
+
+
+# Return list of countries with similar scores
+# Example: /countries/{country_id}/similar
+@countries.route("/countries/<int:country_id>/similar", methods=["GET"])
+def get_similar_countries(country_id):
+    pass
