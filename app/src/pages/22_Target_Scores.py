@@ -6,6 +6,6 @@ from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
 
 SideBarLinks()
-st.title("Set and Monitor Target Scores")
+st.title("SET AND MONITOR TARGET SCORES")
 
 
