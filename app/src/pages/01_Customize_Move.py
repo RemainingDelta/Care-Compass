@@ -13,7 +13,7 @@ from modules.nav import SideBarLinks
 SideBarLinks()
 
 # set the header of the page
-st.header('Customize Your Move!')
+st.header('CUSTOMIZE YOUR MOVE!')
 
 # You can access the session state to make a more customized/personalized app experience
 st.write(f"### Hi, {st.session_state['first_name']}. Rank the factors in order of priority -- 1 being the highest and 6 the lowest.")

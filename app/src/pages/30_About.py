@@ -4,7 +4,7 @@ from modules.nav import SideBarLinks
 
 SideBarLinks()
 
-st.write("# Get to Know Care Compass")
+st.write("# GET TO KNOW CARE COMPASS")
 
 st.markdown(
     """

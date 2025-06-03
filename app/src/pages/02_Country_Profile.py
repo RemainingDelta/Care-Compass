@@ -13,7 +13,7 @@ SideBarLinks()
 #add_logo("assets/logo.png", height=400)
 
 # set up the page
-st.title("Country Profile")
+st.title("COUNTRY PROFILE")
 
 
 # CHANGE CODE

@@ -8,7 +8,7 @@ st.set_page_config(layout = 'wide')
 
 SideBarLinks()
 
-st.title('Features Over Time')
+st.title('FEATURES OVER TIME')
 
 
 # CHANGE CODE

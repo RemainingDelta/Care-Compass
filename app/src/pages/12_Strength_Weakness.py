@@ -7,7 +7,7 @@ from modules.nav import SideBarLinks
 
 SideBarLinks()
 
-st.title("Strengths vs. Weaknesses")
+st.title("STRENGTHS VS. WEAKNESSES")
 
 
 # CHANGE CODE
