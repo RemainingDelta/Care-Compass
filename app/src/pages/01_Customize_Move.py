@@ -20,6 +20,47 @@ st.write(f"### Hi, {st.session_state['first_name']}.")
 
 
 # CHANGE FOLLOWING CODE 
+st.write("Rank the factors in order of priority (1 being the highest and 6 the lowest)")
+
+options = ["Prevention","Health System","Rapid Response","Detection & Reporting", 
+           "International Norms Compliance","Risk Environment"]
+option1 = st.selectbox(
+    "1:",
+    options,
+    index=None,
+    placeholder="Select PRIORITY healthcare factor...",
+)
+option2 = st.selectbox(
+    "2:",
+    options,
+    index=None,
+    placeholder="Select SECONDARY healthcare factor...",
+)
+option3 = st.selectbox(
+    "3:",
+    options,
+    index=None,
+    placeholder="Select TERTIARY healthcare factor...",
+)
+option4 = st.selectbox(
+    "4:",
+    options,
+    index=None,
+    placeholder="Select QUARTERNARY healthcare factor...",
+)
+option5 = st.selectbox(
+    "5:",
+    options,
+    index=None,
+    placeholder="Select QUINARY healthcare factor...",
+)
+option6 = st.selectbox(
+    "6:",
+    options,
+    index=None,
+    placeholder="Select SENARY healthcare factor...",
+)
+
 
 
 
