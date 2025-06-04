@@ -135,8 +135,29 @@ def update_country(country_id):
 # Example: /countries/<country_id>
 @countries.route("/countries/<int:country_id>", methods=["DELETE"])
 def delete_country(country_id):
+    try:
+        current_app.logger.info("Attempting to delete country ID %s", country_id)
 
-    pass
+        cursor = db.get_db().cursor()
+
+        # First, check if the country exists
+        cursor.execute("SELECT id FROM country WHERE id = %s", (country_id,))
+        if not cursor.fetchone():
+            current_app.logger.warning("Country ID %s not found", country_id)
+            cursor.close()
+            return jsonify({"error": "Country not found"}), 404
+
+        # Delete the country
+        cursor.execute("DELETE FROM country WHERE id = %s", (country_id,))
+        db.get_db().commit()
+        cursor.close()
+
+        current_app.logger.info("Successfully deleted country ID %s", country_id)
+        return jsonify({"message": f"Country {country_id} deleted successfully"}), 200
+
+    except Error as e:
+        current_app.logger.error("Database error in delete_country: %s", str(e))
+        return jsonify({"error": str(e)}), 500
 
 # Reads in GHS Index data
 # Example: /countries/ghs_index
