@@ -7,7 +7,7 @@ import streamlit as st
 
 #### ------------------------ General ------------------------
 def HomeNav():
-    st.sidebar.page_link("Home.py", label="Home", icon="🏠"
+    st.sidebar.page_link("Home.py", label="Home", icon="🧭"
     )
 
 
@@ -19,13 +19,13 @@ def AboutPageNav():
 #### ------------------------ Examples for Role of Resident ------------------------
 def ResidentHomeNav():
     st.sidebar.page_link(
-        "pages/00_Resident_Home.py", label="Resident Home", icon="👤"
+        "pages/00_Resident_Home.py", label="Resident Home", icon="🏠"
     )
 
 
 def CustomizeMoveNav():
     st.sidebar.page_link(
-        "pages/01_Customize_Move.py", label="Customize Your Move", icon="🏦"
+        "pages/01_Customize_Move.py", label="Customize Your Move", icon="✈️"
     )
 
 
@@ -36,19 +36,19 @@ def CountryProfNav():
 
 ## ------------------------ Examples for Role of Student ------------------------
 def StudentHomeNav():
-    st.sidebar.page_link("pages/10_Student_Home.py", label="Student Home", icon="👤"
+    st.sidebar.page_link("pages/10_Student_Home.py", label="Student Home", icon="📚"
     )
 
 
 def CountryComparatorNav():
     st.sidebar.page_link(
-        "pages/11_Country_Comparator.py", label="Country Comparator", icon="📈"
+        "pages/11_Country_Comparator.py", label="Country Comparator", icon="📊"
     )
 
 
 def StrengthWeaknessNav():
     st.sidebar.page_link(
-        "pages/12_Strength_Weakness.py", label="Strengths vs. Weaknesses", icon="🌺"
+        "pages/12_Strength_Weakness.py", label="Strengths vs. Weaknesses", icon="➕"
     )
 
 
@@ -56,7 +56,7 @@ def StrengthWeaknessNav():
 
 #### ------------------------ Policymaker Role ------------------------
 def PolicymakerHomeNav():
-    st.sidebar.page_link("pages/20_Policymaker_Home.py", label="Policymaker Home", icon="🖥️")
+    st.sidebar.page_link("pages/20_Policymaker_Home.py", label="Policymaker Home", icon="👤")
     
 
 def FeatOverTimeNav():
@@ -64,7 +64,7 @@ def FeatOverTimeNav():
 
 
 def TargetScoresNav():
-    st.sidebar.page_link("pages/22_Target_Scores.py", label="Target Scores", icon="➕")
+    st.sidebar.page_link("pages/22_Target_Scores.py", label="Target Scores", icon="🎯")
 
 # --------------------------------Links Function -----------------------------------------------
 def SideBarLinks(show_home=False):
