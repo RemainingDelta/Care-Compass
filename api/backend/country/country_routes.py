@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request
 from backend.db_connection import db
 from mysql.connector import Error
 from flask import current_app
+import pandas as pd 
+import sqlite3
 
 
 countries = Blueprint("country_routes", __name__)
@@ -139,3 +141,22 @@ def update_country(country_id):
 @countries.route("/countries/<int:country_id>", methods=["DELETE"])
 def delete_country(country_id):
     pass
+
+# Reads in GHS Index data
+# Example: /countries/ghs_index
+@countries.route("/countries/ghs_index", methods=["GET"])
+def get_ghs_index():
+    if_exists = "replace"
+    df = pd.read_csv('https://www.ghsindex.org/wp-content/uploads/2022/04/2021-GHS-Index-April-2022.csv')
+    #current_app.logger.info(f'Successfully retrieved {len(countries)} Countries')
+    conn = sqlite3.connect(r"..\\..\database-files\\cc_db.sql")
+    df.to_sql('ghs_table', conn, if_exists="replace", index=False)
+    cursor = conn.cursor()
+    cursor.execute("SELECT 'Afghanistan' FROM ghs_table")
+    countries = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(countries), 200
+
+
+    
