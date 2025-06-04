@@ -39,3 +39,19 @@ def get_strengths_weaknesses(country_id):
 @countries.route("/countries/<int:country_id>/similar", methods=["GET"])
 def get_similar_countries(country_id):
     pass
+
+
+'''
+'''
+# Update a country’s metadata (Admin only)
+# Example: /countries/<country_id>
+@countries.route("/countries/<int:country_id>", methods=["PUT"])
+def update_country(country_id):
+    pass
+
+
+# Delete a country record (Admin only)
+# Example: /countries/<country_id>
+@countries.route("/countries/<int:country_id>", methods=["DELETE"])
+def delete_country(country_id):
+    pass
