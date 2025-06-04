@@ -65,4 +65,6 @@ st.write("")
 plot = st.button("Plot", type="primary")
 
 if plot:
-    st.line_chart(df)
+    results = requests.get(f"http://web-api:4000/ml/predict/{feature}/{country1}") # need to do more for the other countries
+    json_results = results.json()
+    st.dataframe(json_results)
