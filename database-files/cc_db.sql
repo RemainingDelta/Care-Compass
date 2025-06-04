@@ -1,10 +1,10 @@
-DROP DATABASE IF EXISTS carecompass_database;
-CREATE DATABASE carecompass_database;
-USE carecompass_database;
+DROP DATABASE IF EXISTS cc_database;
+CREATE DATABASE cc_database;
+USE cc_database;
 
 -- create country table
-DROP TABLE IF EXISTS country;
-CREATE TABLE country
+DROP TABLE IF EXISTS Country;
+CREATE TABLE Country
 (
     id   INT PRIMARY KEY,
     name        VARCHAR(50),
@@ -28,7 +28,7 @@ CREATE TABLE users
     affordabilityWeight FLOAT,
     outcomeWeight       FLOAT,
     countryID       INT,
-    FOREIGN KEY (countryID) REFERENCES country (id)
+    FOREIGN KEY (countryID) REFERENCES Country (id)
 );
 
 -- create score projection table
@@ -62,7 +62,7 @@ CREATE TABLE factors
     countryID   INT,
     overallScore   FLOAT,
     targetScore     FLOAT,
-    FOREIGN KEY (countryID) REFERENCES country(id),
+    FOREIGN KEY (countryID) REFERENCES Country(id),
     FOREIGN KEY (overallScore) REFERENCES overall_score(overallScore),
     FOREIGN KEY (targetScore) REFERENCES score_project(targetScore)
 );
@@ -75,9 +75,9 @@ CREATE TABLE comparator
     country1ID  INT,
     country2ID  INT,
     country3ID INT,
-    FOREIGN KEY (country1ID) REFERENCES country(id),
-    FOREIGN KEY (country2ID) REFERENCES country(id),
-    FOREIGN KEY (country3ID) REFERENCES country(id)
+    FOREIGN KEY (country1ID) REFERENCES Country(id),
+    FOREIGN KEY (country2ID) REFERENCES Country(id),
+    FOREIGN KEY (country3ID) REFERENCES Country(id)
 );
 
 -- create country_compare table
@@ -88,7 +88,7 @@ CREATE TABLE country_compare
     Country1_ID   INT,
     Country2_ID    INT,
     Country3_ID   INT,
-    FOREIGN KEY (countryID) REFERENCES country(id)
+    FOREIGN KEY (countryID) REFERENCES Country(id)
 
 );
 
