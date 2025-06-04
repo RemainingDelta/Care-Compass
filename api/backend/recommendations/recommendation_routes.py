@@ -8,7 +8,7 @@ recommendations = Blueprint("recommendations", __name__)
 
 # Get list of all recommendation factors with descriptions
 # Example: /recommendations/factors
-@recommendations.route("/recommendations/factors", methods=["GET"])
+@recommendations.route("/factors", methods=["GET"])
 def get_recommendation_factors():
     pass
 
@@ -29,6 +29,6 @@ def get_recommendation_factors():
 '''
 # Generate personalized country recommendations based on weighted factors
 # Example: /recommendations/recommendations
-@recommendations.route("/recommendations/recommendations", methods=["POST"])
+@recommendations.route("/recommendations", methods=["POST"])
 def get_country_recommendations():
     pass
