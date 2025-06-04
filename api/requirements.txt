@@ -7,3 +7,4 @@ mysql-connector==2.2.9
 cryptography==38.0.1
 python-dotenv==1.0.1
 numpy==1.26.4
+pandas==2.2.3
