@@ -13,6 +13,20 @@ def get_recommendation_factors():
     pass
 
 
+'''
+{
+  "weights": {
+    "Prevention": 0.25,
+    "Detection and Reporting": 0.15,
+    "Rapid Response": 0.10,
+    "Health System": 0.20,
+    "Compliance with International Norms": 0.20,
+    "Risk Environment": 0.10
+  },
+  "home_country_id": 12,
+  "include_home_context": true
+}
+'''
 # Generate personalized country recommendations based on weighted factors
 # Example: /recommendations/recommendations
 @recommendations.route("/recommendations/recommendations", methods=["POST"])
