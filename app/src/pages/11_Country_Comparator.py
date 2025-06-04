@@ -54,11 +54,15 @@ st.table(df)
 
 st.write("")
 st.write("")
-trackfeat = st.selectbox(
+feature = st.selectbox(
             "Track a feature over time:",
             features,
             index=None,
             placeholder="Select Feature ..."
         )
+st.write("Tracking %s over time" %feature)
+st.write("")
+plot = st.button("Plot", type="primary")
 
-st.line_chart(df)
+if plot:
+    st.line_chart(df)
