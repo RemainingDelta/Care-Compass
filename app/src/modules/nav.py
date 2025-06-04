@@ -55,8 +55,8 @@ def StrengthWeaknessNav():
 
 
 #### ------------------------ Policymaker Role ------------------------
-def PolicymakerNav():
-    st.sidebar.page_link("pages/20_Policymaker_Home.py", label="Policymaker", icon="🖥️")
+def PolicymakerHomeNav():
+    st.sidebar.page_link("pages/20_Policymaker_Home.py", label="Policymaker Home", icon="🖥️")
     
 
 def FeatOverTimeNav():
@@ -102,7 +102,7 @@ def SideBarLinks(show_home=False):
 
         # If the user is an administrator, give them access to the administrator pages
         if st.session_state["role"] == "policymaker":
-            PolicymakerNav()
+            PolicymakerHomeNav()
             FeatOverTimeNav()
             TargetScoresNav()
 

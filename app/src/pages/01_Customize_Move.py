@@ -16,7 +16,7 @@ SideBarLinks()
 st.header('CUSTOMIZE YOUR MOVE!')
 
 # You can access the session state to make a more customized/personalized app experience
-st.write(f"### Hi, {st.session_state['first_name']}. Rank the factors in order of priority -- 1 being the highest and 6 the lowest.")
+st.write(f"### Hi, {st.session_state['first_name']}. Rank the healthcare factors in order of priority -- 1 being the highest and 6 the lowest.")
 st.write("")
 st.write("")
 
@@ -39,7 +39,7 @@ with col1:
             "1:",
             options,
             index=None,
-            placeholder="Select PRIORITY healthcare factor...",
+            placeholder="Select PRIORITY factor...",
         )
         st.write("\n")
 
@@ -48,7 +48,7 @@ with col1:
             "2:",
             options,
             index=None,
-            placeholder="Select SECONDARY healthcare factor...",
+            placeholder="Select SECONDARY factor...",
         )
         st.write("\n")
 
@@ -56,7 +56,7 @@ with col1:
             "3:",
             options,
             index=None,
-            placeholder="Select TERTIARY healthcare factor...",
+            placeholder="Select TERTIARY factor...",
         )
     
 
@@ -65,7 +65,7 @@ with col1:
             "4:",
             options,
             index=None,
-            placeholder="Select QUARTERNARY healthcare factor...",
+            placeholder="Select QUARTERNARY factor...",
         )
         st.write("\n")
 
@@ -73,7 +73,7 @@ with col1:
             "5:",
             options,
             index=None,
-            placeholder="Select QUINARY healthcare factor...",
+            placeholder="Select QUINARY factor...",
         )
         st.write("\n")
 
@@ -81,7 +81,7 @@ with col1:
             "6:",
             options,
             index=None,
-            placeholder="Select SENARY healthcare factor...",
+            placeholder="Select SENARY factor...",
         )
 
 with col2:
