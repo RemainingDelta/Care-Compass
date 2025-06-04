@@ -2,7 +2,6 @@ import logging
 logger = logging.getLogger(__name__)
 import streamlit as st
 from modules.nav import SideBarLinks
-import requests
 import pandas as pd
 import numpy as np
 
@@ -28,6 +27,8 @@ st.scatter_chart(
     color="col4",
     size="col3",
 )
+
+st.plotly_chart()
 
 
 
@@ -94,3 +95,6 @@ with col4:
     impov_house = st.checkbox("Impoverished Households")
     if impov_house:
         st.write("NO")
+
+
+

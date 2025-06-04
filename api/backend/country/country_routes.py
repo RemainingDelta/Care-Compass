@@ -143,6 +143,7 @@ def update_country(country_id):
 # Example: /countries/<country_id>
 @countries.route("/countries/<int:country_id>", methods=["DELETE"])
 def delete_country(country_id):
+
     pass
 
 # Reads in GHS Index data
