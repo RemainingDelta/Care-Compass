@@ -7,7 +7,12 @@ import pydeck as pdk
 from urllib.error import URLError
 from modules.nav import SideBarLinks
 
+from modules.style import style_sidebar, set_background
+style_sidebar()
+set_background("assets/backdrop.jpg")
+
 SideBarLinks()
+
 
 # add the logo
 #add_logo("assets/logo.png", height=400)

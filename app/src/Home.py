@@ -28,14 +28,42 @@ st.session_state['authenticated'] = False
 # showSidebarNavigation = false in the [client] section
 SideBarLinks(show_home=True)
 
+from modules.style import style_sidebar, set_background
+style_sidebar()
+set_background("assets/backdrop.jpg")
+
 # ***************************************************
 #    The major content of this page
 # ***************************************************
 
 # set the title of the page and provide a simple prompt. 
 logger.info("Loading the Home page of the app")
-st.title('CARE COMPASS')
-st.write('\n\n')
+
+
+
+st.markdown("""
+    <style>
+    .centered-title {
+        height: 80vh; /* Full viewport height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .company-name {
+        font-size: 64px;
+        font-weight: bold;
+        color: 	#4682B4;
+        text-align: center;
+    }
+    </style>
+    <div class="centered-title">
+        <div class="company-name">CARE COMPASS</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Add space or content that appears lower on scroll
+st.markdown("---")
 st.write('### Welcome!')
 st.write('\n')
 st.write('#### As which user would you like to log in?')

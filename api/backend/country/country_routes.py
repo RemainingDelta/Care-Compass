@@ -41,6 +41,7 @@ def get_all_countries():
 
 
 
+
 # Get detailed country profile
 # Example: /countries/{country_id}/profile
 @countries.route("/countries/<int:country_id>/profile", methods=["GET"])

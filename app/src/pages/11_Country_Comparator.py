@@ -10,6 +10,10 @@ import numpy as np
 
 st.set_page_config(layout="wide")
 
+from modules.style import style_sidebar, set_background
+style_sidebar()
+set_background("assets/backdrop.jpg")
+
 # Display the appropriate sidebar links for the role of the logged in user
 SideBarLinks()
 
@@ -17,14 +21,29 @@ st.title("COUNTRY COMPARATOR")
 st.write("")
 st.write("")
 
-countries = []
+
+# Your backend endpoint URL
+url = "http://localhost:4000/country/countries"  
+
+# Make GET request for countries
+response = requests.get(url)
+
+# Check response
+if response.status_code == 200:
+    data = response.json()
+    country_list = data.get("countries", [])
+    print("Countries:", country_list)
+else:
+    print("Error:", response.status_code)
+
+
 features = []
 col1, col2, col3 = st.columns(3)
 
 with col1:
     country1 = st.selectbox(
             "Country 1:",
-            countries,
+            country_list,
             index=None,
             placeholder="Select Country 1 ..."
         )
@@ -32,7 +51,7 @@ with col1:
 with col2: 
     country2 = st.selectbox(
             "Country 2:",
-            countries,
+            country_list,
             index=None,
             placeholder="Select Country 2 ..."
     )
@@ -40,7 +59,7 @@ with col2:
 with col3: 
     country3 = st.selectbox(
             "Country 3:",
-            countries.insert(0, "N/A"),
+            country_list.insert(0, "N/A"),
             index=None,
             placeholder="Select Country 3 ..."
     )
