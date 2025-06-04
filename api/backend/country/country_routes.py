@@ -136,7 +136,60 @@ def get_similar_countries(country_id):
 # Example: /countries/<country_id>
 @countries.route("/countries/<int:country_id>", methods=["PUT"])
 def update_country(country_id):
-    pass
+    try:
+        data = request.get_json()
+
+        # Extract fields from JSON
+        name = data.get("name")
+        region = data.get("region")
+        strengths = data.get("strengths")
+        weaknesses = data.get("weaknesses")
+        score = data.get("score")
+        info = data.get("info")
+
+        current_app.logger.info("Updating country ID %s with new metadata", country_id)
+
+        # Validate at least one field is provided
+        if not any([name, region, strengths, weaknesses, score, info]):
+            return jsonify({"error": "No fields provided for update"}), 400
+
+        fields = []
+        values = []
+
+        if name:
+            fields.append("name = %s")
+            values.append(name)
+        if region:
+            fields.append("region = %s")
+            values.append(region)
+        if strengths:
+            fields.append("strengths = %s")
+            values.append(strengths)
+        if weaknesses:
+            fields.append("weaknesses = %s")
+            values.append(weaknesses)
+        if score is not None:
+            fields.append("score = %s")
+            values.append(score)
+        if info:
+            fields.append("info = %s")
+            values.append(info)
+
+        values.append(country_id)  # for WHERE clause
+
+        query = f"UPDATE country SET {', '.join(fields)} WHERE id = %s"
+
+        cursor = db.get_db().cursor()
+        cursor.execute(query, values)
+        db.get_db().commit()
+        cursor.close()
+
+        current_app.logger.info("Successfully updated country ID %s", country_id)
+        return jsonify({"message": "Country updated successfully"}), 200
+
+    except Error as e:
+        current_app.logger.error("Database error in update_country: %s", str(e))
+        return jsonify({"error": str(e)}), 500
 
 
 # Delete a country record (Admin only)
