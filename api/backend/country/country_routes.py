@@ -45,7 +45,40 @@ def get_all_countries():
 # Example: /countries/{country_id}/profile
 @countries.route("/countries/<int:country_id>/profile", methods=["GET"])
 def get_country_profile(country_id):
-    pass
+    try:
+        current_app.logger.info("Retrieving profile for country ID: %s", country_id)
+        cursor = db.get_db().cursor()
+        
+        # subject to change
+        cursor.execute("""
+            SELECT id, name, region, strengths, weaknesses, score, info, time     
+            FROM country
+            WHERE id = %s
+        """, (country_id,))
+        country = cursor.fetchone()
+
+        if not country:
+            current_app.logger.warning("Country ID %s not found", country_id)
+            return jsonify({"error": "Country not found"}), 404
+        
+        # Fetch all factor scores associated with the country
+        cursor.execute("""
+            SELECT name AS factor_name, score, weight
+            FROM factors
+            WHERE countryID = %s
+        """, (country_id,))
+        factors = cursor.fetchall()
+
+        # Attach factors to profile
+        country["factors"] = factors
+
+        cursor.close()
+        current_app.logger.info(f'Successfully retrieved profile for country ID: {country_id}')
+        return jsonify(country), 200
+    
+    except Error as e:
+            current_app.logger.error(f'Database error in get_country_profile: {str(e)}')
+            return jsonify({"error": str(e)}), 500
 
 
 # Get factor scores for a country
