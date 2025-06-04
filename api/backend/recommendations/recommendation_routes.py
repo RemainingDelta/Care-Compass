@@ -27,6 +27,7 @@ def get_recommendation_factors():
   "include_home_context": true
 }
 '''
+
 # Generate personalized country recommendations based on weighted factors
 # Example: /recommendations/recommendations
 @recommendations.route("/recommendations", methods=["POST"])
