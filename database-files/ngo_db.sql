@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS Projects (
     Focus_Area VARCHAR(100),
     Budget DECIMAL(15, 2),
     NGO_ID INT,
-    Start_Date DATE,
+    Start_Date DATE, 
     End_Date DATE,
     FOREIGN KEY (NGO_ID) REFERENCES WorldNGOs(NGO_ID)
 );

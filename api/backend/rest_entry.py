@@ -5,7 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from backend.db_connection import db
-from backend.simple.simple_routes import simple_routes
+from backend.country.country_routes import countries
 from backend.ngos.ngo_routes import ngos
 
 def create_app():
@@ -45,8 +45,8 @@ def create_app():
     # Register the routes from each Blueprint with the app object
     # and give a url prefix to each
     app.logger.info("create_app(): registering blueprints with Flask app object.")
-    app.register_blueprint(simple_routes)
-    app.register_blueprint(ngos, url_prefix="/ngo")
+    app.register_blueprint(countries, url_prefix="/country")
+    #app.register_blueprint(users, url_prefix="/ngo")
 
     # Don't forget to return the app object
     return app

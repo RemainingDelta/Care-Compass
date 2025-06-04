@@ -58,6 +58,9 @@ with col1:
             index=None,
             placeholder="Select TERTIARY factor...",
         )
+
+        st.write("")
+        st.button("Submit", type="primary")
     
 
     with col1b:

@@ -4,13 +4,41 @@ from mysql.connector import Error
 from flask import current_app
 
 
-countries = Blueprint("country", __name__)
+countries = Blueprint("country_routes", __name__)
 
 # Get list of all countries
 # Example: /country/countries 
 @countries.route("/countries", methods=["GET"])
 def get_all_countries():
-    pass
+    try:
+        current_app.logger.info('Starting get_all_countries request')
+        cursor = db.get_db().cursor()
+
+        # Get query parameters for filtering
+        score = request.args.get("score")
+            
+        current_app.logger.debug(f'Query parameters - score: {score}')
+
+        # Prepare the Base query
+        query = "SELECT * FROM Country WHERE 1=1"
+        params = []
+
+        # Add filters if provided
+        if score:
+            query += " AND SCORE = %s"
+            params.append(score)
+           
+        current_app.logger.debug(f'Executing query: {query} with params: {params}')
+        cursor.execute(query, params)
+        countries = cursor.fetchall()
+        cursor.close()
+
+        current_app.logger.info(f'Successfully retrieved {len(countries)} Countries')
+        return jsonify(countries), 200
+    except Error as e:
+        current_app.logger.error(f'Database error in get_all_countries: {str(e)}')
+        return jsonify({"error": str(e)}), 500
+
 
 
 # Get detailed country profile
