@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request
 from backend.db_connection import db
 from mysql.connector import Error
 from flask import current_app
-
+import numpy as np
+from backend.ml_models.regression import predict
 
 ml = Blueprint("ml", __name__)
 
@@ -18,11 +19,79 @@ Returns:
 """
 # Generate regression prediction for a feature across countries
 # Example: /ml/predict?feature=Health System&countries=1,2,3
-@ml.route("/ml/predict", methods=["GET"])
-def predict_feature_over_time():
-    feature = request.args.get("feature")
-    countries = request.args.get("countries")
-    return jsonify({"message": "Predicted values coming soon"})
+@ml.route("/ml/predict/<expenditure>/<country>", methods=["GET"])
+def predict_feature_over_time(expenditure,country):
+    # get a database cursor 
+    cursor = db.get_db().cursor()
+    
+    current_app.logger.info(f'expenditure = {expenditure}')
+    current_app.logger.info(f'country = {country}')
 
+    # get the model params from the database
+    query = 'SELECT year, expenditure, country FROM regression_model_params WHERE country = %s'
+    cursor.execute(query, (country),)
+    rows = cursor.fetchall()
 
+    #used chat -- said to build list of column names
+    col_names = [desc[0] for desc in cursor.description]
 
+    df_expenditure = pd.DataFrame(rows, columns=col_names)
+    
+    result = predict(df_expenditure, country)
+
+    return_dict = {
+        "slope": result["slope"],
+        "intercept": result["intercept"],
+        "mse": result['"mse"'],
+        "r2": result["r2"]
+    }
+
+    the_response = make_response(jsonify(return_dict))
+    the_response.status_code = 200
+    the_response.mimetype = 'application/json'
+    return the_response
+    
+    
+
+# model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/store-weights", methods=["POST"])
+def store_weights():
+    try:
+        data = request.get_json()
+
+        # Validate required fields
+        required_fields = ["country", "feature", "slope", "intercept"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
+        cursor = db.get_db().cursor()
+
+        # Insert new Weight
+        query = """
+        INSERT INTO regression_weights (country, feature, slope, intercept)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(
+            query,
+            (
+                data["country"],
+                data["feature"],
+                data["slope"],
+                data["intercept"],
+                data.get["mse", None],
+                data.get("r2", None)
+            )
+        )
+
+        db.get_db().commit()
+        new_weight_id = cursor.lastrowid
+        cursor.close()
+
+        return (
+            jsonify({"message": "Weight created successfully", "weight_id": new_weight_id}),
+            201,
+        )
+    except Error as e:
+        return jsonify({"error": str(e)}), 500

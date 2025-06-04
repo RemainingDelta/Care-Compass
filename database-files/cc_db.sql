@@ -102,5 +102,26 @@ CREATE TABLE user_score
     FOREIGN KEY (overallScore) REFERENCES overall_score(overallScore)
 );
 
+DROP TABLE IF EXISTS regression_model_params;
+CREATE TABLE regression_model_params
+(
+    year INT,
+    expenditure FLOAT,
+    country VARCHAR(50),
+    FOREIGN KEY (country) REFERENCES country(name)
+)
+
+DROP TABLE IF EXISTS regression_weights;
+CREATE TABLE regression_weights
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    country VARCHAR(50),
+    feature VARCHAR(50),
+    slope FLOAT,
+    intercept FLOAT,
+    mse FLOAT,
+    r2 FLOAT
+)
+
 
 
