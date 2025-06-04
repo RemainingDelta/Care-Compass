@@ -11,6 +11,7 @@ st.title("SET AND MONITOR TARGET SCORES")
 st.write("")
 
 col1, col2 = st.columns(2)
+
 countries = ["Afghanistan", "Cuba"]
 
 with col1:
@@ -27,38 +28,52 @@ with col1:
          # on_click=None, 
          # args=None,  
        # )
-    if st.button("Submit", type="primary"):
-        col2.write("Scores")
-        
-col2.subheader("Current Scores for %s" %country)
+    submit = st.button("Submit", type="primary")
+
+if submit:
+    col2.subheader("Current Scores for %s" %country)
+    col2.write("Scores")
 
 st.write("")
 st.write("")
 st.subheader("INPUT TARGET SCORES")
 cola,colb,colc = st.columns(3)
+
 with cola:
-    prevention = st.number_input("Prevention")
-    rapresp = st.number_input("Rapid Response")
+        prevention = st.number_input("Prevention")
+        rapresp = st.number_input("Rapid Response")
 
 with colb:
-    healthsys = st.number_input("Health System")
-    detectreport = st.number_input("Detection & Reporting")
+        healthsys = st.number_input("Health System")
+        detectreport = st.number_input("Detection & Reporting")
+       
+
 
 with colc:
-    intlnorms = st.number_input("International Norms Compliance")
-    riskenv = st.number_input("Risk Environment")
+        intlnorms = st.number_input("International Norms Compliance")
+        riskenv = st.number_input("Risk Environment")
+        st.write("")
+        calculate = st.button("Calculate", type="primary")
 
 st.write("")
 st.write("")
-st.subheader("PROJECTED TIME")
-progress_text = "Operation in progress. Please wait."
-my_bar = st.progress(0, text=progress_text)
+if calculate:
+    st.subheader("PROJECTED TIME")
+    progress_text = "Operation in progress. Please wait."
+    my_bar = st.progress(0, text=progress_text)
 
-for percent_complete in range(100):
-    time.sleep(0.01)
-    my_bar.progress(percent_complete + 1, text=progress_text)
-time.sleep(1)
-my_bar.empty()
+    for percent_complete in range(100):
+        time.sleep(0.01)
+        my_bar.progress(percent_complete + 1, text=progress_text)
+    time.sleep(1)
+    my_bar.empty()
 
-st.button("Rerun")
+    st.button("Rerun")
+
+
+
+
+
+
+
 
