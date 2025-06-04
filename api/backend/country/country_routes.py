@@ -4,6 +4,8 @@ from mysql.connector import Error
 from flask import current_app
 import sqlite3
 import pandas as pd 
+import requests
+import json
 
 
 countries = Blueprint("country_routes", __name__)
@@ -154,6 +156,44 @@ def get_ghs_index():
     df.to_sql('ghs_table', conn, if_exists="replace", index=False)
     cursor = conn.cursor()
     cursor.execute("SELECT 'Afghanistan' FROM ghs_table")
+    countries = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(countries), 200
+
+# Reads in Practitioners dataset
+# Example: /countries/practitioners
+@countries.route("/countries/practitioners", methods=["GET"])
+def get_practitioners():
+    if_exists = "replace"
+    headers = {
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    url = f'https://dw.euro.who.int/api/v3/measures/HLTHRES_67?output=data'
+    url_text = requests.get(url, headers=headers).text
+
+    result = json.loads(url_text)
+
+    data = result['data']
+
+    #print(data)
+    df_practitioners = pd.DataFrame()
+    final_dict = dict()
+
+    for item in data:
+    
+        final_dict['country'] = item['dimensions']['COUNTRY']
+        #final_dict['country_grp'] = item['dimensions']['COUNTRY_GRP']
+        final_dict['year'] = item['dimensions']['YEAR']
+        final_dict['practitioners'] = item['value']['numeric']
+        series = pd.Series(final_dict)
+        df_practitioners = pd.concat([df_practitioners, series.to_frame().T], ignore_index = True)
+
+    #current_app.logger.info(f'Successfully retrieved {len(countries)} Countries')
+    conn = sqlite3.connect(r"..\\..\database-files\\cc_db.sql")
+    df_practitioners.to_sql('practitioner_table', conn, if_exists="replace", index=False)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM practitioner_table")
     countries = cursor.fetchall()
     cursor.close()
     conn.close()
