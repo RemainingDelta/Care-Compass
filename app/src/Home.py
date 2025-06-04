@@ -34,7 +34,7 @@ SideBarLinks(show_home=True)
 
 # set the title of the page and provide a simple prompt. 
 logger.info("Loading the Home page of the app")
-st.title('Care Compass')
+st.title('CARE COMPASS')
 st.write('\n\n')
 st.write('### Welcome!')
 st.write('\n')

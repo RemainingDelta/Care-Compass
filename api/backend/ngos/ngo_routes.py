@@ -11,7 +11,7 @@ ngos = Blueprint("ngos", __name__)
 # Example: /ngo/ngos?country=United%20States&focus_area=Environmental%20Conservation
 @ngos.route("/ngos", methods=["GET"])
 def get_all_ngos():
-    try:
+    try: 
         current_app.logger.info('Starting get_all_ngos request')
         cursor = db.get_db().cursor()
 
