@@ -57,15 +57,38 @@ def predict_feature_over_time(expenditure,country):
     
     
 
+
+    
+# model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_cosine_similar/<chosen_country>", methods=["GET"])
+def get_cosine_similar(chosen_country):
+    df = get_similar(chosen_country)
+    print("Country received:", chosen_country)
+
+    result = df.to_dict()
+    return jsonify(result)
+
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_regression/<chosen_country>", methods=["GET"])
+def get_regression(chosen_country):
+    result = predict(dataframe(), chosen_country)
+    print("Country received:", chosen_country)
+
+    return jsonify(result)
+
 # model calls post to put weights in database
 # adds new regression weight from model to database
 @ml.route("/ml/store-weights", methods=["POST"])
 def store_weights():
     try:
         data = request.get_json()
+        result = predict(dataframe(), chosen_country)
 
         # Validate required fields
-        required_fields = ["country", "feature", "slope", "intercept"]
+        required_fields = ["country", "feature", "slope", "intercept", "mse", "r2"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -74,8 +97,8 @@ def store_weights():
 
         # Insert new Weight
         query = """
-        INSERT INTO regression_weights (country, feature, slope, intercept)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO regression_weights (country, feature, slope, intercept, mse, r2)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(
             query,
