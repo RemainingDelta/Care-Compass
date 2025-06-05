@@ -62,6 +62,8 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+st.markdown("We use real health data and machine learning to help users compare and understand global healthcare systems. Our platform lets you explore country profiles, visualize key trends, and get personalized recommendations based on your healthcare priorities.")
+
 # Add space or content that appears lower on scroll
 st.markdown("---")
 st.write('### Welcome!')
