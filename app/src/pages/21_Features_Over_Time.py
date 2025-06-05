@@ -17,35 +17,11 @@ SideBarLinks()
 st.title('FEATURES OVER TIME')
 st.write("Choose a region and your target country to view how including features changes scores over time.")
 st.write("")
-
-
-# EX DATA 
-chart_data = pd.DataFrame(
-    np.random.randn(20, 3), columns=["col1", "col2", "col3"]
-)
-chart_data["col4"] = np.random.choice(["A", "B", "C"], 20)
-
-st.scatter_chart(
-    chart_data,
-    x="col1",
-    y="col2",
-    color="col4",
-    size="col3",
-)
-
-
 col1,col2 = st.columns(2)
 countries = []
-regions = []
 time = []
 
 with col1: 
-    region = st.selectbox(
-        "Region:",
-        regions,
-        index=None,
-        placeholder="Select Region ..."
-    )
     
     country = st.selectbox(
         "Country:",
@@ -54,14 +30,7 @@ with col1:
         placeholder="Select Country ..."
     )
     
-    
 with col2:
-    time = st.selectbox(
-        "Time (years):",
-        time,
-        index=None,
-        placeholder="Select Time ..."
-    )
 
     end_date = st.date_input(
         "End Date:", 
@@ -69,6 +38,7 @@ with col2:
 
 st.write("")
 st.write("")
+
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
 
@@ -115,9 +85,19 @@ with col4:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
     
-    impov_house = st.checkbox("Impoverished Households")
+    impov_house = st.checkbox("Households Impoverished After Out of Pocket Healthcare Payments")
     if impov_house:
         st.write("NO")
 
+# EX DATA 
+chart_data = pd.DataFrame(
+    np.random.randn(20,2), columns=["feature", "time"]
+)
 
+st.scatter_chart(
+    chart_data,
+    x="time",
+    y="feature",
+ 
+)
 
