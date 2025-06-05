@@ -4,6 +4,7 @@ import streamlit as st
 from modules.nav import SideBarLinks
 import pandas as pd
 import numpy as np
+import requests
 
 st.set_page_config(layout = 'wide')
 
@@ -92,9 +93,29 @@ with col4:
     if gen_prac:
         st.write("Yea")
     
-    health_expen = st.checkbox("Total Health Expenditure per Capita")
-    if health_expen:
-        st.write("Money")
+    health_expen = st.button("Total Health Expenditure per Capita")
+    if health_expen: 
+        api_url = f"http://docker.internal:4000/ml/get_regression"
+
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Accept': 'application/json',
+                'Connection': 'keep-alive'
+            }
+
+            response = requests.get(api_url, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json
+                st.success("Prediction successful")
+                st.json(data)
+            else:
+                st.error(f"Error: {response.status_code}")
+                st.write(response.text)
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+            st.write(f"URL that worked : {api_url}")
     
     impov_house = st.checkbox("Impoverished Households")
     if impov_house:
