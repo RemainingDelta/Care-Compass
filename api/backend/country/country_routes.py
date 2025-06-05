@@ -30,7 +30,9 @@ def get_all_countries():
            
         current_app.logger.debug(f'Executing query: {query} with params: {params}')
         cursor.execute(query, params)
-        countries = cursor.fetchall()
+        
+        columns = [col[0] for col in cursor.description]
+        countries = [dict(zip(columns, row)) for row in cursor.fetchall()]
         cursor.close()
 
         current_app.logger.info(f'Successfully retrieved {len(countries)} Countries')

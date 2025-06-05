@@ -32,9 +32,6 @@ st.scatter_chart(
     size="col3",
 )
 
-st.plotly_chart()
-
-
 
 col1,col2 = st.columns(2)
 countries = []
