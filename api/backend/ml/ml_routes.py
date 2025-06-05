@@ -4,9 +4,10 @@ from mysql.connector import Error
 from flask import current_app
 from flask import make_response
 import numpy as np
-from backend.ml_models.regression import predict
-import requests 
 from backend.ml_models.cosine_similarity import get_similar
+from backend.ml_models.regression import dataframe
+from backend.ml_models.regression import predict
+
 
 ml = Blueprint("ml", __name__)
 
@@ -107,4 +108,14 @@ def get_cosine_similar(chosen_country):
     print("Country received:", chosen_country)
 
     result = df.to_dict()
+    return jsonify(result)
+
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_regression/<chosen_country>", methods=["GET"])
+def get_regression(chosen_country):
+    result = predict(dataframe(), chosen_country)
+    print("Country received:", chosen_country)
+
     return jsonify(result)
