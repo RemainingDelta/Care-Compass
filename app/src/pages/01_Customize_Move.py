@@ -18,7 +18,7 @@ set_background("assets/backdrop.jpg")
 SideBarLinks()
 
 # set the header of the page
-st.header('CUSTOMIZE YOUR MOVE!')
+st.title('CUSTOMIZE YOUR MOVE!')
 
 # You can access the session state to make a more customized/personalized app experience
 st.write(f"### Hi, {st.session_state['first_name']}. Rank the healthcare factors in order of priority -- 1 being the highest and 6 the lowest.")
