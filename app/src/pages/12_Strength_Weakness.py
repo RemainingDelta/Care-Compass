@@ -5,6 +5,10 @@ import requests
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
 
+from modules.style import style_sidebar, set_background
+style_sidebar()
+set_background("assets/backdrop.jpg")
+
 SideBarLinks()
 
 st.title("STRENGTHS VS. WEAKNESSES")

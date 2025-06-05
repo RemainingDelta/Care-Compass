@@ -9,6 +9,10 @@ import numpy as np
 import plotly.express as px
 from modules.nav import SideBarLinks
 
+from modules.style import style_sidebar, set_background
+style_sidebar()
+set_background("assets/backdrop.jpg")
+
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
 
