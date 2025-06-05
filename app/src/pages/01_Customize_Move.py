@@ -41,11 +41,17 @@ headers = {
     "Content-Type": "application/json"
 }
 
-button = st.button("Test Similarity with Vietnam")
-if button:
-    chosen_country = "Vietnam"
+st.title("Please input the country to get similarity scores:")
+
+# Text input box
+user_input = st.text_input("Enter Country Here:")
+
+# Submit button
+if st.button("Submit"):
+    st.write("You entered:", user_input)
+    #chosen_country = user_input 
     #Hard coding similarity for now: 
-    api_url = f"http://host.docker.internal:4000/ml/ml/get_cosine_similar/{chosen_country}"
+    api_url = f"http://host.docker.internal:4000/ml/ml/get_cosine_similar/{user_input}"
     response = requests.get(api_url, headers=headers, timeout=10)
     #print(response)
 
