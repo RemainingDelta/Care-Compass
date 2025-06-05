@@ -78,9 +78,20 @@ with col3:
             placeholder="Select Country 3 ..."
     )
 
-#EX DATAFRAME
+#EX DATAFRAME and countries
+country1="Belgium"
+country2="USA"
+country3="Argentina"
 df = pd.DataFrame(
-    np.random.randn(10, 5), columns=("col %d" % i for i in range(5))
+    np.random.randn(3, 6), 
+    index=[country1, country2, country3], 
+    columns=[
+        "Life Expectancy (years)",
+        "Infant Mortality Rate",
+        "Live Births per 1000 Population",
+        "General Practitioners per 10,000 Population",
+        "Total health Expenditure per Capita",
+        "Households Impoverished After Out of Pocket Healthcare Payments"]
 )
 
 st.table(df)
