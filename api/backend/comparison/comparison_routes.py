@@ -17,7 +17,26 @@ Returns:
 # Example: /compare?countries=1,2,3
 @comparison.route("/compare", methods=["GET"])
 def compare_countries():
-    pass
+    country_ids = request.args.get("countries")
+    if not country_ids:
+        return jsonify({"error": "Missing required query parameter: countries"}), 400
+
+    country_ids = [int(cid) for cid in country_ids.split(",")]
+
+    cursor = db.get_db().cursor()
+
+    query = """
+    SELECT c.id AS country_id, c.name AS country_name, f.name AS factor_name, f.score
+    FROM country c JOIN factors f ON f.countryID = c.id
+    WHERE c.id IN (%s)
+    ORDER BY c.id, f.name
+    """ % (",".join(["%s"] * len(country_ids)))
+
+    cursor.execute(query, tuple(country_ids))
+    results = cursor.fetchall()
+
+    return jsonify(results)
+
 
 
 """
@@ -32,4 +51,24 @@ Returns:
 # Example: /compare/timeseries?feature=Health System&countries=1,2,3
 @comparison.route("/compare/timeseries", methods=["GET"])
 def compare_feature_over_time():
-    pass
+    feature = request.args.get("feature")
+    countries = request.args.get("countries")
+    if not feature or not countries:
+        return jsonify({"error": "Missing required query parameters: feature and countries"}), 400
+
+    country_ids = [int(cid) for cid in countries.split(",")]
+
+    cursor = db.get_db().cursor()
+
+    query = """
+    SELECT c.name AS country_name, f.name AS factor_name, f.score, c.time
+    FROM country c JOIN factors f ON f.countryID = c.id
+    WHERE f.name = %s AND c.id IN (%s)
+    ORDER BY c.name, c.time
+    """ % ("%s", ",".join(["%s"] * len(country_ids)))
+
+    cursor.execute(query, (feature, *country_ids))
+    results = cursor.fetchall()
+
+    return jsonify(results)
+
