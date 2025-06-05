@@ -138,13 +138,13 @@ def show_fit(X, y, slope, intercept):
     plt.suptitle(f'y_hat = {slope:.3f} * x + {intercept:.3f}, MSE = {mse:.3f}')
 
 #gathers a creates dataframe for expenditure dataset
-def dataframe():
+def dataframe(code):
     headers = {
     "Accept": "application/json",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
            
-    url2 = f'https://dw.euro.who.int/api/v3/measures/HFA_570?output=data'
+    url2 = f"https://dw.euro.who.int/api/v3/measures/{code}?output=data"
     url_text2 = requests.get(url2, headers=headers).text
     result2 = json.loads(url_text2)
     #print(result2)

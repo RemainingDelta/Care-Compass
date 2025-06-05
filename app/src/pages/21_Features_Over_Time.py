@@ -71,6 +71,9 @@ st.write("")
 st.write("")
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
+chosen_country = st.text_input("Enter Country Here:")
+
+
 
 with col3:
     life_exp = st.checkbox("Life Expectancy (years)")
@@ -86,14 +89,11 @@ with col3:
         st.write("YES")
 
 with col4:
-    gen_prac = st.checkbox("General Practitioners per 10,000 Population")
+    gen_prac = st.button("General Practitioners per 10,000 Population")
     if gen_prac:
-        st.write("Yea")
-    
-    health_expen = st.button("Total Health Expenditure per Capita")
-    if health_expen:
-        chosen_country = "BEL" 
-        api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country}"
+        data_code = "HLTHRES_67"
+        st.write("Country Code", chosen_country) 
+        api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
             headers = {
@@ -115,9 +115,57 @@ with col4:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
     
-    impov_house = st.checkbox("Impoverished Households")
+    health_expen = st.button("Total Health Expenditure per Capita")
+    if health_expen:
+        data_code = "HFA_570"
+        st.write("Country Code", chosen_country) 
+        api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+
+        try:
+            headers = {
+                "User-Agent": "Python/requests",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+
+            response = requests.get(api_url, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()  
+                st.success("Here are the values for the line of best fit!")
+                st.json(data)
+            else:
+                st.error(f"Error: {response.status_code}")
+                st.write(response.text)
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+            st.write(f"URL that worked : {api_url}")
+    
+    impov_house = st.button("Impoverished Households")
     if impov_house:
-        st.write("NO")
+        data_code = "UHCFP_2"
+        st.write("Country Code", chosen_country) 
+        api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+
+        try:
+            headers = {
+                "User-Agent": "Python/requests",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+
+            response = requests.get(api_url, headers=headers, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()  
+                st.success("Here are the values for the line of best fit!")
+                st.json(data)
+            else:
+                st.error(f"Error: {response.status_code}")
+                st.write(response.text)
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+            st.write(f"URL that worked : {api_url}")
 
 
 

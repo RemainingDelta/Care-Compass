@@ -113,9 +113,10 @@ def get_cosine_similar(chosen_country):
 
 #model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/ml/get_regression/<chosen_country>", methods=["GET"])
-def get_regression(chosen_country):
-    result = predict(dataframe(), chosen_country)
-    print("Country received:", chosen_country)
+@ml.route("/ml/get_regression/<input>", methods=["GET"])
+def get_regression(input):
+    inputs = [str(x.strip()) for x in input.split(',')]
+    result = predict(dataframe(inputs[1]), inputs[0])
+    print("Country received:", inputs[0])
 
     return jsonify(result)
