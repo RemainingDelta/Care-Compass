@@ -14,10 +14,6 @@ import pandas as pd
 
 def get_similar(chosen_country):
 
-  headers = {
-    "Accept": "application/json",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-  }
 
 # Fix this to not just call API here?
   ghs_index = pd.read_csv('https://www.ghsindex.org/wp-content/uploads/2022/04/2021-GHS-Index-April-2022.csv')

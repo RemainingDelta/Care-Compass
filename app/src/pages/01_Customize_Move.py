@@ -4,10 +4,11 @@ import pandas as pd
 import streamlit as st
 from streamlit_extras.app_logo import add_logo
 import world_bank_data as wb
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
-import plotly.express as px
+#import plotly.express as px
 from modules.nav import SideBarLinks
+import requests
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -32,6 +33,28 @@ df = pd.DataFrame(
     np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
     columns=["lat", "lon"],
 )
+
+
+headers = {
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "Connection":'keep-alive'
+  }
+
+button = st.button("Test Similarity with Vietnam")
+if button:
+    chosen_country = "Vietnam"
+    #Hard coding similarity for now: 
+    api_url = f"http://host.docker.internal:4000/ml/ml/get_cosine_similar/{chosen_country}"
+    response = requests.get(api_url, headers=headers, timeout=10)
+    #print(response)
+
+    if response.status_code == 200:
+         data = response.json()  
+         st.success("It worked!")
+         st.json(data) 
+
+
 
 col1, col2 = st.columns(2)
 
