@@ -194,8 +194,8 @@ def predict(df_expenditure, country_name):
     relation_dict = linreg_predict(train_test[1], train_test[3], fit)
     #graph = show_fit(X, y, fit[1], fit[0])
     return {
-        "slope": fit[0],
-        "intercept": fit[1],
+        "slope": fit[1],
+        "intercept": fit[0],
         "mse": relation_dict['mse'],
         "r2": relation_dict['r2']
     }

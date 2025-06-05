@@ -106,7 +106,7 @@ with col4:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("It worked!")
+                st.success("Here are the values for the line of best fit!")
                 st.json(data)
             else:
                 st.error(f"Error: {response.status_code}")

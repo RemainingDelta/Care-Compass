@@ -54,6 +54,7 @@ def StrengthWeaknessNav():
 
 
 
+
 #### ------------------------ Policymaker Role ------------------------
 def PolicymakerHomeNav():
     st.sidebar.page_link("pages/20_Policymaker_Home.py", label="Policymaker Home", icon="👤")
@@ -98,6 +99,7 @@ def SideBarLinks(show_home=False):
             StudentHomeNav()
             CountryComparatorNav()
             StrengthWeaknessNav()
+            CountryProfNav()
 
 
         # If the user is an administrator, give them access to the administrator pages
