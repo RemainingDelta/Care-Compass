@@ -21,24 +21,36 @@ st.title("COUNTRY COMPARATOR")
 st.write("")
 st.write("")
 
+headers = {
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0"
+}
 
 # Your backend endpoint URL
-url = "http://localhost:4000/country/countries"  
+url = "http://host.docker.internal:4000/country/countries"  
 
-# Make GET request for countries
-response = requests.get(url)
+country_list = []
 
-# Check response
-if response.status_code == 200:
+try:
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
     data = response.json()
-    country_list = data.get("countries", [])
-    print("Countries:", country_list)
-else:
-    print("Error:", response.status_code)
 
+    st.write("Raw API response:", data)
+
+    # If the response is a list of country dicts
+    country_list = [item["country"] for item in data]
+
+    print("Countries:", country_list)
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
 
 features = []
 col1, col2, col3 = st.columns(3)
+
 
 with col1:
     country1 = st.selectbox(
@@ -59,7 +71,7 @@ with col2:
 with col3: 
     country3 = st.selectbox(
             "Country 3:",
-            country_list.insert(0, "N/A"),
+            country_list,
             index=None,
             placeholder="Select Country 3 ..."
     )

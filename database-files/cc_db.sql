@@ -6,15 +6,22 @@ USE cc_database;
 DROP TABLE IF EXISTS Country;
 CREATE TABLE Country
 (
-    id   INT PRIMARY KEY,
-    name        VARCHAR(50),
-    region      VARCHAR(50),
+    Continent VARCHAR(50),
+    name        VARCHAR(50) PRIMARY KEY,
+);
+
+DROP TABLE IF EXISTS CountryInfo;
+CREATE TABLE CountryInfo
+(
+    country VARCHAR(50),
     strengths   VARCHAR(50),
     weaknesses  VARCHAR(50),
     score       FLOAT,
     info        VARCHAR(50),
-    time        DATETIME
-);
+    FOREIGN KEY (country) REFERENCES Country(name),
+    FOREIGN KEY (score) REFERENCES Overall_Score("OVERALL SCORE")
+)
+
 
 -- create users table
 DROP TABLE IF EXISTS users;
@@ -27,8 +34,8 @@ CREATE TABLE users
     accessibilityWeight FLOAT,
     affordabilityWeight FLOAT,
     outcomeWeight       FLOAT,
-    countryID       INT,
-    FOREIGN KEY (countryID) REFERENCES Country (id)
+    country       VARCHAR(50),
+    FOREIGN KEY (country) REFERENCES Country (name)
 );
 
 -- create score projection table
@@ -39,17 +46,21 @@ CREATE TABLE score_project
     targetScore     FLOAT primary key
 );
 
+DROP TABLE IF EXISTS Overall_Score
+CREATE TABLE Overall_Score(
+   Country                                                                                            VARCHAR(31) NOT NULL PRIMARY KEY
+  ,Year                                                                                               INTEGER  NOT NULL
+  ,"OVERALL SCORE"                                                                                    NUMERIC(4,1) NOT NULL
+  ,"1 PREVENTION OF THE EMERGENCE OR RELEASE OF PATHOGENS"                                            NUMERIC(4,1) NOT NULL
+  ,"2 EARLY DETECTION REPORTING FOR EPIDEMICS OF POTENTIAL INTL CONCERN"                              NUMERIC(4,1) NOT NULL
+  ,"3 RAPID RESPONSE TO AND MITIGATION OF THE SPREAD OF AN EPIDEMIC"                                  NUMERIC(4,1) NOT NULL
+  ,"4 SUFFICIENT ROBUST HEALTH SECTOR TO TREAT THE SICK PROTECT HEALTH WORKERS"                       NUMERIC(4,1) NOT NULL
+  ,"5 COMMITMENTS TO IMPROVING NATIONAL CAPACITY FINANCING AND ADHERENCE TO NORMS"                    NUMERIC(4,1) NOT NULL
+  ,"6 OVERALL RISK ENVIRONMENT AND COUNTRY VULNERABILITY TO BIOLOGICAL THREATS"                       NUMERIC(4,1) NOT NULL
 
--- create overall score table
-DROP TABLE IF EXISTS overall_score;
-CREATE TABLE overall_score
-(
-    overallScore FLOAT PRIMARY KEY,
-    qualityScore FLOAT,
-    accessibilityScore FLOAT,
-    affordabilityScore FLOAT,
-    outcomeScore FLOAT
-);
+  ,FOREIGN KEY (Country) REFERENCES Country(name)
+  );
+
 
 -- create factors table
 DROP TABLE IF EXISTS factors;
@@ -59,36 +70,38 @@ CREATE TABLE factors
     name        VARCHAR(50),
     score       FLOAT,
     weight      FLOAT,
-    countryID   INT,
+    country   VARCHAR(50),
     overallScore   FLOAT,
     targetScore     FLOAT,
-    FOREIGN KEY (countryID) REFERENCES Country(id),
-    FOREIGN KEY (overallScore) REFERENCES overall_score(overallScore),
+    FOREIGN KEY (country) REFERENCES Country(name),
+    FOREIGN KEY (overallScore) REFERENCES Overall_Score("OVERALL SCORE"),
     FOREIGN KEY (targetScore) REFERENCES score_project(targetScore)
 );
+
+
 
 
 -- create comparator table
 DROP TABLE IF EXISTS comparator;
 CREATE TABLE comparator
 (
-    country1ID  INT,
-    country2ID  INT,
-    country3ID INT,
-    FOREIGN KEY (country1ID) REFERENCES Country(id),
-    FOREIGN KEY (country2ID) REFERENCES Country(id),
-    FOREIGN KEY (country3ID) REFERENCES Country(id)
+    country1  VARCHAR(50),
+    country2  VARCHAR(50),
+    country3 VARCHAR(50),
+    FOREIGN KEY (country1) REFERENCES Country(name),
+    FOREIGN KEY (country2) REFERENCES Country(name),
+    FOREIGN KEY (country3) REFERENCES Country(name)
 );
 
 -- create country_compare table
 DROP TABLE IF EXISTS country_compare;
 CREATE TABLE country_compare
 (
-    countryID   INT,
-    Country1_ID   INT,
-    Country2_ID    INT,
-    Country3_ID   INT,
-    FOREIGN KEY (countryID) REFERENCES Country(id)
+    country   VARCHAR(50),
+    Country1   VARCHAR(50),
+    Country2   VARCHAR(50),
+    Country3   VARCHAR(50),
+    FOREIGN KEY (country) REFERENCES Country(name)
 
 );
 

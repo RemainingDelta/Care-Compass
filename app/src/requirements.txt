@@ -13,3 +13,4 @@ plotly
 seaborn
 scikit-learn
 shap
+requests
