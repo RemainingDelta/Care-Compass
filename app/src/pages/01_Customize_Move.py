@@ -36,10 +36,10 @@ df = pd.DataFrame(
 
 
 headers = {
+    "User-Agent": "Python/requests",
     "Accept": "application/json",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-    "Connection":'keep-alive'
-  }
+    "Content-Type": "application/json"
+}
 
 button = st.button("Test Similarity with Vietnam")
 if button:

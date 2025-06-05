@@ -97,9 +97,9 @@ with col4:
 
         try:
             headers = {
-                'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                'Connection': 'keep-alive'
+                "User-Agent": "Python/requests",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
             }
 
             response = requests.get(api_url, headers=headers, timeout=10)

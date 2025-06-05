@@ -22,9 +22,11 @@ st.write("")
 st.write("")
 
 headers = {
+    "User-Agent": "Python/requests",
     "Accept": "application/json",
-    "User-Agent": "Mozilla/5.0"
+    "Content-Type": "application/json"
 }
+
 
 # Your backend endpoint URL
 url = "http://host.docker.internal:4000/country/countries"  
