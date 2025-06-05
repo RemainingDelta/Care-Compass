@@ -2,8 +2,11 @@ from flask import Blueprint, jsonify, request
 from backend.db_connection import db
 from mysql.connector import Error
 from flask import current_app
+from flask import make_response
 import numpy as np
 from backend.ml_models.regression import predict
+import requests 
+from backend.ml_models.cosine_similarity import get_similar
 
 ml = Blueprint("ml", __name__)
 
@@ -95,3 +98,13 @@ def store_weights():
         )
     except Error as e:
         return jsonify({"error": str(e)}), 500
+    
+# model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_cosine_similar/<chosen_country>", methods=["GET"])
+def get_cosine_similar(chosen_country):
+    df = get_similar(chosen_country)
+    print("Country received:", chosen_country)
+
+    result = df.to_dict()
+    return jsonify(result)
