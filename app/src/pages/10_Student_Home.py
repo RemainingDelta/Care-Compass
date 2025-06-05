@@ -27,3 +27,30 @@ if st.button('View Country Strength & Weakness Profiles',
              type='primary',
              use_container_width=True):
   st.switch_page('pages/12_Strength_Weakness.py')
+
+if st.button('View Country Profile', 
+             type='primary',
+             use_container_width=True):
+  st.switch_page('pages/02_Country_Profile.py')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
