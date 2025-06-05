@@ -91,21 +91,22 @@ with col4:
         st.write("Yea")
     
     health_expen = st.button("Total Health Expenditure per Capita")
-    if health_expen: 
-        api_url = f"http://docker.internal:4000/ml/get_regression"
+    if health_expen:
+        chosen_country = "BEL" 
+        api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country}"
 
         try:
             headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                 'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                 'Connection': 'keep-alive'
             }
 
             response = requests.get(api_url, headers=headers, timeout=10)
 
             if response.status_code == 200:
-                data = response.json
-                st.success("Prediction successful")
+                data = response.json()  
+                st.success("It worked!")
                 st.json(data)
             else:
                 st.error(f"Error: {response.status_code}")

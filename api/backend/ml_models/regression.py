@@ -2,8 +2,8 @@ import requests
 import pandas as pd
 import numpy as np
 import json
-import plotly.express as px
-import plotly.graph_objects as go
+#import plotly.express as px
+#import plotly.graph_objects as go
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
@@ -181,14 +181,8 @@ def dataframe():
 def predict(df_expenditure, country_name):
     #print(series)
     #pd.set_option('display.max_rows', None)
-    col_num_list = ['year', 'expenditure']
-    df_expenditure_num = df_expenditure.loc[:, col_num_list]
-    df_expenditure_scaled = pd.DataFrame()
-    for item in df_expenditure_num.columns:
-        df_expenditure_scaled[f'{item}_scaled'] = ((df_expenditure_num[item] - df_expenditure_num[item].mean()) / df_expenditure_num[item].std()).round(3)
-    
-    df_expenditure_scaled['country'] = df_expenditure['country']  # make sure 'country' column is retained
-    df_expenditure_country = df_expenditure_scaled[(df_expenditure_scaled['country'] == country_name)]
+    df_expenditure['year'] = df_expenditure['year'].astype(float)
+    df_expenditure_country = df_expenditure[(df_expenditure['country'] == country_name)]
 
     X = np.array(df_expenditure_country['year'])
     y = np.array(df_expenditure_country['expenditure'])
@@ -198,7 +192,7 @@ def predict(df_expenditure, country_name):
     #finds the line of best fit based on the training data and compares it to the testing data
     fit = line_of_best_fit(train_test[0], train_test[2])
     relation_dict = linreg_predict(train_test[1], train_test[3], fit)
-    graph = show_fit(X, y, fit[1], fit[0])
+    #graph = show_fit(X, y, fit[1], fit[0])
     return {
         "slope": fit[0],
         "intercept": fit[1],
