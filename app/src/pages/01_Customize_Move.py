@@ -31,7 +31,7 @@ options = ["Prevention","Health System","Rapid Response","Detection & Reporting"
 #EX DATAFRAME
 df = pd.DataFrame(
     np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
-    columns=["lat", "lon"],
+    columns=["countries","features"],
 )
 
 
@@ -121,11 +121,11 @@ with col1:
         )
 
 with col2:
-    on = st.toggle("Map / Bar Chart")
+    on = st.toggle("Bar Chart / Map")
 
     if on:
-        st.bar_chart(df)
-    else: st.map(df)
+        st.map(df)
+    else: st.bar_chart(df)
 
 
 st.write("")

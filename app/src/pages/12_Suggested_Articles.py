@@ -11,7 +11,7 @@ set_background("assets/backdrop.jpg")
 
 SideBarLinks()
 
-st.title("STRENGTHS VS. WEAKNESSES")
+st.title("SUGGESTED HEALTHCARE ARTICLES")
 
 
 # CHANGE CODE
