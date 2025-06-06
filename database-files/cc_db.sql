@@ -155,6 +155,16 @@ CREATE TABLE train_test
     FOREIGN KEY (country) REFERENCES Countries(code)
 )
 
+DROP TABLE IF EXISTS births_table;
+CREATE TABLE births_table
+(
+   COUNTRY     VARCHAR(3) NOT NULL PRIMARY KEY
+  ,COUNTRY_GRP VARCHAR(17)
+  ,SEX         VARCHAR(3) NOT NULL
+  ,YEAR        INTEGER  NOT NULL
+  ,VALUE       NUMERIC(5,2) NOT NULL
+)
+
 
 
 

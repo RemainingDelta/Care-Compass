@@ -120,3 +120,36 @@ def get_regression(input):
     print("Country received:", inputs[0])
 
     return jsonify(result)
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_graph_data/<input>", methods=["GET"])
+def get_graph_data(input):
+    inputs = [str(x.strip()) for x in input.split(',')]
+    result = dataframe(inputs[1])
+    result.to_dict()
+    print("Country received:", inputs[0])
+
+    return jsonify(result)
+
+#gets all the countries in the live births dataset
+@ml.route("/ml/get_countries", methods=["GET"])
+def get_countries():
+    # get a database cursor 
+    cursor = db.get_db().cursor()
+    
+    #cursor.execute('''
+    #CREATE TABLE IF NOT EXISTS births_table(
+       #COUNTRY     VARCHAR(3) NOT NULL PRIMARY KEY
+      #,COUNTRY_GRP VARCHAR(17)
+      #,SEX         VARCHAR(3) NOT NULL
+      #,YEAR        INTEGER  NOT NULL
+      #,VALUE       NUMERIC(5,2) NOT NULL
+    #)
+    #''')
+    
+    
+    # Query distinct countries
+    cursor.execute("SELECT DISTINCT COUNTRY FROM births_table WHERE COUNTRY IS NOT NULL ORDER BY COUNTRY")
+    countries = [row[0] for row in cursor.fetchall()]
+    return countries
