@@ -121,6 +121,17 @@ def get_regression(input):
 
     return jsonify(result)
 
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_graph_data/<input>", methods=["GET"])
+def get_graph_data(input):
+    inputs = [str(x.strip()) for x in input.split(',')]
+    result = dataframe(inputs[1])
+    result.to_dict()
+    print("Country received:", inputs[0])
+
+    return jsonify(result)
+
 #gets all the countries in the live births dataset
 @ml.route("/ml/get_countries", methods=["GET"])
 def get_countries():

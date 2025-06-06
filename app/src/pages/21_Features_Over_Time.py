@@ -83,7 +83,7 @@ if all_countries.status_code == 200:
 else:
     st.error(f"Error: {all_countries.status_code}")
     st.write(all_countries.text)
-option = st.selectbox("Select A Country", tuple(all_countries))
+#option = st.selectbox("Select A Country", tuple(all_countries))
 chosen_country = st.text_input("Enter Country Here:")
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
