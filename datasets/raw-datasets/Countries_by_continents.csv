@@ -1,197 +1,197 @@
-﻿Continent,Country
-Africa,Algeria
-Africa,Angola
-Africa,Benin
-Africa,Botswana
-Africa,Burkina
-Africa,Burundi
-Africa,Cameroon
-Africa,Cape Verde
-Africa,Central African Republic
-Africa,Chad
-Africa,Comoros
-Africa,Congo
-Africa,Democratic Republic of Congo
-Africa,Djibouti
-Africa,Egypt
-Africa,Equatorial Guinea
-Africa,Eritrea
-Africa,Ethiopia
-Africa,Gabon
-Africa,Gambia
-Africa,Ghana
-Africa,Guinea
-Africa,Guinea-Bissau
-Africa,Ivory Coast
-Africa,Kenya
-Africa,Lesotho
-Africa,Liberia
-Africa,Libya
-Africa,Madagascar
-Africa,Malawi
-Africa,Mali
-Africa,Mauritania
-Africa,Mauritius
-Africa,Morocco
-Africa,Mozambique
-Africa,Namibia
-Africa,Niger
-Africa,Nigeria
-Africa,Rwanda
-Africa,Sao Tome and Principe
-Africa,Senegal
-Africa,Seychelles
-Africa,Sierra Leone
-Africa,Somalia
-Africa,South Africa
-Africa,South Sudan
-Africa,Sudan
-Africa,Swaziland
-Africa,Tanzania
-Africa,Togo
-Africa,Tunisia
-Africa,Uganda
-Africa,Zambia
-Africa,Zimbabwe
-Asia,Afghanistan
-Asia,Bahrain
-Asia,Bangladesh
-Asia,Bhutan
-Asia,Brunei
-Asia,Burma (Myanmar)
-Asia,Cambodia
-Asia,China
-Asia,East Timor
-Asia,Hong Kong
-Asia,India
-Asia,Indonesia
-Asia,Iran
-Asia,Iraq
-Asia,Israel
-Asia,Japan
-Asia,Jordan
-Asia,Kazakhstan
-Asia,North Korea
-Asia,South Korea
-Asia,Kuwait
-Asia,Kyrgyzstan
-Asia,Laos
-Asia,Lebanon
-Asia,Malaysia
-Asia,Maldives
-Asia,Mongolia
-Asia,Nepal
-Asia,Oman
-Asia,Pakistan
-Asia,Philippines
-Asia,Qatar
-Asia,Russia
-Asia,Saudi Arabia
-Asia,Singapore
-Asia,Sri Lanka
-Asia,Syria
-Asia,Taiwan
-Asia,Tajikistan
-Asia,Thailand
-Europe,Turkey
-Asia,Turkmenistan
-Asia,United Arab Emirates
-Asia,Uzbekistan
-Asia,Vietnam
-Asia,Yemen
-Europe,Albania
-Europe,Andorra
-Europe,Armenia
-Europe,Austria
-Europe,Azerbaijan
-Europe,Belarus
-Europe,Belgium
-Europe,Bosnia and Herzegovina
-Europe,Bulgaria
-Europe,Croatia
-Europe,Cyprus
-Europe,Czechia
-Europe,Denmark
-Europe,Estonia
-Europe,Finland
-Europe,France
-Europe,Georgia
-Europe,Germany
-Europe,Greece
-Europe,Hungary
-Europe,Iceland
-Europe,Ireland
-Europe,Italy
-Europe,Latvia
-Europe,Liechtenstein
-Europe,Lithuania
-Europe,Luxembourg
-Europe,Macedonia
-Europe,Malta
-Europe,Moldova
-Europe,Monaco
-Europe,Montenegro
-Europe,Netherlands
-Europe,Norway
-Europe,Poland
-Europe,Portugal
-Europe,Romania
-Europe,San Marino
-Europe,Serbia
-Europe,Slovakia
-Europe,Slovenia
-Europe,Spain
-Europe,Sweden
-Europe,Switzerland
-Europe,Ukraine
-Europe,United Kingdom
-Europe,Vatican City
-North America,Antigua and Barbuda
-North America,Bahamas
-North America,Barbados
-North America,Belize
-North America,Canada
-North America,Costa Rica
-North America,Cuba
-North America,Dominica
-North America,Dominican Republic
-North America,El Salvador
-North America,Grenada
-North America,Guatemala
-North America,Haiti
-North America,Honduras
-North America,Jamaica
-North America,Mexico
-North America,Nicaragua
-North America,Panama
-North America,Saint Kitts and Nevis
-North America,Saint Lucia
-North America,Saint Vincent and the Grenadines
-North America,Trinidad and Tobago
-North America,United States
-Oceania,Australia
-Oceania,Fiji
-Oceania,Kiribati
-Oceania,Marshall Islands
-Oceania,Micronesia
-Oceania,Nauru
-Oceania,New Zealand
-Oceania,Palau
-Oceania,Papua New Guinea
-Oceania,Samoa
-Oceania,Solomon Islands
-Oceania,Tonga
-Oceania,Tuvalu
-Oceania,Vanuatu
-South America,Argentina
-South America,Bolivia
-South America,Brazil
-South America,Chile
-South America,Colombia
-South America,Ecuador
-South America,Guyana
-South America,Paraguay
-South America,Peru
-South America,Suriname
-South America,Uruguay
-South America,Venezuela
+﻿Continent,Country,Code
+Africa,Algeria,DZA
+Africa,Angola,AND
+Africa,Benin,BEN
+Africa,Botswana,BWA
+Africa,Burkina,BFA
+Africa,Burundi,BDI
+Africa,Cameroon,CMR
+Africa,Cape Verde,CPV
+Africa,Central African Republic,CAF
+Africa,Chad,TCD
+Africa,Comoros,COM
+Africa,Congo,COG
+Africa,Democratic Republic of Congo,COD
+Africa,Djibouti,DJI
+Africa,Egypt,EGY
+Africa,Equatorial Guinea,GNQ
+Africa,Eritrea,ERI
+Africa,Ethiopia,ETH
+Africa,Gabon,GAB
+Africa,Gambia,GMB
+Africa,Ghana,GHA
+Africa,Guinea,GIN
+Africa,Guinea-Bissau,GNB
+Africa,Ivory Coast,CIV
+Africa,Kenya,KEN
+Africa,Lesotho,LSO
+Africa,Liberia,LBR
+Africa,Libya,LBY
+Africa,Madagascar,MDG
+Africa,Malawi,MWI
+Africa,Mali,MLI
+Africa,Mauritania,MRT
+Africa,Mauritius,MUS
+Africa,Morocco,MAR
+Africa,Mozambique,MOZ
+Africa,Namibia,NAM
+Africa,Niger,NER
+Africa,Nigeria,NGA
+Africa,Rwanda,RWA
+Africa,Sao Tome and Principe,STP
+Africa,Senegal,SEN
+Africa,Seychelles,SYC
+Africa,Sierra Leone,SLE
+Africa,Somalia,SOM
+Africa,South Africa,ZAF
+Africa,South Sudan,SSD
+Africa,Sudan,SDN
+Africa,Swaziland,SWZ
+Africa,Tanzania,TZA
+Africa,Togo,TGO
+Africa,Tunisia,TUN
+Africa,Uganda,UGA
+Africa,Zambia,ZMB
+Africa,Zimbabwe,ZWE
+Asia,Afghanistan,AFG
+Asia,Bahrain,BHR
+Asia,Bangladesh,BGD
+Asia,Bhutan,BTN
+Asia,Brunei,BRN
+Asia,Burma (Myanmar),MMR
+Asia,Cambodia,KHM
+Asia,China,CHN
+Asia,East Timor,TLS
+Asia,Hong Kong,HKG
+Asia,India,IND
+Asia,Indonesia,IDN
+Asia,Iran,IRN
+Asia,Iraq,IRQ
+Asia,Israel,ISR
+Asia,Japan,JPN
+Asia,Jordan,JOR
+Asia,Kazakhstan,KAZ
+Asia,North Korea,PRK
+Asia,South Korea,KOR
+Asia,Kuwait,KWT
+Asia,Kyrgyzstan,KGZ
+Asia,Laos,LAO
+Asia,Lebanon,LBN
+Asia,Malaysia,MYS
+Asia,Maldives,MDV
+Asia,Mongolia,MNG
+Asia,Nepal,NPL
+Asia,Oman,OMN
+Asia,Pakistan,PAK
+Asia,Philippines,PHL
+Asia,Qatar,QAT
+Asia,Russia,RUS
+Asia,Saudi Arabia,SAU
+Asia,Singapore,SGP
+Asia,Sri Lanka,LKA
+Asia,Syria,SYR
+Asia,Taiwan,TWN
+Asia,Tajikistan,TJK
+Asia,Thailand,THA
+Europe,Turkey,TUR
+Asia,Turkmenistan,TKM
+Asia,United Arab Emirates,ARE
+Asia,Uzbekistan,UZB
+Asia,Vietnam,VNM
+Asia,Yemen,YEM
+Europe,Albania,ALB
+Europe,Andorra,AND
+Europe,Armenia,ARM
+Europe,Austria,AUT
+Europe,Azerbaijan,AZE
+Europe,Belarus,BLR
+Europe,Belgium,BEL
+Europe,Bosnia and Herzegovina,BIH
+Europe,Bulgaria,BGR
+Europe,Croatia,HRV
+Europe,Cyprus,CYP
+Europe,Czechia,CZE
+Europe,Denmark,DNK
+Europe,Estonia,EST
+Europe,Finland,FIN
+Europe,France,FRA
+Europe,Georgia,GEO
+Europe,Germany,DEU
+Europe,Greece,GRC
+Europe,Hungary,HUN
+Europe,Iceland,ISL
+Europe,Ireland,IRL
+Europe,Italy,ITA
+Europe,Latvia,LVA
+Europe,Liechtenstein,LIE
+Europe,Lithuania,LTU
+Europe,Luxembourg,LUX
+Europe,Macedonia,MKD
+Europe,Malta,MLT
+Europe,Moldova,MDA
+Europe,Monaco,MCO
+Europe,Montenegro,MNE
+Europe,Netherlands,NLD
+Europe,Norway,NOR
+Europe,Poland,POL
+Europe,Portugal,PRT
+Europe,Romania,ROU
+Europe,San Marino,SMR
+Europe,Serbia,SRB
+Europe,Slovakia,SVK
+Europe,Slovenia,SVN
+Europe,Spain,ESP
+Europe,Sweden,SWE
+Europe,Switzerland,CHE
+Europe,Ukraine,UKR
+Europe,United Kingdom,GBR
+Europe,Vatican City,VAT
+North America,Antigua and Barbuda,ATG
+North America,Bahamas,BHS
+North America,Barbados,BRB
+North America,Belize,BLZ
+North America,Canada,CAN
+North America,Costa Rica,CRI
+North America,Cuba,CUB
+North America,Dominica,DMA
+North America,Dominican Republic,DOM
+North America,El Salvador,SLV
+North America,Grenada,GRD
+North America,Guatemala,GTM
+North America,Haiti,HTI
+North America,Honduras,HND
+North America,Jamaica,JAM
+North America,Mexico,MEX
+North America,Nicaragua,NIC
+North America,Panama,PAN
+North America,Saint Kitts and Nevis,KNA
+North America,Saint Lucia,LCA
+North America,Saint Vincent and the Grenadines,VCT
+North America,Trinidad and Tobago,TTO
+North America,United States,USA
+Oceania,Australia,AUS
+Oceania,Fiji,FJI
+Oceania,Kiribati,KIR
+Oceania,Marshall Islands,MHL
+Oceania,Micronesia,FSM
+Oceania,Nauru,NRU
+Oceania,New Zealand,NZL
+Oceania,Palau,PLW
+Oceania,Papua New Guinea,PNG
+Oceania,Samoa,WSM
+Oceania,Solomon Islands,SLB
+Oceania,Tonga,TON
+Oceania,Tuvalu,TUV
+Oceania,Vanuatu,VUT
+South America,Argentina,ARG
+South America,Bolivia,BOL
+South America,Brazil,BRA
+South America,Chile,CHL
+South America,Colombia,COL
+South America,Ecuador,ECU
+South America,Guyana,GUY
+South America,Paraguay,PRY
+South America,Peru,PER
+South America,Suriname,SUR
+South America,Uruguay,URY
+South America,Venezuela,VEN
