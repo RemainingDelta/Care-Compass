@@ -161,7 +161,7 @@ def dataframe(code):
         #final_dict['country_grp'] = item['dimensions']['COUNTRY_GRP']
         final_dict['year'] = item['dimensions']['YEAR']
         #final_dict['sex'] = item['dimensions']['SEX']
-        final_dict['expenditure'] = item['value']['numeric']
+        final_dict['value'] = item['value']['numeric']
         series = pd.Series(final_dict)
         df_expenditure = pd.concat([df_expenditure, series.to_frame().T], ignore_index = True)
 
@@ -185,7 +185,7 @@ def predict(df_expenditure, country_name):
     df_expenditure_country = df_expenditure[(df_expenditure['country'] == country_name)]
 
     X = np.array(df_expenditure_country['year'])
-    y = np.array(df_expenditure_country['expenditure'])
+    y = np.array(df_expenditure_country['value'])
 
     train_test = train_test_split(X, y, test_size = 0.3, random_state=42)
     #train_test
