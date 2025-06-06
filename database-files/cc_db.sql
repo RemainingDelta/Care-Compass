@@ -2,31 +2,31 @@ DROP DATABASE IF EXISTS cc_database;
 CREATE DATABASE cc_database;
 USE cc_database;
 
--- create country table
+
 DROP TABLE IF EXISTS Countries;
 CREATE TABLE Countries
 (
-    code    VARCHAR(50) PRIMARY KEY
     region  VARCHAR(50),
     name    VARCHAR(50),
+    code    VARCHAR(50) PRIMARY KEY
+
 );
 
-
-DROP TABLE IF EXISTS OverallScore
+DROP TABLE IF EXISTS OverallScore;
 CREATE TABLE OverallScore(
-   country                                                                                            VARCHAR(31) NOT NULL PRIMARY KEY
-  ,year                                                                                               INTEGER  NOT NULL
-  ,overall_score                                                                               NUMERIC(4,1) NOT NULL
-  ,"1 PREVENTION OF THE EMERGENCE OR RELEASE OF PATHOGENS"                                        NUMERIC(4,1) NOT NULL
-  ,"2 EARLY DETECTION REPORTING FOR EPIDEMICS OF POTENTIAL INTL CONCERN"                       NUMERIC(4,1) NOT NULL
-  ,"3 RAPID RESPONSE TO AND MITIGATION OF THE SPREAD OF AN EPIDEMIC"                                NUMERIC(4,1) NOT NULL
-  ,"4 SUFFICIENT ROBUST HEALTH SECTOR TO TREAT THE SICK PROTECT HEALTH WORKERS"                       NUMERIC(4,1) NOT NULL
-  ,"5 COMMITMENTS TO IMPROVING NATIONAL CAPACITY FINANCING AND ADHERENCE TO NORMS"                    NUMERIC(4,1) NOT NULL
-  ,"6 OVERALL RISK ENVIRONMENT AND COUNTRY VULNERABILITY TO BIOLOGICAL THREATS"                      NUMERIC(4,1) NOT NULL
+    scoreID INT AUTO_INCREMENT PRIMARY KEY,
+    country          VARCHAR(31) NOT NULL,
+    year             INTEGER  NOT NULL,
+    overall_score    FLOAT NOT NULL,
+    prevention       FLOAT NOT NULL,
+    detectReport     FLOAT NOT NULL,
+    rapidResp        FLOAT NOT NULL,
+    healthSys        FLOAT NOT NULL,
+    intlNorms        FLOAT NOT NULL,
+    riskEnv          FLOAT NOT NULL,
 
-  ,FOREIGN KEY (country) REFERENCES Countries(code)
+    FOREIGN KEY (country) REFERENCES Countries(code)
   );
-
 
 
 DROP TABLE IF EXISTS CountryInfo;
@@ -35,60 +35,56 @@ CREATE TABLE CountryInfo
     countryCode VARCHAR(50),
     strengths   VARCHAR(50),
     weaknesses  VARCHAR(50),
-    score       FLOAT,
+    score       INT,
     info        VARCHAR(50),
     FOREIGN KEY (countryCode) REFERENCES Countries(code),
-    FOREIGN KEY (score) REFERENCES OverallScore(overall_score)
-)
+    FOREIGN KEY (score) REFERENCES OverallScore(scoreID)
+);
 
 
 DROP TABLE IF EXISTS UserRoles;
-CREATE TABLE UserROles;
+CREATE TABLE UserRoles
 (
     roleID INT PRIMARY KEY,
-    roleName VARCHAR(50),
-)
+    roleName VARCHAR(50)
+);
 
--- create users table
 DROP TABLE IF EXISTS Users;
 CREATE TABLE Users
 (
-    id               INT PRIMARY KEY,
+    id               INT AUTO_INCREMENT PRIMARY KEY,
     name             VARCHAR(50),
-    roleID      INT,
-    country VARCHAR(50),
-    FOREIGN KEY (country) REFERENCES Countries (code).
+    roleID           INT,
+    country          VARCHAR(50),
+    FOREIGN KEY (country) REFERENCES Countries (code),
     FOREIGN KEY (roleID) REFERENCES UserRoles(roleID)
 );
 
 
--- create factors table
 DROP TABLE IF EXISTS Factors;
 CREATE TABLE Factors
 (
     factorID    INT PRIMARY KEY,
     name        VARCHAR(50),
-    score       FLOAT,
+    score       INT,
     
-    FOREIGN KEY (score) REFERENCES OverallScore(overall_score),
+    FOREIGN KEY (score) REFERENCES OverallScore(scoreID)
 );
 
--- create score projection table
 DROP TABLE IF EXISTS score_project;
 CREATE TABLE score_project
 (
     time    DATETIME,
-    targetScore     FLOAT primary key
+    targetScore     FLOAT primary key,
     factorID        INT,
     FOREIGN KEY (factorID) REFERENCES Factors(factorID)
 );
 
 
--- create comparator table
 DROP TABLE IF EXISTS comparator;
 CREATE TABLE comparator
 (
-    id INT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     country1  VARCHAR(50),
     country2  VARCHAR(50),
     country3 VARCHAR(50),
@@ -97,14 +93,11 @@ CREATE TABLE comparator
     FOREIGN KEY (country3) REFERENCES Countries(code)
 );
 
-
-
-
 DROP TABLE IF EXISTS regression_weights;
 CREATE TABLE regression_weights
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    country INT,
+    country VARCHAR(50),
     slope FLOAT,
     intercept FLOAT,
     mse FLOAT,
@@ -114,8 +107,8 @@ CREATE TABLE regression_weights
 
     FOREIGN KEY (userID) REFERENCES Users(id),
     FOREIGN KEY (country) REFERENCES Countries(code),
-    FOREIGN KEY (feature) REFERENCES Factors(factorID)
-)
+    FOREIGN KEY (factorID) REFERENCES Factors(factorID)
+);
 
 DROP TABLE IF EXISTS cosine_weights;
 CREATE TABLE cosine_weights
@@ -127,21 +120,22 @@ CREATE TABLE cosine_weights
     intlNormsWeight FLOAT,
     riskEnvWeight FLOAT,
     detectReportWeight FLOAT,
-    country INT,
+    country VARCHAR(50),
     userID INT,
 
     FOREIGN KEY (userID) REFERENCES Users(id),
     FOREIGN KEY (country) REFERENCES Countries(code)
-)
+);
 
 DROP TABLE IF EXISTS regression_model_params;
 CREATE TABLE regression_model_params
 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     year INT,
     expenditure FLOAT,
     country VARCHAR(50),
-    FOREIGN KEY (country) REFERENCES country(name)
-)
+    FOREIGN KEY (country) REFERENCES Countries(code)
+);
 
 DROP TABLE IF EXISTS train_test;
 CREATE TABLE train_test
@@ -151,19 +145,20 @@ CREATE TABLE train_test
     test_x INT,
     train_y INT,
     test_y INT,
-    country INT,
+    country VARCHAR(50),
     FOREIGN KEY (country) REFERENCES Countries(code)
-)
+);
 
 DROP TABLE IF EXISTS births_table;
 CREATE TABLE births_table
 (
-   COUNTRY     VARCHAR(3) NOT NULL PRIMARY KEY
-  ,COUNTRY_GRP VARCHAR(17)
-  ,SEX         VARCHAR(3) NOT NULL
+   COUNTRY     VARCHAR(50) NOT NULL 
+  ,COUNTRY_GRP VARCHAR(50)
+  ,SEX         VARCHAR(50) NOT NULL
   ,YEAR        INTEGER  NOT NULL
   ,VALUE       NUMERIC(5,2) NOT NULL
-)
+  ,FOREIGN KEY (COUNTRY) REFERENCES Countries(code)
+);
 
 
 
