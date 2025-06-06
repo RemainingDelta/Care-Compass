@@ -23,10 +23,10 @@ if st.button('Compare Countries',
              use_container_width=True):
   st.switch_page('pages/11_Country_Comparator.py')
 
-if st.button('View Country Strength & Weakness Profiles', 
+if st.button('Read Suggested Healthcare Articles', 
              type='primary',
              use_container_width=True):
-  st.switch_page('pages/12_Strength_Weakness.py')
+  st.switch_page('pages/12_Suggested_Articles.py')
 
 if st.button('View Country Profile', 
              type='primary',

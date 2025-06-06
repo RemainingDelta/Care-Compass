@@ -46,9 +46,9 @@ def CountryComparatorNav():
     )
 
 
-def StrengthWeaknessNav():
+def SuggestedArticlesNav():
     st.sidebar.page_link(
-        "pages/12_Strength_Weakness.py", label="Strengths vs. Weaknesses", icon="➕"
+        "pages/12_Suggested_Articles.py", label="Suggested Articles", icon="➕"
     )
 
 
@@ -98,7 +98,7 @@ def SideBarLinks(show_home=False):
         if st.session_state["role"] == "student":
             StudentHomeNav()
             CountryComparatorNav()
-            StrengthWeaknessNav()
+            SuggestedArticlesNav()
             CountryProfNav()
 
 
