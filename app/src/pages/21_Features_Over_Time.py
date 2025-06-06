@@ -5,6 +5,7 @@ from modules.nav import SideBarLinks
 import pandas as pd
 import numpy as np
 import requests
+import json
 
 st.set_page_config(layout = 'wide')
 
@@ -88,7 +89,7 @@ chosen_country = st.text_input("Enter Country Here:")
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
 
-
+data_code = ""
 
 with col3:
     life_exp = st.button("Life Expectancy (years)")
@@ -247,5 +248,40 @@ with col4:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
 
+# EX DATA 
+get_graph = f"http://host.docker.internal:4000/ml/ml/get_graph_data/{data_code}"
+headers = {
+    "User-Agent": "Python/requests",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+    }
+
+all_countries = requests.get(get_graph, headers=headers, timeout=10)
+all_country = requests.get(get_graph, headers=headers, timeout=10).text
+if all_countries.status_code == 200:
+    data_dict = json.loads(all_country)
+
+    #data_series = pd.Series(all_countries)
+    #print(all_countries)
+    df_graph = pd.DataFrame(data_dict)
+    #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
+    #print(df_graph)
+    st.dataframe(df_graph)
+
+else:
+    st.error(f"Error: {all_countries.status_code}")
+    st.write(all_countries.text)
+chart_data = pd.DataFrame(
+    np.random.randn(20, 3), columns=["col1", "col2", "col3"]
+)
+chart_data["col4"] = np.random.choice(["A", "B", "C"], 20)
+
+#st.scatter_chart(
+    #chart_data,
+    #x="col1",
+    #y="col2",
+    #color="col4",
+    #size="col3",
+#)
 
 
