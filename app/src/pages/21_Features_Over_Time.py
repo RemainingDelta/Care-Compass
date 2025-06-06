@@ -69,6 +69,21 @@ with col2:
 
 st.write("")
 st.write("")
+countries_get = f"http://host.docker.internal:4000/ml/ml/get_countries"
+headers = {
+    "User-Agent": "Python/requests",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+    }
+
+all_countries = requests.get(countries_get, headers=headers, timeout=10)
+if all_countries.status_code == 200:
+    test_data = all_countries.json()
+    st.write(test_data)
+else:
+    st.error(f"Error: {all_countries.status_code}")
+    st.write(all_countries.text)
+option = st.selectbox("Select A Country", tuple(all_countries))
 chosen_country = st.text_input("Enter Country Here:")
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
