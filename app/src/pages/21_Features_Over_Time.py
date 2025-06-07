@@ -28,16 +28,18 @@ headers = {
 }
 
 # Your backend endpoint URL
-API_URL = "http://host.docker.internal:4000/country/countries"  
+get_country_url = "http://host.docker.internal:4000/country/countries"  
 
 country_list = []
 
 try:
-    response = requests.get(API_URL, headers=headers)
+    response = requests.get(get_country_url, headers=headers, timeout=10)
     response.raise_for_status()
     data = response.json()
 
-    country_list = [item["name"] for item in data]
+
+    country_list = [item["country"] for item in data]
+    code_list = [item["code"] for item in data]
     print("Countries:", country_list)
 
 
@@ -47,14 +49,13 @@ except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
 
-
 col1,col2 = st.columns(2)
 regions = []
 time = []
 
 with col1: 
     
-    country = st.selectbox(
+    chosen_country = st.selectbox(
         "Country:",
         country_list,
         index=None,
@@ -75,6 +76,16 @@ st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
 
 data_code = ""
+countries_get = f"http://host.docker.internal:4000/ml/ml/get_countries"
+all_countries = requests.get(countries_get, headers=headers, timeout=10)
+if all_countries.status_code == 200:
+    test_data = all_countries.json()
+    st.write(test_data)
+else:
+    st.error(f"Error: {all_countries.status_code}")
+    st.write(all_countries.text)
+#option = st.selectbox("Select A Country", tuple(all_countries))
+chosen_country = st.text_input("Enter Country Here:")
 
 with col3:
     life_exp = st.button("Life Expectancy (years)")
@@ -102,7 +113,8 @@ with col3:
                 st.write(response.text)
         except Exception as e:
             st.error(f"Error: {str(e)}")
-            st.write(f"URL that worked : {api_url}")    
+            st.write(f"URL that worked : {api_url}")   
+
     inf_mort = st.button("Infant Mortality Rate")
     if inf_mort:
         data_code = "H2020_19"
@@ -240,7 +252,6 @@ with col4:
             st.write(f"URL that worked : {api_url}")
 
 # EX DATA 
-
 #graph_button = st.button("Display Graph")
 #if graph_button:
 get_graph = f"http://host.docker.internal:4000/ml/ml/get_graph_data/{data_code}"
@@ -300,5 +311,3 @@ if all_countries.status_code == 200:
 else:
     st.error(f"Error: {all_countries.status_code}")
     st.write(all_countries.text)
-
-
