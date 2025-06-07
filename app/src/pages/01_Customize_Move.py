@@ -43,9 +43,6 @@ headers = {
 
 st.title("Please input the country to get similarity scores:")
 
-# Text input box
-user_input = st.text_input("Enter Country Here:")
-
 API_URL = "http://web-api:4000/country/countries"
 
 country_list = []
@@ -55,10 +52,8 @@ try:
     response.raise_for_status()
     data = response.json()
 
-    st.write("Raw API response:", data)
-
-    # If the response is a list of country dicts
-    country_list = [item["country"] for item in data]
+    # Response is a list of country dicts
+    country_list = [item["name"] for item in data]
 
     print("Countries:", country_list)
 
@@ -67,12 +62,16 @@ except requests.exceptions.RequestException as e:
 except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
+# Select Country Dropdown
+chosen_country = st.selectbox("Select Country:", 
+                                country_list,
+                                index=None)
+
 # Submit button
 if st.button("Submit"):
-    st.write("You entered:", user_input)
-    #chosen_country = user_input 
+    
     #Hard coding similarity for now: 
-    api_url = f"http://host.docker.internal:4000/ml/ml/get_cosine_similar/{user_input}"
+    api_url = f"http://host.docker.internal:4000/ml/ml/get_cosine_similar/{chosen_country}"
     response = requests.get(api_url, headers=headers, timeout=10)
     #print(response)
 
@@ -80,7 +79,6 @@ if st.button("Submit"):
          data = response.json()  
          st.success("It worked!")
          st.json(data) 
-
 
 
 col1, col2 = st.columns(2)
