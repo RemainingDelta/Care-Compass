@@ -11,17 +11,42 @@ style_sidebar()
 set_background("assets/backdrop.jpg")
 
 SideBarLinks()
+
+headers = {
+    "User-Agent": "Python/requests",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+# Your backend endpoint URL
+API_URL = "http://host.docker.internal:4000/country/countries"  
+
+country_list = []
+
+try:
+    response = requests.get(API_URL, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+
+    country_list = [item["name"] for item in data]
+    print("Countries:", country_list)
+
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
+
+
 st.title("SET AND MONITOR TARGET SCORES")
 st.write("")
 
 col1, col2 = st.columns(2)
 
-countries = ["Afghanistan", "Cuba"]
-
 with col1:
     country = st.selectbox(
             "Choose Country:",
-            countries,
+            country_list,
             index=None,
             placeholder="Select Country ..."
         )
