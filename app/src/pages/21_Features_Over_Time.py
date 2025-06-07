@@ -21,23 +21,34 @@ st.write("Choose a region and your target country to view how including features
 st.write("")
 
 
-# EX DATA 
-#chart_data = pd.DataFrame(
-    #np.random.randn(20, 3), columns=["col1", "col2", "col3"]
-#)
-#chart_data["col4"] = np.random.choice(["A", "B", "C"], 20)
+headers = {
+    "User-Agent": "Python/requests",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
 
-#st.scatter_chart(
-    #chart_data,
-    #x="col1",
-    #y="col2",
-    #color="col4",
-    #size="col3",
-#)
+# Your backend endpoint URL
+API_URL = "http://host.docker.internal:4000/country/countries"  
+
+country_list = []
+
+try:
+    response = requests.get(API_URL, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+
+    country_list = [item["name"] for item in data]
+    print("Countries:", country_list)
+
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
+
 
 
 col1,col2 = st.columns(2)
-countries = []
 regions = []
 time = []
 
@@ -45,7 +56,7 @@ with col1:
     
     country = st.selectbox(
         "Country:",
-        countries,
+        country_list,
         index=None,
         placeholder="Select Country ..."
     )
@@ -53,29 +64,13 @@ with col1:
     
 with col2:
 
-
     end_date = st.date_input(
         "End Date:", 
         "today")
 
 st.write("")
 st.write("")
-countries_get = f"http://host.docker.internal:4000/ml/ml/get_countries"
-headers = {
-    "User-Agent": "Python/requests",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-    }
 
-all_countries = requests.get(countries_get, headers=headers, timeout=10)
-if all_countries.status_code == 200:
-    test_data = all_countries.json()
-    st.write(test_data)
-else:
-    st.error(f"Error: {all_countries.status_code}")
-    st.write(all_countries.text)
-#option = st.selectbox("Select A Country", tuple(all_countries))
-chosen_country = st.text_input("Enter Country Here:")
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
 
