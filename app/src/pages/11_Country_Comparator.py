@@ -38,30 +38,26 @@ try:
     response.raise_for_status()
     data = response.json()
 
-    st.write("Raw API response:", data)
-
-    # If the response is a list of country dicts
-    country_list = [item["country"] for item in data]
-
+    country_list = [item["name"] for item in data]
     print("Countries:", country_list)
+
 
 except requests.exceptions.RequestException as e:
     print("API request failed:", e)
 except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
+
 features = []
 col1, col2, col3 = st.columns(3)
 
-
 with col1:
     country1 = st.selectbox(
-            "Country 1:",
-            country_list,
-            index=None,
-            placeholder="Select Country 1 ..."
-        )
-
+        "Country 1:",
+        country_list,
+        index=None,
+        placeholder="Select Country 1 ..."
+    )
 with col2: 
     country2 = st.selectbox(
             "Country 2:",
