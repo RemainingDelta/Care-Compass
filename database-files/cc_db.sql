@@ -152,6 +152,7 @@ CREATE TABLE train_test
 DROP TABLE IF EXISTS births_table;
 CREATE TABLE births_table
 (
+    id INT AUTO_INCREMENT PRIMARY KEY,
    COUNTRY     VARCHAR(50) NOT NULL 
   ,COUNTRY_GRP VARCHAR(50)
   ,SEX         VARCHAR(50) NOT NULL
@@ -159,8 +160,3 @@ CREATE TABLE births_table
   ,VALUE       NUMERIC(5,2) NOT NULL
   ,FOREIGN KEY (COUNTRY) REFERENCES Countries(code)
 );
-
-
-
-
-

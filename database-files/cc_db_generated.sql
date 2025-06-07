@@ -1,5 +1,6 @@
 USE cc_database;
 
+
 INSERT INTO Countries(region,name,code) VALUES ('Africa','Algeria','DZA');
 INSERT INTO Countries(region,name,code) VALUES ('Africa','Angola','AGO');
 INSERT INTO Countries(region,name,code) VALUES ('Africa','Benin','BEN');
