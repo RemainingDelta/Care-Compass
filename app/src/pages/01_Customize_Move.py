@@ -46,6 +46,8 @@ st.title("Please input the country to get similarity scores:")
 # Text input box
 user_input = st.text_input("Enter Country Here:")
 
+API_URL = "http://web-api:4000/country/countries"
+
 # Submit button
 if st.button("Submit"):
     st.write("You entered:", user_input)

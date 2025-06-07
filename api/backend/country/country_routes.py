@@ -20,19 +20,13 @@ def get_all_countries():
         current_app.logger.debug(f'Query parameters - score: {score}')
 
         # Prepare the Base query
-        query = "SELECT * FROM Country WHERE 1=1"
-        params = []
+        query = "SELECT * FROM Countries WHERE 1=1"
+        
+        cursor.execute(query)
 
-        # Add filters if provided
-        if score:
-            query += " AND SCORE = %s"
-            params.append(score)
-           
-        current_app.logger.debug(f'Executing query: {query} with params: {params}')
-        cursor.execute(query, params)
         
         columns = [col[0] for col in cursor.description]
-        countries = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        countries = cursor.fetchall()
         cursor.close()
 
         current_app.logger.info(f'Successfully retrieved {len(countries)} Countries')
