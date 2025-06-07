@@ -48,6 +48,25 @@ user_input = st.text_input("Enter Country Here:")
 
 API_URL = "http://web-api:4000/country/countries"
 
+country_list = []
+
+try:
+    response = requests.get(API_URL, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+
+    st.write("Raw API response:", data)
+
+    # If the response is a list of country dicts
+    country_list = [item["country"] for item in data]
+
+    print("Countries:", country_list)
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
+
 # Submit button
 if st.button("Submit"):
     st.write("You entered:", user_input)
