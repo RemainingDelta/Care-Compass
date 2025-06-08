@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import requests
 import json
+import plotly.express as px
+import plotly.graph_objects as go 
 
 st.set_page_config(layout = 'wide')
 
@@ -111,7 +113,6 @@ def display_data(data_code, y_value, title):
         slope = predict_dict['slope']
         intercept = predict_dict['intercept']
         def show_fit(X, y, slope, intercept):
-            plt.figure()
             
             # in case this wasn't done before, transform the input data into numpy arrays and flatten them
             x = np.array(X).ravel()
@@ -119,32 +120,39 @@ def display_data(data_code, y_value, title):
 
             
             # plot the actual data
-            plt.scatter(x, y, label='data')
+            figure1 = px.scatter(x=x, y=y, labels={
+                "x": "Time in Years",
+                "y": y_value
+            }, title = title)
             
             # compute linear predictions 
             # x is a numpy array so each element gets multiplied by slope and intercept is added
+            x = np.linspace(1970, 2025, 10)
             y_pred = slope * x + intercept
             
-            # plot the linear fit
-            plt.plot(x, y_pred, color='black',
-                ls=':',
-                label='linear fit')
-            
-            plt.legend()
-            
-            plt.xlabel('year')
-            plt.ylabel(y_value)
-            plt.title(title)
-            
-            # print the mean squared error
-            y_pred = slope * x + intercept
+            #px.legend()
+            figure2 = go.Figure(data=[go.Scatter(x=x, y=y_pred, mode='lines', name='line of best fit')])
 
-        st.pyplot(show_fit(X, y, slope, intercept))
+            figure3 = go.Figure(data = figure1.data + figure2.data)
+            figure3.update_layout(title=title, xaxis_title='Year', yaxis_title=y_value)
 
+            return figure3
 
+        st.plotly_chart(show_fit(X, y, slope, intercept))
     else:
         st.error(f"Error: {all_countries.status_code}")
         st.write(all_countries.text)
+
+life_exp_bool = False
+inf_mort_bool = False
+impov_house_bool = False
+expenditure_bool = False
+gen_prac_bool = False
+live_birth_bool = False
+
+data_code = ""
+y_value = ""
+title = ""
 
 
 with col3:
@@ -153,7 +161,7 @@ with col3:
         data_code = "H2020_17"
         y_value = "Life Expectancy (years)"
         title = "Life Expectancy Over Time"
-        st.write("Country Code", chosen_country) 
+       # st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
@@ -168,9 +176,7 @@ with col3:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("Here are the values for the line of best fit!")
-                st.json(data)
-                display_data(data_code, y_value, title)
+                life_exp_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
                 st.write(f"No life expectancy data for: {chosen_country}")
@@ -181,7 +187,9 @@ with col3:
     inf_mort = st.button("Infant Mortality Rate")
     if inf_mort:
         data_code = "H2020_19"
-        st.write("Country Code", chosen_country) 
+        y_value = "Infant Mortality Rate (%)"
+        title = "Infant Mortality Rate Over Time"
+        #st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
@@ -196,11 +204,10 @@ with col3:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("Here are the values for the line of best fit!")
-                st.json(data)
+                inf_mort_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No infant mortality data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -208,7 +215,9 @@ with col3:
     live_birth = st.button("Live Births per 1000 Population")
     if live_birth:
         data_code = "HFA_16"
-        st.write("Country Code", chosen_country) 
+        y_value = "Live Births per 1000 population"
+        title = "Live Births Over Time"
+        #st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
@@ -223,11 +232,10 @@ with col3:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("Here are the values for the line of best fit!")
-                st.json(data)
+                live_birth_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No live births data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -236,7 +244,9 @@ with col4:
     gen_prac = st.button("General Practitioners per 10,000 Population")
     if gen_prac:
         data_code = "HLTHRES_67"
-        st.write("Country Code", chosen_country) 
+        y_value = "General Practitoners per 10,000 population"
+        title = "Life Expectancy Over Time"
+        #st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
@@ -251,11 +261,10 @@ with col4:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("Here are the values for the line of best fit!")
-                st.json(data)
+                gen_prac_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No general practioner data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -263,7 +272,9 @@ with col4:
     health_expen = st.button("Total Health Expenditure per Capita")
     if health_expen:
         data_code = "HFA_570"
-        st.write("Country Code", chosen_country) 
+        y_value = "Total Health Expenditure per Capita"
+        title = "Total Health Expenditure Over Time"
+        #st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
@@ -278,11 +289,10 @@ with col4:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("Here are the values for the line of best fit!")
-                st.json(data)
+                expenditure_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No total health expenditure data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -290,7 +300,9 @@ with col4:
     impov_house = st.button("Impoverished Households")
     if impov_house:
         data_code = "UHCFP_2"
-        st.write("Country Code", chosen_country) 
+        y_value = "Impoverished Households due to out-of-pocket healthcare payments"
+        title = "Impoverished Households Over Time"
+        #st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
         try:
@@ -305,14 +317,23 @@ with col4:
 
             if response.status_code == 200:
                 data = response.json()  
-                st.success("Here are the values for the line of best fit!")
-                st.json(data)
+                impov_house_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No impoverished households data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
 
-# EX DATA 
+# Displaying relevant information
+if inf_mort_bool or expenditure_bool or life_exp_bool or live_birth_bool or impov_house_bool or gen_prac_bool:
+    st.success(f"""
+                Here are the values for the line of best fit!  
+                Slope: {round(data['slope'], 4)}  
+                Intercept: {round(data['intercept'], 4)}
+                """)
+    st.write(f"Mean Squared Error: {round(data['mse'], 4)}")
+    st.write(f"Coefficient of Determination: {round(data['r2'], 4)}")
+    #st.json(data)
+    display_data(data_code, y_value, title)
 

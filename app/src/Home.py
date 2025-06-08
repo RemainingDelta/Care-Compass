@@ -44,10 +44,10 @@ logger.info("Loading the Home page of the app")
 st.markdown("""
     <style>
     .centered-title {
-        height: 80vh; /* Full viewport height */
+        height: 30vh; /* Full viewport height */
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: top;
+        align-items: top;
         flex-direction: column;
     }
     .company-name {
