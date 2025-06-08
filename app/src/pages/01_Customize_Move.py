@@ -9,6 +9,7 @@ import numpy as np
 #import plotly.express as px
 from modules.nav import SideBarLinks
 import requests
+import json
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -76,9 +77,15 @@ if st.button("Submit"):
     #print(response)
 
     if response.status_code == 200:
-         data = response.json()  
-         st.success("It worked!")
-         st.json(data) 
+         data = response.text  
+         #st.success("It worked!")
+         data_dict = json.loads(data)
+         df_similar = pd.DataFrame(data_dict)
+         sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
+         st.write(f"Here are the countries most similar to: {chosen_country}")
+         st.dataframe(sorted_df_similar.head(10)) 
+         st.write(f"Here are the countries least similar to: {chosen_country}")
+         st.dataframe(sorted_df_similar.tail(10)) 
 
 
 col1, col2 = st.columns(2)
