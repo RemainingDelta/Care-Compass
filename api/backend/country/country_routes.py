@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from backend.db_connection import db
 from mysql.connector import Error
 from flask import current_app
+from backend.ml_models.regression import dataframe
 
 
 countries = Blueprint("country_routes", __name__)
@@ -265,3 +266,11 @@ def get_practitioners():
     cursor.close()
     conn.close()
     return jsonify(countries), 200
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@countries.route("/countries/data/<input>", methods=["GET"])
+def get_data(input):
+    result = dataframe(input)
+    table = result.to_dict()
+    return jsonify(table)
