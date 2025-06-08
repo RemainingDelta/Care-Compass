@@ -18,18 +18,19 @@ set_background("assets/backdrop.jpg")
 
 SideBarLinks()
 
+#Creates title and description of the page
 st.title('FEATURES OVER TIME')
 st.write("Choose a region and your target country to view how including features changes scores over time.")
 st.write("")
 
-
+#headers to bypass requests 
 headers = {
     "User-Agent": "Python/requests",
     "Accept": "application/json",
     "Content-Type": "application/json"
 }
 
-# Your backend endpoint URL
+# Your backend endpoint URL - for getting all countries for the drop down 
 get_country_url = "http://host.docker.internal:4000/country/countries"  
 
 country_list = []
@@ -52,6 +53,7 @@ except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
 
+#creates necessary columns for user inputs 
 col1,col2 = st.columns(2)
 regions = []
 time = []
@@ -72,10 +74,16 @@ with col2:
         "End Date:", 
         "today")
 
+#handles considering the end date:
+if end_date:
+    chosen_year = end_date.year 
+
+
 st.write("")
 st.write("")
+
+#handles getting the country code needed for accessing each dataset 
 if chosen_country2:
-#chosen_country = st.text_input("Enter Country Here:")
     start_index = (str(chosen_country2)).index('-') + 1
     chosen_country = chosen_country2[start_index:]
 else:
@@ -88,6 +96,7 @@ st.write("")
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
 
+#displays all graphical data through getting the regression values and using plotly to graph
 def display_data(data_code, y_value, title):
     get_graph = f"http://host.docker.internal:4000/ml/ml/get_graph_data/{data_code}"
     headers = {
@@ -127,7 +136,7 @@ def display_data(data_code, y_value, title):
             
             # compute linear predictions 
             # x is a numpy array so each element gets multiplied by slope and intercept is added
-            x = np.linspace(1970, 2025, 10)
+            x = np.linspace(1970, 2040, 10)
             y_pred = slope * x + intercept
             
             #px.legend()
@@ -143,6 +152,7 @@ def display_data(data_code, y_value, title):
         st.error(f"Error: {all_countries.status_code}")
         st.write(all_countries.text)
 
+#creates booleans and empty values when deciding what to display
 life_exp_bool = False
 inf_mort_bool = False
 impov_house_bool = False
@@ -154,7 +164,7 @@ data_code = ""
 y_value = ""
 title = ""
 
-
+#each button when pressed calls the correct route to get regression values 
 with col3:
     life_exp = st.button("Life Expectancy (years)")
     if life_exp:
@@ -179,7 +189,7 @@ with col3:
                 life_exp_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(f"No life expectancy data for: {chosen_country}")
+                st.error(f"No life expectancy data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")   
@@ -207,7 +217,7 @@ with col3:
                 inf_mort_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(f"No infant mortality data for: {chosen_country}")
+                st.error(f"No infant mortality data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -235,7 +245,7 @@ with col3:
                 live_birth_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(f"No live births data for: {chosen_country}")
+                st.error(f"No live births data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -264,7 +274,7 @@ with col4:
                 gen_prac_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(f"No general practioner data for: {chosen_country}")
+                st.error(f"No general practioner data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -292,7 +302,7 @@ with col4:
                 expenditure_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(f"No total health expenditure data for: {chosen_country}")
+                st.error(f"No total health expenditure data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -320,20 +330,23 @@ with col4:
                 impov_house_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(f"No impoverished households data for: {chosen_country}")
+                st.error(f"No impoverished households data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
 
-# Displaying relevant information
+# Displaying relevant information if a button is pressed 
 if inf_mort_bool or expenditure_bool or life_exp_bool or live_birth_bool or impov_house_bool or gen_prac_bool:
     st.success(f"""
                 Here are the values for the line of best fit!  
                 Slope: {round(data['slope'], 4)}  
                 Intercept: {round(data['intercept'], 4)}
                 """)
-    st.write(f"Mean Squared Error: {round(data['mse'], 4)}")
-    st.write(f"Coefficient of Determination: {round(data['r2'], 4)}")
+    st.badge(f"Mean Squared Error: {round(data['mse'], 4)}", color='violet')
+    st.badge(f"Coefficient of Determination: {round(data['r2'], 4)}", color='violet')
+    calculation = float(chosen_year)*data['slope'] + data['intercept']
+    st.badge(f"The predicted value for your chosen date is: {round(calculation, 4)}", color='blue')
     #st.json(data)
+    st.success("Hover over the graph below to see specific values")
     display_data(data_code, y_value, title)
 
