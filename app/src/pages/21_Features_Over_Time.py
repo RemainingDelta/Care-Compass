@@ -38,8 +38,9 @@ try:
     data = response.json()
 
 
-    country_list = [item["country"] for item in data]
+    country_list = [item["name"] for item in data]
     code_list = [item["code"] for item in data]
+    country_code_list = [item['name'] + '-' + item['code'] for item in data]
     print("Countries:", country_list)
 
 
@@ -55,9 +56,9 @@ time = []
 
 with col1: 
     
-    chosen_country = st.selectbox(
+    chosen_country2 = st.selectbox(
         "Country:",
-        country_list,
+        country_code_list,
         index=None,
         placeholder="Select Country ..."
     )
@@ -71,18 +72,87 @@ with col2:
 
 st.write("")
 st.write("")
-chosen_country = st.text_input("Enter Country Here:")
+if chosen_country2:
+#chosen_country = st.text_input("Enter Country Here:")
+    start_index = (str(chosen_country2)).index('-') + 1
+    chosen_country = chosen_country2[start_index:]
+else:
+    st.info("Please select a country to proceed")
+
+
 st.write("")
 st.write("")
 
 st.subheader("SELECT FEATURES TO CONSIDER")
 col3,col4 = st.columns(2)
 
+def display_data(data_code, y_value, title):
+    get_graph = f"http://host.docker.internal:4000/ml/ml/get_graph_data/{data_code}"
+    headers = {
+        "User-Agent": "Python/requests",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+        }
+    all_countries = requests.get(get_graph, headers=headers, timeout=10)
+    all_country = requests.get(get_graph, headers=headers, timeout=10).text
+    if all_countries.status_code == 200:
+        data_dict = json.loads(all_country)
+
+        #data_series = pd.Series(all_countries)
+        #print(all_countries)
+        df_country = pd.DataFrame(data_dict)
+        #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
+        #print(df_graph)
+        df_graph = df_country[(df_country['country'] == chosen_country)]
+        df_graph['year'] = df_graph['year'].astype(float)
+        X = np.array(df_graph['year'])
+        y = np.array(df_graph['value']) 
+        predict_dict = json.loads(response_text)
+        slope = predict_dict['slope']
+        intercept = predict_dict['intercept']
+        def show_fit(X, y, slope, intercept):
+            plt.figure()
+            
+            # in case this wasn't done before, transform the input data into numpy arrays and flatten them
+            x = np.array(X).ravel()
+            y = np.array(y).ravel()
+
+            
+            # plot the actual data
+            plt.scatter(x, y, label='data')
+            
+            # compute linear predictions 
+            # x is a numpy array so each element gets multiplied by slope and intercept is added
+            y_pred = slope * x + intercept
+            
+            # plot the linear fit
+            plt.plot(x, y_pred, color='black',
+                ls=':',
+                label='linear fit')
+            
+            plt.legend()
+            
+            plt.xlabel('year')
+            plt.ylabel(y_value)
+            plt.title(title)
+            
+            # print the mean squared error
+            y_pred = slope * x + intercept
+
+        st.pyplot(show_fit(X, y, slope, intercept))
+
+
+    else:
+        st.error(f"Error: {all_countries.status_code}")
+        st.write(all_countries.text)
+
 
 with col3:
     life_exp = st.button("Life Expectancy (years)")
     if life_exp:
         data_code = "H2020_17"
+        y_value = "Life Expectancy (years)"
+        title = "Life Expectancy Over Time"
         st.write("Country Code", chosen_country) 
         api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
 
@@ -100,9 +170,10 @@ with col3:
                 data = response.json()  
                 st.success("Here are the values for the line of best fit!")
                 st.json(data)
+                display_data(data_code, y_value, title)
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No life expectancy data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")   
@@ -244,62 +315,4 @@ with col4:
             st.write(f"URL that worked : {api_url}")
 
 # EX DATA 
-#graph_button = st.button("Display Graph")
-#if graph_button:
-get_graph = f"http://host.docker.internal:4000/ml/ml/get_graph_data/{data_code}"
-headers = {
-    "User-Agent": "Python/requests",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-    }
-all_countries = requests.get(get_graph, headers=headers, timeout=10)
-all_country = requests.get(get_graph, headers=headers, timeout=10).text
-if all_countries.status_code == 200:
-    data_dict = json.loads(all_country)
 
-    #data_series = pd.Series(all_countries)
-    #print(all_countries)
-    df_country = pd.DataFrame(data_dict)
-    #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
-    #print(df_graph)
-    df_graph = df_country[(df_country['country'] == chosen_country)]
-    df_graph['year'] = df_graph['year'].astype(float)
-    X = np.array(df_graph['year'])
-    y = np.array(df_graph['value']) 
-    predict_dict = json.loads(response_text)
-    slope = predict_dict['slope']
-    intercept = predict_dict['intercept']
-    def show_fit(X, y, slope, intercept):
-        plt.figure()
-        
-        # in case this wasn't done before, transform the input data into numpy arrays and flatten them
-        x = np.array(X).ravel()
-        y = np.array(y).ravel()
-
-        
-        # plot the actual data
-        plt.scatter(x, y, label='data')
-        
-        # compute linear predictions 
-        # x is a numpy array so each element gets multiplied by slope and intercept is added
-        y_pred = slope * x + intercept
-        
-        # plot the linear fit
-        plt.plot(x, y_pred, color='black',
-            ls=':',
-            label='linear fit')
-        
-        plt.legend()
-        
-        plt.xlabel('x')
-        plt.ylabel('y')
-        
-        # print the mean squared error
-        y_pred = slope * x + intercept
-
-    st.pyplot(show_fit(X, y, slope, intercept))
-
-
-else:
-    st.error(f"Error: {all_countries.status_code}")
-    st.write(all_countries.text)
