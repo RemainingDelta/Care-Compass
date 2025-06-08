@@ -61,6 +61,8 @@ with col1:
         start_index = (str(chosen_country2)).index('-') + 1
         chosen_country = chosen_country2[start_index:]
         st.write("You selected ", chosen_country2)
+    else:
+        st.info("Please select a country to proceed")
      #st.form_submit_button(
         #  label="Submit", 
          # help=None, 
