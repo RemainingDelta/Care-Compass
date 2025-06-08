@@ -7,6 +7,7 @@ import numpy as np
 from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
+import json
 
 
 ml = Blueprint("ml", __name__)
@@ -102,9 +103,36 @@ def store_weights():
     
 # model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/ml/get_cosine_similar/<chosen_country>", methods=["GET"])
-def get_cosine_similar(chosen_country):
-    df = get_similar(chosen_country)
+@ml.route("/ml/get_cosine_similar/<chosen_country>/<weights_dict>", methods=["GET"])
+def get_cosine_similar(chosen_country, weights_dict):
+    weights_vect = []
+    #weights_dict_dump = json.dumps(weights_dict) 
+    weights_dict2 = json.loads(weights_dict)
+    print("THIS IS WEIGHTS DICT 2")
+    print(weights_dict2)
+    for key in weights_dict2:
+        print("ITERATION 1")
+        if key == "Prevention":
+            print("This is prevention")
+            print(weights_dict2[key])
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Detection & Reporting":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Rapid Response":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Health System":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "International Norms Compliance":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Risk Environment":
+            weights_vect.append(weights_dict2[key])
+    print(weights_vect)
+    df = get_similar(chosen_country, weights_vect)
     print("Country received:", chosen_country)
 
     result = df.to_dict()
