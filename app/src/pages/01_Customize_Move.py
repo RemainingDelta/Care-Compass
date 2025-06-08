@@ -10,6 +10,8 @@ import numpy as np
 from modules.nav import SideBarLinks
 import requests
 import json
+from streamlit_sortables import sort_items
+
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -20,6 +22,18 @@ SideBarLinks()
 
 # set the header of the page
 st.title('CUSTOMIZE YOUR MOVE!')
+
+st.markdown("""
+    <style>
+    div[data-testid="sortable-item"] {
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 1rem;
+        padding: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 
 # You can access the session state to make a more customized/personalized app experience
 st.write(f"### Hi, {st.session_state['first_name']}. Rank the healthcare factors in order of priority -- 1 being the highest and 6 the lowest.")
@@ -88,89 +102,72 @@ if st.button("Submit"):
          st.dataframe(sorted_df_similar.tail(10)) 
 
 
-col1, col2 = st.columns(2)
+st.subheader("Rank the healthcare factors (drag to reorder)")
 
-with col1:
-    col1a, col1b = st.columns(2)
-    
-    with col1a: 
-        option1 = st.selectbox(
-            "1:",
-            options,
-            index=None,
-            placeholder="Select PRIORITY factor...",
+factors = [
+    "Prevention",
+    "Health System",
+    "Rapid Response",
+    "Detection & Reporting",
+    "International Norms Compliance",
+    "Risk Environment"
+]
+
+# Persistent state
+if "factor_weights" not in st.session_state:
+    st.session_state.factor_weights = {factor: 100 - i * 20 for i, factor in enumerate(factors)}
+if "dragged_factors" not in st.session_state:
+    st.session_state.dragged_factors = factors.copy()
+
+# Show rank guidance
+st.markdown('<div style="text-align: center; font-weight: bold;">1</div>', unsafe_allow_html=True)
+st.session_state.dragged_factors = sort_items(
+    st.session_state.dragged_factors,
+    direction="vertical",
+    key="drag_order"
+)
+st.markdown('<div style="text-align: center; font-weight: bold;">6</div>', unsafe_allow_html=True)
+
+# Set default weights per slot, not per factor
+if "slot_weights" not in st.session_state:
+    st.session_state.slot_weights = [100 - i * 20 for i in range(6)]
+
+st.markdown("### Adjust weight for each priority slot")
+
+ranges = [(90, 100), (70, 90), (50, 70), (30, 50), (10, 30), (0, 10)]
+
+for i in range(6):
+    factor = st.session_state.dragged_factors[i]
+    min_val, max_val = ranges[i]
+
+    # Clamp value into range
+    cur_val = min(max(st.session_state.slot_weights[i], min_val), max_val)
+
+    # Create row: number | factor | slider | input
+    col_num, col_label, col_slider, col_input = st.columns([1, 3, 5, 2])
+    with col_num:
+        st.markdown(f"**{i+1}.**")
+    with col_label:
+        st.markdown(f"""
+            <div style="padding-top: 8px; font-weight: 600;">
+                {factor}
+            </div>
+        """, unsafe_allow_html=True)
+    with col_slider:
+        st.session_state.slot_weights[i] = st.slider(
+            "", min_val, max_val, cur_val, key=f"slider_{i}"
         )
-        st.write("\n")
-
-    
-        option2 = st.selectbox(
-            "2:",
-            options,
-            index=None,
-            placeholder="Select SECONDARY factor...",
-        )
-        st.write("\n")
-
-        option3 = st.selectbox(
-            "3:",
-            options,
-            index=None,
-            placeholder="Select TERTIARY factor...",
+    with col_input:
+        st.session_state.slot_weights[i] = st.number_input(
+            "", min_value=min_val, max_value=max_val,
+            value=st.session_state.slot_weights[i],
+            step=1, key=f"input_{i}"
         )
 
-        st.write("")
-        st.button("Submit", type="primary")
-    
-
-    with col1b:
-        option4 = st.selectbox(
-            "4:",
-            options,
-            index=None,
-            placeholder="Select QUARTERNARY factor...",
-        )
-        st.write("\n")
-
-        option5 = st.selectbox(
-            "5:",
-            options,
-            index=None,
-            placeholder="Select QUINARY factor...",
-        )
-        st.write("\n")
-
-        option6 = st.selectbox(
-            "6:",
-            options,
-            index=None,
-            placeholder="Select SENARY factor...",
-        )
-
-with col2:
-    on = st.toggle("Bar Chart / Map")
-
-    if on:
-        st.map(df)
-    else: st.bar_chart(df)
-
-
-st.write("")
-st.write("")
-
-st.write("#### Use the Sliders")
-
-col1,col2 = st.columns(2)
-with col1:  
-    prevention = st.slider("Prevention Score: ", 0, 100, 25)
-    healthsys = st.slider("Health System Score: ", 0, 100, 25)
-    rapidresp = st.slider("Rapid Response Score: ", 0, 100, 25)
-
-with col2:
-    detectreport = st.slider("Detection & Reporting Score: ", 0, 100, 25)
-    normscomp = st.slider("International Norms Compliance Score: ", 0, 100, 25)
-    riskenv = st.slider("Risk Environment Score: ", 0, 100, 25)
-
-
-
-
-
+# Output
+st.markdown("---")
+st.markdown("### Final Rankings & Slot Weights")
+for i in range(6):
+    factor = st.session_state.dragged_factors[i]
+    weight = st.session_state.slot_weights[i]
+    st.write(f"{i+1}. {factor}: {weight}")

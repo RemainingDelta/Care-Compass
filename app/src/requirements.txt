@@ -14,5 +14,5 @@ seaborn
 scikit-learn
 shap
 requests
-json
 plotly 
+streamlit-sortables
