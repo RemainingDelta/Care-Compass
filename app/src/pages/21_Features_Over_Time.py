@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import requests
 import json
+import plotly.express as px
+import plotly.graph_objects as go 
 
 st.set_page_config(layout = 'wide')
 
@@ -111,7 +113,6 @@ def display_data(data_code, y_value, title):
         slope = predict_dict['slope']
         intercept = predict_dict['intercept']
         def show_fit(X, y, slope, intercept):
-            plt.figure()
             
             # in case this wasn't done before, transform the input data into numpy arrays and flatten them
             x = np.array(X).ravel()
@@ -119,29 +120,25 @@ def display_data(data_code, y_value, title):
 
             
             # plot the actual data
-            plt.scatter(x, y, label='data')
+            figure1 = px.scatter(x=x, y=y, labels={
+                "x": "Time in Years",
+                "y": y_value
+            }, title = title)
             
             # compute linear predictions 
             # x is a numpy array so each element gets multiplied by slope and intercept is added
+            x = np.linspace(1970, 2025, 10)
             y_pred = slope * x + intercept
             
-            # plot the linear fit
-            plt.plot(x, y_pred, color='black',
-                ls=':',
-                label='linear fit')
-            
-            plt.legend()
-            
-            plt.xlabel('year')
-            plt.ylabel(y_value)
-            plt.title(title)
-            
-            # print the mean squared error
-            y_pred = slope * x + intercept
+            #px.legend()
+            figure2 = go.Figure(data=[go.Scatter(x=x, y=y_pred, mode='lines', name='line of best fit')])
 
-        st.pyplot(show_fit(X, y, slope, intercept))
+            figure3 = go.Figure(data = figure1.data + figure2.data)
+            figure3.update_layout(title=title, xaxis_title='Year', yaxis_title=y_value)
 
+            return figure3
 
+        st.plotly_chart(show_fit(X, y, slope, intercept))
     else:
         st.error(f"Error: {all_countries.status_code}")
         st.write(all_countries.text)
@@ -210,7 +207,7 @@ with col3:
                 inf_mort_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No infant mortality data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -238,7 +235,7 @@ with col3:
                 live_birth_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No live births data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -267,7 +264,7 @@ with col4:
                 gen_prac_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No general practioner data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -295,7 +292,7 @@ with col4:
                 expenditure_bool = True
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No total health expenditure data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
@@ -323,14 +320,20 @@ with col4:
                 impov_house_bool = True 
             else:
                 st.error(f"Error: {response.status_code}")
-                st.write(response.text)
+                st.write(f"No impoverished households data for: {chosen_country}")
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
 
 # Displaying relevant information
 if inf_mort_bool or expenditure_bool or life_exp_bool or live_birth_bool or impov_house_bool or gen_prac_bool:
-    st.success("Here are the values for the line of best fit!")
-    st.json(data)
+    st.success(f"""
+                Here are the values for the line of best fit!  
+                Slope: {round(data['slope'], 4)}  
+                Intercept: {round(data['intercept'], 4)}
+                """)
+    st.write(f"Mean Squared Error: {round(data['mse'], 4)}")
+    st.write(f"Coefficient of Determination: {round(data['r2'], 4)}")
+    #st.json(data)
     display_data(data_code, y_value, title)
 
