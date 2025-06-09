@@ -7,6 +7,8 @@ import numpy as np
 from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
+from backend.ml_models.regression import autoreg_predict
+
 
 
 ml = Blueprint("ml", __name__)
