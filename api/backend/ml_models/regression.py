@@ -202,54 +202,91 @@ def predict(df_expenditure, country_name):
 #function for creating the X and y for the autoregressive model
 def create_xy(df, country_name):
 
-    df['year'] = df['year'].astype(float)
+    #df['year'] = df['year'].astype(float)
     df_country = df[(df['country'] == country_name)]
-    #X = np.array(df__country['year'])
-    y = np.array(df_country['value'])
-    index = df_country.index[[df_country['year'] == 1990]]
+    df_country = df_country.reset_index(drop=True)
+    #X = np.array(df_country['year'])
+    #y = np.array(df_country['value'])
+    index_raw = df_country.index[df_country['year'] == "1990"]
+    index = index_raw[0]
+    y_vector = df_country[index :]['value'].tolist()
     x_matrix = []
     x_list = []
-    while index <= len(df_country):
+    while index < (len(df_country)):
         for i in range(1, 11):
             temp_index = index - i
-            x_list.append(df_country.iloc(temp_index)['value'])
+            x_list.append(df_country.iloc[temp_index]['value'])
         x_matrix.append(x_list)
         x_list = []
         index += 1
     
+    x_matrix = np.array(x_matrix)
+    y_vector = np.array(y_vector)
+    return x_matrix, y_vector
     
     
+    
+def autoreg_train(x_matrix, y_vector):
+    """
+    Creates a weight vector for the autoregression model
 
-                           
+    Args:
+        X (array) : matrix of predictor values not including bias terms
+        y (array) : vector of corrseponding response values to X
+
+    Return: 
+
+        m (vector) : vector containing values corresponding to the line of best fit for the inputted values
+    
+    """
+    # adds a bias column to the X input
+    #X = add_bias_column(x_matrix)
+    X = x_matrix
+    #calculates the vector whos values correspond to the slope and intercept of the line of best fit 
+    XtXinv = np.linalg.inv(np.matmul(X.T, X))
+    b = np.matmul(XtXinv, np.matmul(X.T, y_vector))
+    return b
 
 
 
+
+def autoreg_predict(x_matrix, y_vector, b, num):
+
+    """
+    Returns a dictionary containing predicted values, residuals, the mean squared error, and the coefficient of determination
+
+    Args:
+        Xnew (array) : array of the predictor features, not including the bias term
+        ynew (1D array) : 1D array of the corresponding response values to Xnew
+        b (1D array) : array of length p+1 containing the coefficients from the line of best fit
+
+    Return:
+        result (dictionary) : dictionary containing predicted values, residuals, the mean squared error, and the coefficient of determination
+    
+    """
+    #creates predicted values, residuals, mean squared error, and coefficient of determination
+    x_matrix = add_bias_column(x_matrix)
+    test_vec = x_matrix[len(x_matrix) - 1]
+    test_vec = test_vec.tolist()
+    y_pred = []
+    for i in range(num):
+        y_temp = np.dot(test_vec[i + 1: ], b)
+        test_vec.append(y_temp)
+        y_pred.append(y_temp)
     
 
+    #ypreds = np.dot(, b)
+    #res = ynew - ypreds
+    #mse = (res**2).mean()
+    #r2 = r2_score(ynew, ypreds)
+    #adds the previously calculated values to a dictionary
+    #result['ypreds'] = ypreds
+    #result['resids'] = res
+    #result['mse'] = mse
+    #result['r2'] = r2
 
-
-
-def autoreg_predict(df, country_name):
-    #print(series)
-    #pd.set_option('display.max_rows', None)
-    df['year'] = df['year'].astype(float)
-    df_expenditure_country = df[(df['country'] == country_name)]
-
-    X = np.array(df_expenditure_country['year'])
-    y = np.array(df_expenditure_country['value'])
-
-    train_test = train_test_split(X, y, test_size = 0.3, random_state=42)
-    #train_test
-    #finds the line of best fit based on the training data and compares it to the testing data
-    fit = line_of_best_fit(train_test[0], train_test[2])
-    relation_dict = linreg_predict(train_test[1], train_test[3], fit)
-    #graph = show_fit(X, y, fit[1], fit[0])
-    return {
-        "slope": fit[1],
-        "intercept": fit[0],
-        "mse": relation_dict['mse'],
-        "r2": relation_dict['r2']
-    }
+    # returns the dictionary
+    return y_pred
 
    
 
