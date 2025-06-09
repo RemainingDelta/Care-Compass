@@ -11,6 +11,8 @@ from modules.nav import SideBarLinks
 import requests
 import json
 from streamlit_sortables import sort_items
+import plotly.express as px 
+import plotly.graph_objects as go
 
 
 from modules.style import style_sidebar, set_background
@@ -70,8 +72,6 @@ try:
             factor_descriptions[key] = item["description"]
 except Exception as e:
     print("Failed to fetch factor descriptions:", e)
-
-st.title("Please input the country to get similarity scores:")
 
 API_URL = "http://web-api:4000/country/countries"
 
@@ -200,10 +200,10 @@ for i in range(6):
 
 submit = st.button("Submit", type="primary")
 on = st.toggle("Bar Chart / Map")
-sorted_df_similar = pd.DataFrame()
-sorted_df_similar['Country'] = []
-sorted_df_similar['the_country_cosine'] = []
-sorted_df_similar['the_country_dot_product'] = []
+bar_chart_display = pd.DataFrame()
+bar_chart_display['Country'] = []
+bar_chart_display['the_country_cosine'] = []
+bar_chart_display['the_country_dot_product'] = []
 if submit:
         weights_dict = json.dumps(weights_dict)
         #Calculating Similarity 
@@ -217,15 +217,34 @@ if submit:
             data_dict = json.loads(data)
             df_similar = pd.DataFrame(data_dict)
             sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
-            st.write(f"Here are the countries most similar to: {chosen_country}")
-            st.dataframe(sorted_df_similar.head(10)) 
-            st.write(f"Here are the countries least similar to: {chosen_country}")
-            st.dataframe(sorted_df_similar.tail(10)) 
+            #st.write(f"Here are the countries most similar to: {chosen_country}")
+            #st.dataframe(sorted_df_similar.head(10)) 
+            #st.write(f"Here are the countries least similar to: {chosen_country}")
+            #st.dataframe(sorted_df_similar.tail(10)) 
+            bar_chart_display = sorted_df_similar[1:6]
         else:
             st.error("It didn't work")
 if on and chosen_country is not None:
     st.map(sorted_df_similar)
 elif not on and chosen_country is not None: 
-        st.bar_chart(sorted_df_similar['the_country_cosine'])
+    # Create the bar chart with individual bar colors
+    fig = px.bar(bar_chart_display,
+                    x='Country',
+                    y='the_country_cosine',
+                    color='Country',  
+                    color_discrete_sequence=px.colors.qualitative.Set2 
+                )
+
+    fig.update_yaxes(range=[0.90, 1])
+    # Customize axes labels and layout
+    fig.update_layout(
+        xaxis_title="Country",
+        yaxis_title="Similarity Score"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+    #st.bar_chart(bar_chart_display, x="Country", 
+     #            y="the_country_cosine", x_label="Country", y_label="Overall Score (unscaled)")
+
 
 
