@@ -90,13 +90,26 @@ st.write("")
 st.write("")
 
 #handles getting the country code needed for accessing each dataset 
-if country1 or country2 or country3:
+if country1 :
     start_index = (str(country1)).index('-') + 1
     country1 = country1[start_index:]
 else:
     st.info("Please select countries to proceed.")
 
+if country2 :
+    start_index = (str(country2)).index('-') + 1
+    country2 = country2[start_index:]
+
+if country3 and country3_status :
+    start_index = (str(country3)).index('-') + 1
+    country3 = country3[start_index:]
+
 table = st.button("Submit", type="primary")
+
+st.write(country1)
+st.write(country2)
+st.write(country3)
+
 
 
 # CODE FOR DATAFRAME STARTS
@@ -136,7 +149,7 @@ def display_data(data_code, country):
         st.error(f"Error: {all_countries.status_code}")
         st.write(all_countries.text)
 
-
+"""
 life_expectancy_1 = display_data("H2020_17","Life Expectancy (years)")
 inf_mortality_1 = display_data("H2020_19", "Infant Mortality Rate (%)")
 live_births_1 = display_data("HFA_16","Live Births per 1000 Population")
@@ -146,9 +159,10 @@ impov_house = display_data("UHCFP_2", "Impoverished Households due to out-of-poc
 
 df = {life_expectancy_1}
 
-        
+        """
 
-
+d = {'col1': [1, 2], 'col2': [3, 4]}
+df = pd.DataFrame(data=d)
 
 
 # TABLE
