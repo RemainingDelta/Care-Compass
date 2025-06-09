@@ -8,6 +8,8 @@ from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
 from backend.ml_models.regression import autoreg_predict
+import pandas as pd
+import json
 
 
 
@@ -104,8 +106,8 @@ def store_weights():
     
 # model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/ml/get_cosine_similar/<chosen_country>/<weights_dict>", methods=["GET"])
-def get_cosine_similar(chosen_country, weights_dict):
+@ml.route("/ml/cosine/<chosen_country>/<weights_dict>", methods=["GET"])
+def cosine(chosen_country, weights_dict):
     weights_vect = []
     #weights_dict_dump = json.dumps(weights_dict) 
     weights_dict2 = json.loads(weights_dict)
