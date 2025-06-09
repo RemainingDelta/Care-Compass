@@ -199,6 +199,57 @@ def predict(df_expenditure, country_name):
         "mse": relation_dict['mse'],
         "r2": relation_dict['r2']
     }
+#function for creating the X and y for the autoregressive model
+def create_xy(df, country_name):
+
+    df['year'] = df['year'].astype(float)
+    df_country = df[(df['country'] == country_name)]
+    #X = np.array(df__country['year'])
+    y = np.array(df_country['value'])
+    index = df_country.index[[df_country['year'] == 1990]]
+    x_matrix = []
+    x_list = []
+    while index <= len(df_country):
+        for i in range(1, 11):
+            temp_index = index - i
+            x_list.append(df_country.iloc(temp_index)['value'])
+        x_matrix.append(x_list)
+        x_list = []
+        index += 1
+    
+    
+    
+
+                           
+
+
+
+    
+
+
+
+
+def autoreg_predict(df, country_name):
+    #print(series)
+    #pd.set_option('display.max_rows', None)
+    df['year'] = df['year'].astype(float)
+    df_expenditure_country = df[(df['country'] == country_name)]
+
+    X = np.array(df_expenditure_country['year'])
+    y = np.array(df_expenditure_country['value'])
+
+    train_test = train_test_split(X, y, test_size = 0.3, random_state=42)
+    #train_test
+    #finds the line of best fit based on the training data and compares it to the testing data
+    fit = line_of_best_fit(train_test[0], train_test[2])
+    relation_dict = linreg_predict(train_test[1], train_test[3], fit)
+    #graph = show_fit(X, y, fit[1], fit[0])
+    return {
+        "slope": fit[1],
+        "intercept": fit[0],
+        "mse": relation_dict['mse'],
+        "r2": relation_dict['r2']
+    }
 
    
 

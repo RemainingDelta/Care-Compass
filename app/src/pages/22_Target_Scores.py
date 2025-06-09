@@ -18,23 +18,26 @@ headers = {
     "Content-Type": "application/json"
 }
 
-# Your backend endpoint URL
+# backend endpoint URL
 API_URL = "http://host.docker.internal:4000/country/countries"  
 
 country_list = []
 
 try:
+    #gathers the coutry data for the dropdown box (country and country code)
     response = requests.get(API_URL, headers=headers, timeout=10)
     response.raise_for_status()
-    
+
+    #converts gathered data into json
     data = response.json()
 
     country_list = [item["name"] for item in data]
     code_list = [item["code"] for item in data]
+    #creates list of countrys and their corresponding country codes
     country_code_list = [item['name'] + '-' + item['code'] for item in data]
     print("Countries:", country_list)
 
-
+#throws errors if get request was unsuccessful
 except requests.exceptions.RequestException as e:
     print("API request failed:", e)
 except (KeyError, TypeError) as e:
@@ -47,6 +50,7 @@ st.write("")
 col1, col2 = st.columns(2)
 
 with col1:
+    #creates the dropdown box and returns only the country code of the selected country
     chosen_country2 = st.selectbox(
             "Choose Country:",
             country_code_list,
@@ -57,6 +61,8 @@ with col1:
         start_index = (str(chosen_country2)).index('-') + 1
         chosen_country = chosen_country2[start_index:]
         st.write("You selected ", chosen_country2)
+    else:
+        st.info("Please select a country to proceed")
      #st.form_submit_button(
         #  label="Submit", 
          # help=None, 
@@ -72,8 +78,9 @@ with col1:
 
 st.write("")
 st.write("")
-st.subheader("INPUT TARGET SCORES")
+st.subheader("INPUT TARGET Values")
 col_calculate, col_null = st.columns(2)
+#creates the calculate button for calculating target values
 with col_calculate:
     calculate_bool = False
     calculate = st.button("Calculate", type="primary")
@@ -99,12 +106,18 @@ impoverished_bool = False
 
 
 
+# creates input box for each W.H.O value
+
+# each input box follows the same format as 
+# demonstrated within the code for the life expectancy input box below.
 with cola:
+        #input box for life expectancy
         life_expectancy = st.number_input("Life Expectancy")
         if life_expectancy and calculate_bool:
             expectancy_value = life_expectancy
             expectancy_bool = True
             
+            #data code for life expectancy and get request url which passes through country and data_code
             data_code = "H2020_17"
             api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
             try:
@@ -113,10 +126,11 @@ with cola:
                 "Accept": "application/json",
                 "Content-Type": "application/json"
                 }
-
+                #returns data gathered from the get request
                 response = requests.get(api_url, headers=headers, timeout=10)
                 response_text = requests.get(api_url, headers=headers, timeout=10).text
 
+                #calculates the predicted date if the get request was successful 
                 if response.status_code == 200:
                     if expectancy_bool and calculate_bool:
                         data = response.json()  
@@ -127,6 +141,8 @@ with cola:
                         st.write("The predicted date for this value is:")
                         st.write(round(calculation))
                         #st.badge(f"The predicted date for this value is: {round(calculation, 1)}", color='blue')
+                # returns the status_code if an error with the get request is encountered
+                # or if data for the requested country does not exist for the given dataset
                 else:
                     st.error(f"Error: {response.status_code}")
                     st.error(f"No life expectancy data for: {chosen_country}")
@@ -313,9 +329,6 @@ with colc:
                 st.write(f"URL that worked : {api_url}")
 
         
-
-st.write("")
-st.write("")
 
 
 
