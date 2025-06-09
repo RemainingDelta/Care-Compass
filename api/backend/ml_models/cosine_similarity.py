@@ -12,8 +12,10 @@ import requests
 import pandas as pd
 
 
-def get_similar(chosen_country):
+def get_similar(chosen_country, weights_vect):
+  print(weights_vect)  
 
+  #weights_vect = float(weights_vect)
 
 # Fix this to not just call API here?
   ghs_index = pd.read_csv('https://www.ghsindex.org/wp-content/uploads/2022/04/2021-GHS-Index-April-2022.csv')
@@ -36,17 +38,30 @@ def get_similar(chosen_country):
   #print(f'Country index: {country_index}')
   the_country_vec = ghs_index_2021_scaled.iloc[country_index].to_numpy()
   print("This is the full data point for country:\n", the_country_vec)
+  print("WEIGHTS VECTOR:\n", weights_vect)
+  #doing the weight scaling for chosen country 
+  the_country_vec = np.multiply(the_country_vec, weights_vect)
+  #print(the_country_vec)
+
+  
+
 
   # this creates empty lists to fill in with the dot products and cos(theta) of each country relative to Vietnam
   the_country_dot_products = []
   the_country_cosines = []
 
-  # this goes iteratively (loops) through each song in the data set and:
-  # (a) calculates the dot product between Mr. Brightside and the song
-  # (b) calculates the cosine(theta) between Mr. Brightside and the song
+  # this goes iteratively (loops) through each country in the data set and:
+  # (a) calculates the dot product between the chosen country and the current country 
+  # (b) calculates the cosine(theta) between the chosen country and the current country
   for country in range(ghs_index_2021_scaled.shape[0]):
 
     temp_country_vec = ghs_index_2021_scaled.iloc[country].to_numpy()
+
+    print("THE VECTOR BEFORE:", temp_country_vec.shape)
+    #doing the weight scaling for temp country 
+    temp_country_vec = np.multiply(temp_country_vec, weights_vect)
+
+    print("THE VECTOR AFTER:", the_country_vec.shape)
 
     temp_dot = np.dot(the_country_vec, temp_country_vec)
     temp_cos = temp_dot/(np.linalg.norm(the_country_vec) * np.linalg.norm(temp_country_vec))
