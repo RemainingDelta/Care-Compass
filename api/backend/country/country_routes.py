@@ -274,3 +274,5 @@ def get_data(input):
     result = dataframe(input)
     table = result.to_dict()
     return jsonify(table)
+
+#post route for six features 
