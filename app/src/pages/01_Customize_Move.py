@@ -102,7 +102,7 @@ if st.button("Submit"):
          st.dataframe(sorted_df_similar.tail(10)) 
 
 
-st.subheader("Rank the healthcare factors (drag to reorder)")
+st.subheader("Rank the healthcare factors (drag to reorder, top = 1, bottom = 6)")
 
 factors = [
     "Prevention",
@@ -120,13 +120,11 @@ if "dragged_factors" not in st.session_state:
     st.session_state.dragged_factors = factors.copy()
 
 # Show rank guidance
-st.markdown('<div style="text-align: center; font-weight: bold;">1</div>', unsafe_allow_html=True)
 st.session_state.dragged_factors = sort_items(
     st.session_state.dragged_factors,
     direction="vertical",
     key="drag_order"
 )
-st.markdown('<div style="text-align: center; font-weight: bold;">6</div>', unsafe_allow_html=True)
 
 # Set default weights per slot, not per factor
 if "slot_weights" not in st.session_state:
