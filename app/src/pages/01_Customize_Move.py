@@ -147,21 +147,15 @@ if "slot_weights" not in st.session_state:
 
 st.markdown("### Adjust weight for each priority slot")
 
-ranges = [(90, 100), (70, 90), (50, 70), (30, 50), (10, 30), (0, 10)]
+slider_range = (1, 10)
 
 for i in range(6):
     factor = st.session_state.dragged_factors[i]
-    min_val, max_val = ranges[i]
 
-    # Clamp value into range
-    cur_val = min(max(st.session_state.slot_weights[i], min_val), max_val)
-
-    # Create row: number | factor | slider | input
     col_num, col_label, col_slider, col_input = st.columns([1, 3, 5, 2])
     with col_num:
         st.markdown(f"**{i+1}.**")
     with col_label:
-    # Mapping UI label → API label for tooltips
         tooltip_keys = {
             "prevention": "prevention",
             "healthsystem": "healthsystem",
@@ -170,7 +164,6 @@ for i in range(6):
             "internationalnormscompliance": "compliancewithinternationalnorms",
             "riskenvironment": "riskenvironment"
         }
-
         lookup_key = tooltip_keys.get(factor.lower().replace(" ", "").strip(), "")
         desc = factor_descriptions.get(lookup_key, "")
 
@@ -179,27 +172,39 @@ for i in range(6):
             st.markdown(f"**{factor}**", unsafe_allow_html=True)
         with col_icon:
             st.button(
-                label=" ",  # empty label for accessibility
-                key=f"info_button_{i}",
-                help=desc,  # This is the tooltip text
-                icon="ℹ️",
-                use_container_width=True
+                label=" ", key=f"info_button_{i}", help=desc, icon="ℹ️", use_container_width=True
             )
 
-
     with col_slider:
-        st.session_state.slot_weights[i] = st.slider(
-            "_", min_val, max_val, cur_val, key=f"slider_{i}", 
-            label_visibility="collapsed"
+        slider_val = st.slider(
+            "_", 0, 10, 5, key=f"slider_{i}", label_visibility="collapsed"
+        )
+    with col_input:
+        slider_val = st.number_input(
+            "_", min_value=0, max_value=10, value=slider_val,
+            step=1, key=f"input_{i}", label_visibility="collapsed"
         )
 
-    with col_input:
-        st.session_state.slot_weights[i] = st.number_input(
-            "_", min_value=min_val, max_value=max_val,
-            value=st.session_state.slot_weights[i],
-            step=1, key=f"input_{i}",
-            label_visibility="collapsed"
-        )
+    if i == 0:
+        true_weight = 90 + slider_val
+    elif i == 5:
+        true_weight = slider_val
+    else:
+        true_weight = 90 - 20 * i + 2 * slider_val
+
+    st.session_state.slot_weights[i] = true_weight
+
+
+
+if i == 0:
+    true_weight = 90 + slider_val
+elif i == 5:
+    true_weight = slider_val
+else:
+    base = 90 - 20 * i
+    true_weight = base + 2 * slider_val
+
+st.session_state.slot_weights[i] = true_weight
 
 
 # Output
