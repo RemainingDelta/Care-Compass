@@ -7,7 +7,6 @@ import numpy as np
 from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
-import json
 
 
 ml = Blueprint("ml", __name__)
@@ -145,6 +144,16 @@ def get_cosine_similar(chosen_country, weights_dict):
 def get_regression(input):
     inputs = [str(x.strip()) for x in input.split(',')]
     result = predict(dataframe(inputs[1]), inputs[0])
+    print("Country received:", inputs[0])
+
+    return jsonify(result)
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_autoregressive/<input>", methods=["GET"])
+def get_autoregressive(input):
+    inputs = [str(x.strip()) for x in input.split(',')]
+    result = autoreg_predict(dataframe(inputs[1]), inputs[0])
     print("Country received:", inputs[0])
 
     return jsonify(result)
