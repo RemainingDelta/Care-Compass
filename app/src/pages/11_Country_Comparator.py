@@ -99,8 +99,23 @@ else:
 table = st.button("Submit", type="primary")
 
 
+# CODE FOR DATAFRAME STARTS
+life_expectancy = "Life Expectancy (years)"
+inf_mortality = "Infant Mortality Rate (%)"
+live_births = "Live Births per 1000 Population"
+gen_practitioners = "General Practitioners per 10,000 Population"
+health_expend = "Total Health Expenditure per Capita"
+impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
+
+#d = pd.DataFrame([1,2,3,4,5,6], 
+                # index=[country1,country2,country3], 
+              #   columns=[life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house])
+
+#df = pd.DataFrame(data=d, index=[country1,country2,country3])
+#st.write(df)
+
 # DISPLAYING TABLE OF FEATURES
-def display_data(data_code, y_value):
+def display_data(data_code, country):
     get_data = f"http://host.docker.internal:4000/country/countries/data/{data_code}"
     headers = {
         "User-Agent": "Python/requests",
@@ -113,13 +128,13 @@ def display_data(data_code, y_value):
     if all_countries.status_code == 200:
         data_dict = json.loads(all_country)
 
-        df_country = pd.DataFrame(data_dict)
+        df = pd.DataFrame(data_dict)
+
         #print(df_graph)
 
     else:
         st.error(f"Error: {all_countries.status_code}")
         st.write(all_countries.text)
-
 
 
 life_expectancy_1 = display_data("H2020_17","Life Expectancy (years)")
@@ -149,6 +164,7 @@ if table:
 st.write("")
 st.write("")
 
+features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
 # TRACK FEATURE OVER TIME
 feature = st.selectbox(
             "Track a feature over time:",
