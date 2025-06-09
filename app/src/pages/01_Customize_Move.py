@@ -56,6 +56,21 @@ headers = {
     "Content-Type": "application/json"
 }
 
+# Fetch factor descriptions for tooltips
+factor_descriptions = {}
+
+try:
+    response = requests.get("http://host.docker.internal:4000/recommendations/factors", headers=headers, timeout=10)
+    if response.status_code == 200:
+        data = response.json()
+        for item in data:
+            # Normalize key for matching
+            key = item["name"].lower().replace(" ", "").replace("&", "and").strip()
+            print("Storing description for:", key)
+            factor_descriptions[key] = item["description"]
+except Exception as e:
+    print("Failed to fetch factor descriptions:", e)
+
 st.title("Please input the country to get similarity scores:")
 
 API_URL = "http://web-api:4000/country/countries"
@@ -146,21 +161,46 @@ for i in range(6):
     with col_num:
         st.markdown(f"**{i+1}.**")
     with col_label:
-        st.markdown(f"""
-            <div style="padding-top: 8px; font-weight: 600;">
-                {factor}
-            </div>
-        """, unsafe_allow_html=True)
+    # Mapping UI label → API label for tooltips
+        tooltip_keys = {
+            "prevention": "prevention",
+            "healthsystem": "healthsystem",
+            "rapidresponse": "rapidresponse",
+            "detection&reporting": "detectionandreporting",
+            "internationalnormscompliance": "compliancewithinternationalnorms",
+            "riskenvironment": "riskenvironment"
+        }
+
+        lookup_key = tooltip_keys.get(factor.lower().replace(" ", "").strip(), "")
+        desc = factor_descriptions.get(lookup_key, "")
+
+        col_text, col_icon = st.columns([8, 1])
+        with col_text:
+            st.markdown(f"**{factor}**", unsafe_allow_html=True)
+        with col_icon:
+            st.button(
+                label=" ",  # empty label for accessibility
+                key=f"info_button_{i}",
+                help=desc,  # This is the tooltip text
+                icon="ℹ️",
+                use_container_width=True
+            )
+
+
     with col_slider:
         st.session_state.slot_weights[i] = st.slider(
-            "", min_val, max_val, cur_val, key=f"slider_{i}"
+            "_", min_val, max_val, cur_val, key=f"slider_{i}", 
+            label_visibility="collapsed"
         )
+
     with col_input:
         st.session_state.slot_weights[i] = st.number_input(
-            "", min_value=min_val, max_value=max_val,
+            "_", min_value=min_val, max_value=max_val,
             value=st.session_state.slot_weights[i],
-            step=1, key=f"input_{i}"
+            step=1, key=f"input_{i}",
+            label_visibility="collapsed"
         )
+
 
 # Output
 st.markdown("---")
