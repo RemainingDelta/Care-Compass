@@ -97,25 +97,6 @@ chosen_country = st.selectbox("Select Country:",
                                 country_list,
                                 index=None)
 
-# Submit button
-if st.button("Submit"):
-    
-    #Hard coding similarity for now: 
-    api_url = f"http://host.docker.internal:4000/ml/ml/get_cosine_similar/{chosen_country}"
-    response = requests.get(api_url, headers=headers, timeout=10)
-    #print(response)
-
-    if response.status_code == 200:
-         data = response.text  
-         #st.success("It worked!")
-         data_dict = json.loads(data)
-         df_similar = pd.DataFrame(data_dict)
-         sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
-         st.write(f"Here are the countries most similar to: {chosen_country}")
-         st.dataframe(sorted_df_similar.head(10)) 
-         st.write(f"Here are the countries least similar to: {chosen_country}")
-         st.dataframe(sorted_df_similar.tail(10)) 
-
 
 st.subheader("Rank the healthcare factors (drag to reorder, top = 1, bottom = 6)")
 
@@ -206,7 +187,7 @@ else:
 
 st.session_state.slot_weights[i] = true_weight
 
-
+weights_dict = {}
 # Output
 st.markdown("---")
 st.markdown("### Final Rankings & Slot Weights")
@@ -214,3 +195,37 @@ for i in range(6):
     factor = st.session_state.dragged_factors[i]
     weight = st.session_state.slot_weights[i]
     st.write(f"{i+1}. {factor}: {weight}")
+    weights_dict[factor] = float(weight/100)
+
+
+submit = st.button("Submit", type="primary")
+on = st.toggle("Bar Chart / Map")
+sorted_df_similar = pd.DataFrame()
+sorted_df_similar['Country'] = []
+sorted_df_similar['the_country_cosine'] = []
+sorted_df_similar['the_country_dot_product'] = []
+if submit:
+        weights_dict = json.dumps(weights_dict)
+        #Calculating Similarity 
+        api_url = f"http://host.docker.internal:4000/ml/ml/cosine/{chosen_country}/{weights_dict}"
+        response = requests.get(api_url, headers=headers, timeout=10)
+        #print(response)
+
+        if response.status_code == 200:
+            data = response.text  
+            #st.success("It worked!")
+            data_dict = json.loads(data)
+            df_similar = pd.DataFrame(data_dict)
+            sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
+            st.write(f"Here are the countries most similar to: {chosen_country}")
+            st.dataframe(sorted_df_similar.head(10)) 
+            st.write(f"Here are the countries least similar to: {chosen_country}")
+            st.dataframe(sorted_df_similar.tail(10)) 
+        else:
+            st.error("It didn't work")
+if on and chosen_country is not None:
+    st.map(sorted_df_similar)
+elif not on and chosen_country is not None: 
+        st.bar_chart(sorted_df_similar['the_country_cosine'])
+
+
