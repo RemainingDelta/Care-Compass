@@ -15,6 +15,7 @@ from modules.style import style_sidebar, set_background
 style_sidebar()
 set_background("assets/backdrop.jpg")
 
+
 # Display the appropriate sidebar links for the role of the logged in user
 SideBarLinks()
 
@@ -106,10 +107,6 @@ if country3 and country3_status :
 
 table = st.button("Submit", type="primary")
 
-st.write(country1)
-st.write(country2)
-st.write(country3)
-
 
 
 # CODE FOR DATAFRAME STARTS
@@ -120,46 +117,69 @@ gen_practitioners = "General Practitioners per 10,000 Population"
 health_expend = "Total Health Expenditure per Capita"
 impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
 
-#d = pd.DataFrame([1,2,3,4,5,6], 
-                # index=[country1,country2,country3], 
-              #   columns=[life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house])
 
-#df = pd.DataFrame(data=d, index=[country1,country2,country3])
-#st.write(df)
+codes = ["H2020_17","H2020_20","HFA_16","HLTHRES_67","HFA_570","UHCFP_2"]
+countries = [country1, country2, country3]
 
-# DISPLAYING TABLE OF FEATURES
-def display_data(data_code, country):
-    get_data = f"http://host.docker.internal:4000/country/countries/data/{data_code}"
-    headers = {
-        "User-Agent": "Python/requests",
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-        }
-    
-    all_countries = requests.get(get_data, headers=headers, timeout=10)
-    all_country = requests.get(get_data, headers=headers, timeout=10).text
-    if all_countries.status_code == 200:
-        data_dict = json.loads(all_country)
+if table:
+    master_df = pd.DataFrame()
 
-        df = pd.DataFrame(data_dict)
+    for country in countries:
+        try:
+            headers = {
+                "User-Agent": "Python/requests",
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
 
-        #print(df_graph)
+            countryurl = f"http://host.docker.internal:4000/country/features/{country}"
+            response = requests.get(countryurl)
 
-    else:
-        st.error(f"Error: {all_countries.status_code}")
-        st.write(all_countries.text)
+            if response.status_code == 200:
+                data_dict = response.json()
 
-"""
-life_expectancy_1 = display_data("H2020_17","Life Expectancy (years)")
-inf_mortality_1 = display_data("H2020_19", "Infant Mortality Rate (%)")
-live_births_1 = display_data("HFA_16","Live Births per 1000 Population")
-gen_practitioners_1 = display_data("HLTHRES_67", "General Practitioners per 10,000 Population")
-health_expend = display_data("HFA_570","Total Health Expenditure per Capita")
-impov_house = display_data("UHCFP_2", "Impoverished Households due to out-of-pocket healthcare payments")
+                # Debug step — see what the API returned
+                st.write(f"🔍 Raw API response for {country}:", data_dict)
 
-df = {life_expectancy_1}
+                # CHAT GPT - to flatten dictionary row
+                flat_row = {}
 
-        """
+                if isinstance(data_dict, dict):
+                    for feature_name, feature_values in data_dict.items():
+                        if isinstance(feature_values, dict):
+                            for k, v in feature_values.items():
+                                flat_row[f"{feature_name} - {k}"] = v
+                        else:
+                            # If it's just a value (int, str, float...), include directly
+                            flat_row[feature_name] = feature_values
+
+                    flat_row["Country"] = country
+                    df = pd.DataFrame([flat_row])
+
+                elif isinstance(data_dict, list):
+                    df = pd.DataFrame(data_dict)
+                    df["Country"] = country
+
+                else:
+                    st.error(f"Unsupported response format for country: {country}")
+                    continue
+
+                # write data table
+                st.write(f"### Data for country: {country}")
+                st.write(df)
+                master_df = pd.concat([master_df, df], ignore_index=True)
+                st.write(master_df)
+
+
+            else:
+                st.error(f"Failed to fetch data for country: {country} (status code {response.status_code})")
+
+        except Exception as e:
+            st.error(f"Error: {str(e)}")
+            st.write(f"URL that worked : {countryurl}")
+
+
+
 
 d = {'col1': [1, 2], 'col2': [3, 4]}
 df = pd.DataFrame(data=d)
