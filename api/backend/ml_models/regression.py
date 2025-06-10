@@ -142,7 +142,7 @@ def dataframe(code):
     headers = {
     "Accept": "application/json",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-}
+    }
            
     url2 = f"https://dw.euro.who.int/api/v3/measures/{code}?output=data"
     url_text2 = requests.get(url2, headers=headers).text
