@@ -10,32 +10,52 @@ import numpy as np
 from flask import current_app
 import requests 
 import pandas as pd
+import json
 
 
-def get_similar(chosen_country, weights_vect):
+def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_scaled):
   print(weights_vect)  
 
   #weights_vect = float(weights_vect)
 
-# Fix this to not just call API here?
-  ghs_index = pd.read_csv('https://www.ghsindex.org/wp-content/uploads/2022/04/2021-GHS-Index-April-2022.csv')
+  # Fix this to not just call API here and get from database table
+  #ghs_index = pd.read_csv('https://www.ghsindex.org/wp-content/uploads/2022/04/2021-GHS-Index-April-2022.csv')
 
 
-  ghs_index_2021 = ghs_index[(ghs_index['Year'] == 2021)]
-  ghs_index_2021_factors = ghs_index_2021[["1) PREVENTION OF THE EMERGENCE OR RELEASE OF PATHOGENS", "2) EARLY DETECTION & REPORTING FOR EPIDEMICS OF POTENTIAL INT'L CONCERN", "3) RAPID RESPONSE TO AND MITIGATION OF THE SPREAD OF AN EPIDEMIC",
-                          "4) SUFFICIENT & ROBUST HEALTH SECTOR TO TREAT THE SICK & PROTECT HEALTH WORKERS","5) COMMITMENTS TO IMPROVING NATIONAL CAPACITY, FINANCING AND ADHERENCE TO NORMS", "6) OVERALL RISK ENVIRONMENT AND COUNTRY VULNERABILITY TO BIOLOGICAL THREATS"]]
-  # gets the numeric features for the 6 main categories for ghs_index and standardizes them
-  ghs_index_2021_scaled = ghs_index_2021_factors[["1) PREVENTION OF THE EMERGENCE OR RELEASE OF PATHOGENS", "2) EARLY DETECTION & REPORTING FOR EPIDEMICS OF POTENTIAL INT'L CONCERN", "3) RAPID RESPONSE TO AND MITIGATION OF THE SPREAD OF AN EPIDEMIC",
-                          "4) SUFFICIENT & ROBUST HEALTH SECTOR TO TREAT THE SICK & PROTECT HEALTH WORKERS","5) COMMITMENTS TO IMPROVING NATIONAL CAPACITY, FINANCING AND ADHERENCE TO NORMS", "6) OVERALL RISK ENVIRONMENT AND COUNTRY VULNERABILITY TO BIOLOGICAL THREATS"]]
-  for feat in ghs_index_2021_scaled.columns:
-    ghs_index_2021_scaled[feat] = (ghs_index_2021_scaled[feat] - ghs_index_2021_scaled[feat].mean()) / ghs_index_2021_scaled[feat].std()
+  #ghs_index_2021 = ghs_index[(ghs_index['Year'] == 2021)]
 
-  #ghs_index_2021.head()
-  #ghs_index_2021_scaled.head()
+  print("This is the uncleaned ghs_index")
+  print(ghs_index_2021)
 
-  # which countries are most similar to Vietnam (example)
-  country_index = ghs_index_2021.index[ghs_index_2021['Country'] == chosen_country].tolist()
-  #print(f'Country index: {country_index}')
+  print("This is the cleaned ghs_index")
+  print(ghs_index_2021_scaled)
+
+  #converting country code to country
+# Your backend endpoint URL
+  country_url = "http://host.docker.internal:4000/country/countries"  
+
+
+  try:
+    headers = {
+        "User-Agent": "Python/requests",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    response = requests.get(country_url, headers=headers, timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    df_country_and_code = pd.DataFrame(data)
+    print(df_country_and_code)
+
+    for index, row in df_country_and_code.iterrows():
+       if row['name'] == chosen_country:
+         chosen_country = row['code']
+  except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+
+  # which countries are most similar to the given country
+  country_index = ghs_index_2021.index[ghs_index_2021['country'] == chosen_country].tolist()
+  print(f'Country index: {country_index}')
   the_country_vec = ghs_index_2021_scaled.iloc[country_index].to_numpy()
   print("This is the full data point for country:\n", the_country_vec)
   print("WEIGHTS VECTOR:\n", weights_vect)
@@ -60,7 +80,8 @@ def get_similar(chosen_country, weights_vect):
     print("THE VECTOR BEFORE:", temp_country_vec.shape)
     #doing the weight scaling for temp country 
     temp_country_vec = np.multiply(temp_country_vec, weights_vect)
-
+    print("This is the temp country vec as you can see:")
+    print(temp_country_vec)
     print("THE VECTOR AFTER:", the_country_vec.shape)
 
     temp_dot = np.dot(the_country_vec, temp_country_vec)
@@ -70,7 +91,7 @@ def get_similar(chosen_country, weights_vect):
     the_country_cosines.append(temp_cos[0])
 
   # this puts the country similarity info into a dataframe 
-  dict_country = {'Country': ghs_index_2021.Country,
+  dict_country = {'Country': ghs_index_2021.country,
             'the_country_dot_product': the_country_dot_products,
             'the_country_cosine': the_country_cosines}
   df_country = pd.DataFrame(dict_country)

@@ -96,7 +96,7 @@ except (KeyError, TypeError) as e:
 chosen_country = st.selectbox("Select Country:", 
                                 country_list,
                                 index=None)
-
+#st.write("FRONTEND SELECTED COUNTRY", chosen_country)
 
 st.subheader("Rank the healthcare factors (drag to reorder, top = 1, bottom = 6)")
 
@@ -199,7 +199,7 @@ for i in range(6):
 
 
 submit = st.button("Submit", type="primary")
-on = st.toggle("Bar Chart / Map")
+on = st.toggle("Overall Scores / Similarity Scores")
 bar_chart_display = pd.DataFrame()
 bar_chart_display['Country'] = []
 bar_chart_display['the_country_cosine'] = []
@@ -223,6 +223,7 @@ if submit:
             #st.dataframe(sorted_df_similar.tail(10)) 
             bar_chart_display = sorted_df_similar[1:6]
         else:
+            st.error(response.status_code)
             st.error("It didn't work")
 if on and chosen_country is not None:
     st.map(sorted_df_similar)

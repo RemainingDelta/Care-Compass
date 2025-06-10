@@ -103,43 +103,6 @@ def store_weights():
         )
     except Error as e:
         return jsonify({"error": str(e)}), 500
-    
-# model calls post to put weights in database
-# adds new regression weight from model to database
-@ml.route("/ml/cosine/<chosen_country>/<weights_dict>", methods=["GET"])
-def cosine(chosen_country, weights_dict):
-    weights_vect = []
-    #weights_dict_dump = json.dumps(weights_dict) 
-    weights_dict2 = json.loads(weights_dict)
-    print("THIS IS WEIGHTS DICT 2")
-    print(weights_dict2)
-    for key in weights_dict2:
-        print("ITERATION 1")
-        if key == "Prevention":
-            print("This is prevention")
-            print(weights_dict2[key])
-            weights_vect.append(weights_dict2[key])
-    for key in weights_dict2:
-        if key == "Detection & Reporting":
-            weights_vect.append(weights_dict2[key])
-    for key in weights_dict2:
-        if key == "Rapid Response":
-            weights_vect.append(weights_dict2[key])
-    for key in weights_dict2:
-        if key == "Health System":
-            weights_vect.append(weights_dict2[key])
-    for key in weights_dict2:
-        if key == "International Norms Compliance":
-            weights_vect.append(weights_dict2[key])
-    for key in weights_dict2:
-        if key == "Risk Environment":
-            weights_vect.append(weights_dict2[key])
-    print(weights_vect)
-    df = get_similar(chosen_country, weights_vect)
-    print("Country received:", chosen_country)
-
-    result = df.to_dict()
-    return jsonify(result)
 
 
 #model calls post to put weights in database
@@ -191,3 +154,75 @@ def get_countries():
     cursor.execute("SELECT DISTINCT COUNTRY FROM births_table WHERE COUNTRY IS NOT NULL ORDER BY COUNTRY")
     countries = [row[0] for row in cursor.fetchall()]
     return countries
+
+
+#Gets the cosine similarity numbers for the chosen country 
+@ml.route("/ml/cosine/<chosen_country>/<weights_dict>", methods=["GET"])
+def cosine(chosen_country, weights_dict):
+# Get DB cursor
+    cursor = db.get_db().cursor()
+
+    # Query only relevant columns for year 2021
+    query = """
+        SELECT 
+            country,
+            prevention,
+            detectReport,
+            rapidResp,
+            healthSys,
+            intlNorms,
+            riskEnv
+        FROM OverallScore
+    """
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    # Convert to DataFrame
+    columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
+    df_unscaled = pd.DataFrame(rows, columns=columns)
+    print("UNSCALED ROUTE:", df_unscaled)
+
+    #SCALE THE DATA: 
+    ghs_index_2021_factors =df_unscaled[["prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]]
+    # gets the numeric features for the 6 main categories for ghs_index and standardize them
+    df_scaled = ghs_index_2021_factors[["prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]]
+
+    for feat in df_scaled.columns:
+        df_scaled[feat] = (df_scaled[feat] - df_scaled[feat].mean()) / df_scaled[feat].std()
+    print("SCALED ROUTE:", df_scaled)
+
+
+    weights_vect = []
+    #weights_dict_dump = json.dumps(weights_dict) 
+    weights_dict2 = json.loads(weights_dict)
+    print("THIS IS WEIGHTS DICT 2")
+    print(weights_dict2)
+    for key in weights_dict2:
+        print("ITERATION 1")
+        if key == "Prevention":
+            print("This is prevention")
+            print(weights_dict2[key])
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Detection & Reporting":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Rapid Response":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Health System":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "International Norms Compliance":
+            weights_vect.append(weights_dict2[key])
+    for key in weights_dict2:
+        if key == "Risk Environment":
+            weights_vect.append(weights_dict2[key])
+    print(weights_vect)
+    df = get_similar(chosen_country, weights_vect, df_unscaled, df_scaled)
+    print("Country received:", chosen_country)
+
+    result = df.to_dict()
+    return jsonify(result)
+
+
