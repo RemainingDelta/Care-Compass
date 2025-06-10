@@ -163,12 +163,24 @@ if table:
     else:
         st.write("")
         st.dataframe(master_df)
+        st.write("*General Practitioners per 10,000 Population")
+        st.write("** Total Health Expenditure per Capita")
+        st.write("+Impoverished Households due to out-of-pocket healthcare payments")
+        st.write("++ Live Births per 1000 Population")
 
 
 st.write("")
 st.write("")
 
-#features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
+life_expectancy = "Life Expectancy (years)"
+inf_mortality = "Infant Mortality Rate (%)"
+live_births = "Live Births per 1000 Population"
+gen_practitioners = "General Practitioners per 10,000 Population"
+health_expend = "Total Health Expenditure per Capita"
+impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
+
+features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
+
 # TRACK FEATURE OVER TIME
 feature = st.selectbox(
             "Track a feature over time:",

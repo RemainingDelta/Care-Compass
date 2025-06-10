@@ -410,11 +410,11 @@ def get_all_features(input):
 
         # Combine data from multiple related queries into one object to return (after jsonify)
         result = {
-            "Live Births per 1000 Population": filter_livebirths,
+            "Live Births++": filter_livebirths,
             "Life Expectancy (years)": filter_lifeexpec,
-            "General Practitioners per 10,000 Population": filter_genpract,
-            "Total Health Expenditure per Capita": filter_healthexpend,
-            "Impoverished Households due to out-of-pocket healthcare payments": filter_impovhouse,
+            "General Practitioners*": filter_genpract,
+            "Health Expenditure**": filter_healthexpend,
+            "Impoverished Households+": filter_impovhouse,
             "Infant Mortality Rate (%)": filter_infmort,
         }
 
