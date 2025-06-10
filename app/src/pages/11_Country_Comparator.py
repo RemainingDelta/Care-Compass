@@ -108,17 +108,7 @@ if country3 and country3_status :
 table = st.button("Submit", type="primary")
 
 
-
-# CODE FOR DATAFRAME STARTS
-life_expectancy = "Life Expectancy (years)"
-inf_mortality = "Infant Mortality Rate (%)"
-live_births = "Live Births per 1000 Population"
-gen_practitioners = "General Practitioners per 10,000 Population"
-health_expend = "Total Health Expenditure per Capita"
-impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
-
-
-codes = ["H2020_17","H2020_20","HFA_16","HLTHRES_67","HFA_570","UHCFP_2"]
+# TABLE FOR THREE COUNTRIES 
 countries = [country1, country2, country3]
 
 if table:
@@ -139,50 +129,30 @@ if table:
                 data_dict = response.json()
 
                 # Debug step — see what the API returned
-                st.write(f"🔍 Raw API response for {country}:", data_dict)
+                # st.write(f"Raw API response for {country}:", data_dict)
 
-                # CHAT GPT - to flatten dictionary row
+                # flatten dictionary row
                 flat_row = {}
+                flat_row["Country"] = country
 
-                if isinstance(data_dict, dict):
-                    for feature_name, feature_values in data_dict.items():
-                        if isinstance(feature_values, dict):
-                            for k, v in feature_values.items():
-                                flat_row[f"{feature_name} - {k}"] = v
-                        else:
-                            # If it's just a value (int, str, float...), include directly
-                            flat_row[feature_name] = feature_values
+                for feature_name, feature_values in data_dict.items():
+                    for k,v in feature_values.items():
+                        flat_row[f"{feature_name}"] = v
+          
+                df = pd.DataFrame([flat_row])
 
-                    flat_row["Country"] = country
-                    df = pd.DataFrame([flat_row])
-
-                elif isinstance(data_dict, list):
-                    df = pd.DataFrame(data_dict)
-                    df["Country"] = country
-
-                else:
-                    st.error(f"Unsupported response format for country: {country}")
-                    continue
-
-                # write data table
-                st.write(f"### Data for country: {country}")
-                st.write(df)
+                
                 master_df = pd.concat([master_df, df], ignore_index=True)
-                st.write(master_df)
-
 
             else:
-                st.error(f"Failed to fetch data for country: {country} (status code {response.status_code})")
+                if country3_status == True:
+                    st.error(f"Failed to fetch data for country: {country} (status code {response.status_code})")
+                
 
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {countryurl}")
 
-
-
-
-d = {'col1': [1, 2], 'col2': [3, 4]}
-df = pd.DataFrame(data=d)
 
 
 # TABLE
@@ -192,13 +162,13 @@ if table:
 
     else:
         st.write("")
-        st.table(df)
+        st.dataframe(master_df)
 
 
 st.write("")
 st.write("")
 
-features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
+#features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
 # TRACK FEATURE OVER TIME
 feature = st.selectbox(
             "Track a feature over time:",
