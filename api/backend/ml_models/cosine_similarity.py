@@ -87,6 +87,7 @@ def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_sca
     temp_dot = np.dot(the_country_vec, temp_country_vec)
     temp_cos = temp_dot/(np.linalg.norm(the_country_vec) * np.linalg.norm(temp_country_vec))
 
+    #adding to the respective lists
     the_country_dot_products.append(temp_dot[0])
     the_country_cosines.append(temp_cos[0])
 
