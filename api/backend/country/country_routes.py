@@ -277,6 +277,13 @@ def get_data(input):
 
 #post route for six features 
 
+def is_value(pair) :
+    value_key = 'VALUE'
+    key, value = pair
+    if key == value_key : 
+        return True
+    else:
+        return False
 
 #get route for six features for a given country
 #input is country
@@ -290,60 +297,125 @@ def get_all_features(input):
         cursor.execute("SELECT * FROM LiveBirths WHERE COUNTRY = %s ORDER BY YEAR DESC", (input,))
         livebirths = cursor.fetchone()
         if not livebirths:
-            return jsonify({"error": "LiveBirths not found"}, 404)
-        livebirths_cols = [desc[0] for desc in cursor.description]
-        df_livebirths = pd.DataFrame([livebirths], columns=livebirths_cols)
+            livebirths = {
+                "COUNTRY": input,
+                "VALUE": "N/A",
+                "YEAR": "N/A",
+                "id": "N/A"
+                }
+            livebirths_cols = [desc[0] for desc in cursor.description]
+            df_livebirths = pd.DataFrame([livebirths], columns=livebirths_cols)
+        else :
+            livebirths_cols = [desc[0] for desc in cursor.description]
+            df_livebirths = pd.DataFrame([livebirths], columns=livebirths_cols)
         
         # LifeExpectancy
         cursor.execute("SELECT * FROM LifeExpectancy WHERE COUNTRY = %s ORDER BY YEAR DESC", (input,))
         lifeexpec = cursor.fetchone()
         if not lifeexpec:
-            return jsonify({"error": "LifeExpectancy not found"}, 404)
-        lifeexpec_cols = [desc[0] for desc in cursor.description]
-        df_lifeexpec = pd.DataFrame([lifeexpec], columns=lifeexpec_cols)
+            lifeexpec = {
+                "COUNTRY": input,
+                "VALUE": "N/A",
+                "YEAR": "N/A",
+                "id": "N/A"
+            }
+            lifeexpec_cols = [desc[0] for desc in cursor.description]
+            df_lifeexpec = pd.DataFrame([lifeexpec], columns=lifeexpec_cols)
+        else :
+            lifeexpec_cols = [desc[0] for desc in cursor.description]
+            df_lifeexpec = pd.DataFrame([lifeexpec], columns=lifeexpec_cols)
 
         # GenPractitioners
         cursor.execute("SELECT * FROM GenPractitioners WHERE COUNTRY = %s ORDER BY YEAR DESC", (input,))
         genpractitioners = cursor.fetchone()
         if not genpractitioners:
-            return jsonify({"error": "GenPractitioners not found"}, 404)
-        genpract_cols = [desc[0] for desc in cursor.description]
-        df_genpract = pd.DataFrame([genpractitioners], columns=genpract_cols)
+            genpractitioners = {
+                "COUNTRY": input,
+                "VALUE": "N/A",
+                "YEAR": "N/A",
+                "id": "N/A"
+            }
+            genpract_cols = [desc[0] for desc in cursor.description]
+            df_genpract = pd.DataFrame([genpractitioners], columns=genpract_cols)
+        else:
+            genpract_cols = [desc[0] for desc in cursor.description]
+            df_genpract = pd.DataFrame([genpractitioners], columns=genpract_cols)
 
         # Health Expenditure
         cursor.execute("SELECT * FROM HealthExpend WHERE COUNTRY = %s ORDER BY YEAR DESC", (input,))
         healthexpend = cursor.fetchone()
         if not healthexpend:
-            return jsonify({"error": "HealthExpend not found"}, 404)
-        healthexpend_cols = [desc[0] for desc in cursor.description]
-        df_healthexpend = pd.DataFrame([healthexpend], columns=healthexpend_cols)
+            healthexpend = {
+                "COUNTRY": input,
+                "VALUE": "N/A",
+                "YEAR": "N/A",
+                "id": "N/A"
+            }
+            healthexpend_cols = [desc[0] for desc in cursor.description]
+            df_healthexpend = pd.DataFrame([healthexpend], columns=healthexpend_cols)
+        else:
+            healthexpend_cols = [desc[0] for desc in cursor.description]
+            df_healthexpend = pd.DataFrame([healthexpend], columns=healthexpend_cols)
 
         # Impoverished Households
         cursor.execute("SELECT * FROM ImpoverishedHouse WHERE COUNTRY = %s ORDER BY YEAR DESC", (input,))
         impoverishedhouse = cursor.fetchone()
         if not impoverishedhouse:
-            return jsonify({"error": "ImpoverishedHouse not found"}, 404)
-        impoverishedhouse_cols = [desc[0] for desc in cursor.description]
-        df_impovhouse = pd.DataFrame([impoverishedhouse], columns=impoverishedhouse_cols)
+            impoverishedhouse = {
+                "COUNTRY": input,
+                "VALUE": "N/A",
+                "YEAR": "N/A",
+                "id": "N/A"
+            }
+            impoverishedhouse_cols = [desc[0] for desc in cursor.description]
+            df_impovhouse = pd.DataFrame([impoverishedhouse], columns=impoverishedhouse_cols)
+        else:
+            impoverishedhouse_cols = [desc[0] for desc in cursor.description]
+            df_impovhouse = pd.DataFrame([impoverishedhouse], columns=impoverishedhouse_cols)
 
         # Infant Mortality
         cursor.execute("SELECT * FROM InfantMortality WHERE COUNTRY = %s ORDER BY YEAR DESC", (input,))
         infmortality = cursor.fetchone()
         if not infmortality:
-            return jsonify({"error": "InfantMortality not found"}, 404)
-        infmort_cols = [desc[0] for desc in cursor.description]
-        df_infmort = pd.DataFrame([infmortality], columns=infmort_cols)
+            infmortality = {
+                "COUNTRY": input,
+                "VALUE": "N/A",
+                "YEAR": "N/A",
+                "id": "N/A"
+            }
+            infmort_cols = [desc[0] for desc in cursor.description]
+            df_infmort = pd.DataFrame([infmortality], columns=infmort_cols)
+        else: 
+            infmort_cols = [desc[0] for desc in cursor.description]
+            df_infmort = pd.DataFrame([infmortality], columns=infmort_cols)
 
         cursor.close
 
+        # df to dicts
+        livebirths_dict = df_livebirths.to_dict(orient="records")[0]
+        lifeexpec_dict = df_lifeexpec.to_dict(orient="records")[0]
+        genpract_dict = df_genpract.to_dict(orient="records")[0]
+        healthexpend_dict = df_healthexpend.to_dict(orient="records")[0]
+        impovhouse_dict = df_impovhouse.to_dict(orient="records")[0]
+        infmort_dict = df_infmort.to_dict(orient="records")[0]
+
+        # filtered dicts
+        filter_livebirths = dict(filter(is_value,  livebirths_dict.items()))
+        filter_lifeexpec = dict(filter(is_value, lifeexpec_dict.items()))
+        filter_genpract = dict(filter(is_value, genpract_dict.items()))
+        filter_healthexpend = dict(filter(is_value, healthexpend_dict.items()))
+        filter_impovhouse = dict(filter(is_value, impovhouse_dict.items()))
+        filter_infmort = dict(filter(is_value, infmort_dict.items()))
+
+
         # Combine data from multiple related queries into one object to return (after jsonify)
         result = {
-            "Live Births": df_livebirths.to_dict(orient="records")[0],
-            "Life Expectancy": df_lifeexpec.to_dict(orient="records")[0],
-            "Gen Practitioners": df_genpract.to_dict(orient="records")[0],
-            "Health Expenditure": df_healthexpend.to_dict(orient="records")[0],
-            "Impoverished Households": df_impovhouse.to_dict(orient="records")[0],
-            "Infant Mortality": df_infmort.to_dict(orient="records")[0],
+            "Live Births per 1000 Population": filter_livebirths,
+            "Life Expectancy (years)": filter_lifeexpec,
+            "General Practitioners per 10,000 Population": filter_genpract,
+            "Total Health Expenditure per Capita": filter_healthexpend,
+            "Impoverished Households due to out-of-pocket healthcare payments": filter_impovhouse,
+            "Infant Mortality Rate (%)": filter_infmort,
         }
 
         return jsonify(result), 200
