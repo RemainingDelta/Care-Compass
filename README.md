@@ -63,6 +63,39 @@ Public sector professionals and analysts use Care Compass to benchmark healthcar
 - Personalized Recommender: Cosine similarity on normalized Global Health Security Index vectors
 - Forecasting Models: Time-series regression to predict future health indicator values
 
+## Core Functionalities
+
+### Personalized Country Recommendations  
+Users can prioritize six key healthcare factors (e.g., prevention, detection, health system) using sliders. The app uses a similarity algorithm (cosine similarity) to recommend countries that best match user preferences. Users can blend preferences with their home country's profile for more personalized results.
+
+### Country Comparison Table  
+Users can select multiple countries and view a side-by-side comparison of indicators such as:
+- General Practitioners per 10,000 population
+- Total Health Expenditure per capita
+- Impoverished Households due to out-of-pocket costs
+- Infant Mortality Rate
+- Life Expectancy
+- Live Births per 1,000 population
+
+### Country Profiles with Contextual Resources  
+Each country page includes the national flag, a general overview of the country, healthcare-specific information, and curated external resources to support deeper research. Users also see a list of countries with similar overall healthcare scores, making it easier to explore alternatives or draw comparisons.
+
+### Feature Trend Analysis  
+Users can view how a specific indicator (e.g., life expectancy, health spending) has changed over time for a given country. This helps students and analysts evaluate historical shifts, policy effects, or crises.
+
+### Forecasting with Regression Models  
+The app supports forecasting key indicators into the future using regression models. Users can select a factor and view projected values for upcoming years.
+
+### Target Score Simulation  
+Users can enter target values for healthcare factors and receive an estimate of how long it will take a country to reach those targets based on current trends. This supports strategic planning and policy evaluation.
+
+### Role-Based Views  
+Different functionality is emphasized for different user types:
+- **Students** focus on comparison tables and feature trends for academic analysis.
+- **Future residents** use sliders and country profiles to explore where to move.
+- **Policymakers** rely on forecasting and target-setting tools to guide reforms.
+
+
 ## Structure of the Repo
 
 - The repo is organized into five main directories:
