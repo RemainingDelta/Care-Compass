@@ -488,3 +488,33 @@ def get_country(country_code):
         return jsonify(country), 200
     except Error as e:
         return jsonify({"error": str(e)}), 500
+
+
+@countries.route('/countries/<country_code>/articles', methods=['GET'])
+def get_articles_by_country(country_code):
+    try:
+
+        cursor = db.get_db().cursor()
+
+        query = """
+            SELECT article_title, source, article_link
+            FROM CountryArticles
+            WHERE country_code = %s
+        """
+        cursor.execute(query, (country_code,))
+        articles = cursor.fetchall()
+
+        result = [
+            {
+                "title": row["article_title"],
+                "source": row["source"],
+                "link": row["article_link"]
+            }
+            for row in articles
+        ]
+
+
+
+        return jsonify(result)
+    except Error as e: 
+        return jsonify({"error": str(e)}), 500
