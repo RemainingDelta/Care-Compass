@@ -458,3 +458,33 @@ def get_all_info():
         return jsonify({"error": str(e)}), 500
 
 
+
+# Get detailed information about a specific country including its projects and donors
+# Example: /country/countries/ARG
+@countries.route("/countries/<country_code>", methods=["GET"])
+def get_country(country_code):
+    try:
+        cursor = db.get_db().cursor()
+
+        # Get country details
+        cursor.execute("SELECT * FROM Countries WHERE code = %s", (country_code,))
+        country = cursor.fetchone()
+
+        if not country:
+            return jsonify({"error": "Country not found"}), 404
+
+        # Get associated info and articles
+        cursor.execute("SELECT * FROM CountryInfo WHERE countryCode = %s", (country_code,))
+        info = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM CountryArticles WHERE country_code = %s", (country_code,))
+        article = cursor.fetchall()
+
+        # Combine data from multiple related queries into one object to return (after jsonify)
+        country["info"] = info
+        country["articles"] = article
+
+        cursor.close()
+        return jsonify(country), 200
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
