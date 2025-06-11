@@ -17,7 +17,7 @@ import plotly.graph_objects as go
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
-set_background("assets/backdrop.jpg")
+
 
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
@@ -204,6 +204,10 @@ bar_chart_display = pd.DataFrame()
 bar_chart_display['Country'] = []
 bar_chart_display['the_country_cosine'] = []
 bar_chart_display['the_country_dot_product'] = []
+sorted_df_similar = pd.DataFrame()
+sorted_df_similar['Country'] = []
+sorted_df_similar['the_country_cosine'] = []
+sorted_df_similar['the_country_dot_product'] = []
 if submit:
         weights_dict = json.dumps(weights_dict)
         #Calculating Similarity 
@@ -226,7 +230,46 @@ if submit:
             st.error(response.status_code)
             st.error("It didn't work")
 if on and chosen_country is not None:
-    st.map(sorted_df_similar)
+    country_url = "http://host.docker.internal:4000/country/countries"  
+    try:
+        headers = {
+        "User-Agent": "Python/requests",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+        }
+        response = requests.get(country_url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        df_country_and_code = pd.DataFrame(data)
+        #print(df_country_and_code)
+
+        add_names = []
+        for index, row in df_country_and_code.iterrows():
+            for index2, row2 in sorted_df_similar.iterrows():
+                if row['code'] == row2['Country']:
+                   add_names.append(row['name'])
+        sorted_df_similar['name'] = add_names
+    except requests.exceptions.RequestException as e:
+        print("API request failed:", e)
+    print("THIS IS MY DATAFRAME:", sorted_df_similar)
+    fig1 = px.choropleth(
+    sorted_df_similar,
+    locations='Country',  # Column with country names/codes
+    locationmode='country names',  
+    color='the_country_cosine',  # Column with similarity scores
+    color_continuous_scale="Viridis",
+    range_color=(0.95, 1),  # Adjusted range to better show differences (since most scores are >0.95)
+    scope='world',
+    labels={'the_country_cosine': 'Similarity Score'},
+    title='Country Similarity Scores (World)'
+)
+
+    # Update layout for better display
+    fig1.update_geos(showcountries=True, showcoastlines=True, showland=True)
+    fig1.update_layout(margin={"r":0,"t":30,"l":0,"b":0})
+
+    st.plotly_chart(fig1, use_container_width=True)
+
 elif not on and chosen_country is not None: 
     # Create the bar chart with individual bar colors
     fig = px.bar(bar_chart_display,
