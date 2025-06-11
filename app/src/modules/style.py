@@ -7,7 +7,7 @@ def style_sidebar():
     <style>
     /* Sidebar background color */
     [data-testid="stSidebar"] {
-        background-color: #A7C7E7; 
+        background-color: #c2ddd9; 
     }
     </style>
     """,

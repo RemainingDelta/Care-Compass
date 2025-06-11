@@ -14,7 +14,6 @@ st.set_page_config(layout = 'wide')
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
-set_background("assets/backdrop.jpg")
 
 SideBarLinks()
 

@@ -30,7 +30,6 @@ SideBarLinks(show_home=True)
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
-set_background("assets/backdrop.jpg")
 
 # ***************************************************
 #    The major content of this page
@@ -53,7 +52,7 @@ st.markdown("""
     .company-name {
         font-size: 64px;
         font-weight: bold;
-        color: 	#4682B4;
+        color: 	#097969;
         text-align: center;
     }
     </style>
