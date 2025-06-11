@@ -8,7 +8,6 @@ st.set_page_config(layout = 'wide')
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
-set_background("assets/backdrop.jpg")
 
 # Show appropriate sidebar links for the role of the currently logged in user
 SideBarLinks()
