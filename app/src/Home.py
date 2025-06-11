@@ -15,6 +15,8 @@ from modules.nav import SideBarLinks
 
 import time
 
+import requests 
+
 # streamlit supports reguarl and wide layout (how the controls
 # are organized/displayed on the screen).
 st.set_page_config(layout = 'wide')
@@ -89,44 +91,183 @@ st.write('#### Login as a ...')
 # functionality, we put a button on the screen that the user 
 # can click to MIMIC logging in as that mock user. 
 
-col1, col2, col3 = st.columns(3)
+headers = {
+    "User-Agent": "Python/requests",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+    }
 
+# API endpoint
+API_URL = "http://host.docker.internal:4000/users/users"  
+
+
+# Get unique values for filters from the API
+#For resident login 
+try:
+    response = requests.get(API_URL, headers=headers, timeout=10)
+    response.raise_for_status()
+
+    residents = response.json()
+    residents_list = [item["first_name"] for item in residents]
+
+    # Extract unique values for filters
+    role = sorted(list(set(Users["roleID"] for Users in residents)))
+
+    # Create ROLE ID FILTER
+    selected_role = 0
+
+    # Build query parameters
+    params = {"roleID": selected_role}
+
+    # Get filtered data
+    filtered_response = requests.get(API_URL, params=params, headers=headers, timeout=10)
+    #filtered_response.raise_for_status()
+
+    filtered_residents = filtered_response.json()
+    residents_email_list = [item['first_name'] + ' ' + item['last_name'] + ' - ' + item['email'] for item in filtered_residents]
+
+    #filtered_response = requests.get(API_URL, params=params, headers=headers, timeout=10)
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
+
+#For student login 
+# API endpoint
+API_URL = "http://host.docker.internal:4000/users/users"  
+
+
+# Get unique values for filters from the API
+try:
+    response = requests.get(API_URL, headers=headers, timeout=10)
+    response.raise_for_status()
+
+    students = response.json()
+    students_list = [item["first_name"] for item in students]
+
+    # Extract unique values for filters
+    role = sorted(list(set(Users["roleID"] for Users in students)))
+    
+    # Create ROLE ID FILTER
+    selected_role = 1
+    
+    # Build query parameters
+    params = {"roleID": selected_role}
+  
+    # Get filtered data
+    filtered_response = requests.get(API_URL, params=params, headers=headers, timeout=10)
+    #filtered_response.raise_for_status()
+    
+    filtered_students = filtered_response.json()
+    students_email_list = [item['first_name'] + ' ' + item['last_name'] + ' - ' + item['email'] for item in filtered_students]
+
+    #filtered_response = requests.get(API_URL, params=params, headers=headers, timeout=10)
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
+
+
+#For policymaker login 
+# API endpoint
+API_URL = "http://host.docker.internal:4000/users/users"  
+
+
+# Get unique values for filters from the API
+try:
+    response = requests.get(API_URL, headers=headers, timeout=10)
+    response.raise_for_status()
+
+    policy = response.json()
+    policy_list = [item["first_name"] for item in policy]
+
+    # Extract unique values for filters
+    role = sorted(list(set(Users["roleID"] for Users in policy)))
+    
+    # Create ROLE ID FILTER
+    selected_role = 2
+    
+    # Build query parameters
+    params = {"roleID": selected_role}
+  
+    # Get filtered data
+    filtered_response = requests.get(API_URL, params=params, headers=headers, timeout=10)
+    #filtered_response.raise_for_status()
+    
+    filtered_policy = filtered_response.json()
+    policy_email_list = [item['first_name'] + ' ' + item['last_name'] + ' - ' + item['email'] for item in filtered_policy]
+
+    #filtered_response = requests.get(API_URL, params=params, headers=headers, timeout=10)
+
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
+
+
+col1, col2 = st.columns([0.7,0.3],vertical_alignment="bottom")
+
+# UI
 with col1 :
+  resident = st.selectbox(
+      "Resident:",
+      residents_email_list,
+      index=None
+  )
 
-    if st.button("Relocating Resident", 
-                type = 'secondary', 
-                use_container_width=True):
-        # when user clicks the button, they are now considered authenticated
-        st.session_state['authenticated'] = True
-        # we set the role of the current user
-        st.session_state['role'] = 'resident'
-        # we add the first name of the user (so it can be displayed on 
-        # subsequent pages). 
-        st.session_state['name'] = 'Archibald'
-        # finally, we ask streamlit to switch to another page, in this case, the 
-        # landing page for this particular user type
-        logger.info("Logging in as Resident Persona")
-        st.switch_page('pages/00_Resident_Login.py')
+  student = st.selectbox(
+      "Student:",
+      students_email_list,
+      index=None
+  )
+
+  policy = st.selectbox(
+      "Policymaker:",
+      policy_email_list,
+      index=None
+  )
+  
+if resident:
+    name, _ = resident.split(" - ", 1)
+    selected_name = name
+    #st.write("You are logging in as:", selected_name)
+
+if student:
+    name, _ = student.split(" - ", 1)
+    selected_name = name
+    #st.write("You are logging in as:", selected_name)
+
+if policy:
+    name, _ = policy.split(" - ", 1)
+    selected_name = name
+    #st.write("You are logging in as:", selected_name)
+
 
 with col2 :
-    if st.button('Global Health Student', 
-                type = 'secondary', 
-                use_container_width=True):
-        st.session_state['authenticated'] = True
-        st.session_state['role'] = 'student'
-        st.session_state['name'] = 'Gale'
-        logger.info("Logging in as Student Persona")
-        st.switch_page('pages/10_Student_Login.py')
-
-with col3 : 
-    if st.button('Policymaker', 
-                type = 'secondary', 
-                use_container_width=True):
-        st.session_state['authenticated'] = True
-        st.session_state['role'] = 'policymaker'
-        st.session_state['name'] = 'Nancy'
-        logger.info("Logging in as Policymaker Persona")
-        st.switch_page('pages/20_Policymaker_Login.py')
+  if st.button("Login Resident", type="primary",use_container_width=False) :
+    st.session_state['authenticated'] = True
+    st.session_state['role'] = 'resident'
+    st.session_state['name'] = selected_name
+    logger.info("Logging in as Resident Persona")
+    st.switch_page('pages/00_Resident_Home.py')
+  st.write("")
+  st.write("")
+  if st.button("Login Student", type="primary",use_container_width=False) :
+    st.session_state['authenticated'] = True
+    st.session_state['role'] = 'student'
+    st.session_state['name'] = selected_name
+    logger.info("Logging in as Student Persona")
+    st.switch_page('pages/10_Student_Home.py')
+  st.write("")
+  st.write("")
+  if st.button("Login Policymaker", type="primary",use_container_width=False) :
+    st.session_state['authenticated'] = True
+    st.session_state['role'] = 'policymaker'
+    st.session_state['name'] = selected_name
+    logger.info("Logging in as Policymaker Persona")
+    st.switch_page('pages/20_Policymaker_Home.py')
 
 
 
