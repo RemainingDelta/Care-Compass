@@ -55,7 +55,9 @@ except requests.exceptions.RequestException as e:
 except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
+
 # CHOOSE COUNTRIES
+st.subheader("Select countries for comparison.")
 features = []
 col1, col2, col3 = st.columns(3)
 
@@ -93,8 +95,6 @@ st.write("")
 if country1 :
     start_index = (str(country1)).index('-') + 1
     country1 = country1[start_index:]
-else:
-    st.info("Please select countries to proceed.")
 
 if country2 :
     start_index = (str(country2)).index('-') + 1
@@ -155,21 +155,6 @@ if table:
 
 
 # TABLE
-if table:
-    if country1 == country2 or country1 == country3 or country2 == country3:
-        st.badge(f"You chose the same country for comparison. Please try again.", color='red')
-
-    else:
-        st.write("")
-        st.dataframe(master_df)
-        st.write("*General Practitioners per 10,000 Population")
-        st.write("** Total Health Expenditure per Capita")
-        st.write("+Impoverished Households due to out-of-pocket healthcare payments")
-        st.write("++ Live Births per 1000 Population")
-
-
-st.write("")
-st.write("")
 
 life_expectancy = "Life Expectancy (years)"
 inf_mortality = "Infant Mortality Rate (%)"
@@ -179,6 +164,24 @@ health_expend = "Total Health Expenditure per Capita"
 impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
 
 features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
+
+if table:
+    if country1 == country2 or country1 == country3 or country2 == country3:
+        st.badge(f"You chose the same country for comparison. Please try again.", color='red')
+
+    else:
+        st.write("")
+        st.write("")
+        st.write("")
+        st.dataframe(master_df,hide_index=True)
+        st.caption("*General Practitioners per 10,000 Population")
+        st.caption("** Total Health Expenditure per Capita")
+        st.caption("+Impoverished Households due to out-of-pocket healthcare payments")
+        st.caption("++ Live Births per 1000 Population")
+
+
+st.write("")
+st.write("")
 
 
 # TRACK FEATURE OVER TIME
