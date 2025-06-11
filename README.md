@@ -1,12 +1,17 @@
 # Care Compass
 
-This is a project repo for the Care Compass web app associated with the Summer 2025 Northeastern University's Data and Software in International Government and Politics Dialogue of Civilization. Created by a team of the following students: Anoushka Abroal, Katherine Ahn, Shiven Ajwaliya, and Arthur Huang.
+## Overview
+**Name:** Care Compass  
+**Contributors:** Anoushka Abroal, Arthur Huang, Katherine Ahn, Shiven Ajwaliya  
+**Dialogue:** Summer 2025 Data and Software in International Government and Politics in Belgium, Northeastern University  
+**Objective:**
+Care Compass is a data-driven web application that helps users explore and compare global healthcare systems. By combining real-world datasets with interactive visualizations and machine learning models, Care Compass makes complex international health data intuitive, customizable, and accessible.
 
-This repo includes most of the infrastructure setup (containers), sample databases and ML models, and example UI pages. Get ready to explore it!
+Every country claims its healthcare system is the best—but what if you could actually compare them all in one place? Healthcare can be overwhelming and confusing, but Care Compass makes it simple. Users choose what matters most to them—like hospital quality, emergency response, or disease prevention—and receive personalized insights based on real data.
 
-## What is Care Compass? 
+Whether you're planning to move abroad, presenting in class, or shaping the next health reform, Care Compass empowers you with visual maps, detailed country profiles, and future projections. We help people make informed decisions, not guesses—because understanding healthcare shouldn’t be reserved for experts; it should be accessible to all.
 
-Every country says its healthcare is the best, but what if you could actually compare them all in one place? Healthcare is overwhelming and confusing, but Care Compass makes it simple. With Care Compass, users choose what they care about -- this can be hospital conditions, emergency response, and prevention, which are just a few factors that are customizable! Whether you’re planning to move, presenting in class, or shaping the next health reform, you can utilize the visual maps, country profiles, and future projections provided by our application. We help people make informed decisions, not guesses; because understanding healthcare shouldn’t be reserved for experts—it should be accessible to all.
+From policymakers to students and families, Care Compass adapts to diverse needs, enabling smarter decisions through data transparency and clarity.
 
 ## Prerequisites
 
