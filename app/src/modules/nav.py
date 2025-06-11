@@ -106,13 +106,13 @@ def SideBarLinks(show_home=False):
             FeatOverTimeNav()
             TargetScoresNav()
 
-            
 
     # Always show the About page at the bottom of the list of links
     AboutPageNav()
 
     # Always show a logout button if there is a logged in user
-    if st.sidebar.button("Logout"):
-        del st.session_state["role"]
-        del st.session_state["authenticated"]
-        st.switch_page("Home.py")
+    if st.session_state["authenticated"]:
+        if st.sidebar.button("Logout"):
+            del st.session_state["role"]
+            del st.session_state["authenticated"]
+            st.switch_page("Home.py")

@@ -93,7 +93,7 @@ col1, col2, col3 = st.columns(3)
 
 with col1 :
 
-    if st.button("A Relocating Resident", 
+    if st.button("Relocating Resident", 
                 type = 'primary', 
                 use_container_width=True):
         # when user clicks the button, they are now considered authenticated
@@ -109,7 +109,7 @@ with col1 :
         st.switch_page('pages/00_Resident_Login.py')
 
 with col2 :
-    if st.button('A Global Health Student', 
+    if st.button('Global Health Student', 
                 type = 'primary', 
                 use_container_width=True):
         st.session_state['authenticated'] = True
@@ -119,7 +119,7 @@ with col2 :
         st.switch_page('pages/10_Student_Login.py')
 
 with col3 : 
-    if st.button('A Policymaker', 
+    if st.button('Policymaker', 
                 type = 'primary', 
                 use_container_width=True):
         st.session_state['authenticated'] = True
