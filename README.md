@@ -1,8 +1,12 @@
-# Summer 2025 Data and Software Belgium Dialogue
+# Care Compass
 
-This is a template repo for the project course associated with the Summer 2025 Northeastern University's Data and Software in International Government and Politics Dialogue of Civilization.
+This is a project repo for the Care Compass web app associated with the Summer 2025 Northeastern University's Data and Software in International Government and Politics Dialogue of Civilization. Created by a team of the following students: Anoushka Abroal, Katherine Ahn, Shiven Ajwaliya, and Arthur Huang.
 
-It includes most of the infrastructure setup (containers), sample databases and ML models, and example UI pages. Explore it fully and ask questions!
+This repo includes most of the infrastructure setup (containers), sample databases and ML models, and example UI pages. Get ready to explore it!
+
+## What is Care Compass? 
+
+Every country says its healthcare is the best, but what if you could actually compare them all in one place? Healthcare is overwhelming and confusing, but Care Compass makes it simple. With Care Compass, users choose what they care about -- this can be hospital conditions, emergency response, and prevention, which are just a few factors that are customizable! Whether you’re planning to move, presenting in class, or shaping the next health reform, you can utilize the visual maps, country profiles, and future projections provided by our application. We help people make informed decisions, not guesses; because understanding healthcare shouldn’t be reserved for experts—it should be accessible to all.
 
 ## Prerequisites
 
