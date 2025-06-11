@@ -423,3 +423,38 @@ def get_all_features(input):
     except Error as e:
         return jsonify({"error": str(e)}), 500
 
+# Get all countryinfo with  filtering by country
+# Example: /country/info
+@countries.route("/info", methods=["GET"])
+def get_all_info():
+    try: 
+        current_app.logger.info('Starting get_all_info request')
+        cursor = db.get_db().cursor()
+
+        # Get query parameters for filtering
+        countryCode = request.args.get("countryCode")
+
+        current_app.logger.debug(f'Query parameters - Countries: {countryCode}')
+
+        # Prepare the Base query
+        query = "SELECT * FROM CountryInfo WHERE 1=1"
+        params = []
+
+        # Add filters if provided
+        if countryCode:
+            query += " AND countryCode = %s"
+            params.append(countryCode)
+        
+
+        current_app.logger.debug(f'Executing query: {query} with params: {params}')
+        cursor.execute(query, params)
+        countryInfo = cursor.fetchall()
+        cursor.close()
+
+        current_app.logger.info(f'Successfully retrieved {len(countryInfo)} Country Info')
+        return jsonify(countryInfo), 200
+    except Error as e:
+        current_app.logger.error(f'Database error in get_all_info: {str(e)}')
+        return jsonify({"error": str(e)}), 500
+
+
