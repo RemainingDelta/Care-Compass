@@ -82,8 +82,6 @@ Public sector professionals and analysts use Care Compass to benchmark healthcar
 
 ## Run Instructions
 
-Anyone should be able to get Care Compass running by following these simple steps — **no code editing or ML expertise required.**
-
 ### 1. Clone the Repository
 In a terminal:
 ```
