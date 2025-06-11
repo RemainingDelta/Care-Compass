@@ -36,8 +36,18 @@ CREATE TABLE CountryInfo
     generalInfo        TEXT,
     healthcareInfo      TEXT,
     FOREIGN KEY (countryCode) REFERENCES Countries(code)
-);
+); 
 
+DROP TABLE IF EXISTS CountryArticles;
+CREATE TABLE CountryArticles(
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    country_code        VARCHAR(3) NOT NULL,
+    article_title  VARCHAR(255) NOT NULL,
+    article_link   VARCHAR(1371) NOT NULL,
+    source         VARCHAR(100) NOT NULL,
+
+    FOREIGN KEY (country_code) REFERENCES Countries(code)
+);
 
 DROP TABLE IF EXISTS UserRoles;
 CREATE TABLE UserRoles
