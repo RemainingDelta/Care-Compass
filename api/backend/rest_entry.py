@@ -10,6 +10,7 @@ from backend.recommendations.recommendation_routes import recommendations
 from backend.ml.ml_routes import ml
 from backend.comparison.comparison_routes import comparison
 from backend.ngos.ngo_routes import ngos
+from backend.users.user_routes import users
 
 def create_app():
     app = Flask(__name__)
@@ -51,6 +52,7 @@ def create_app():
     app.register_blueprint(recommendations, url_prefix="/recommendations")
     app.register_blueprint(ml, url_prefix="/ml")
     app.register_blueprint(comparison, url_prefix="/comparison")
+    app.register_blueprint(users, url_prefix="/users")
     #app.register_blueprint(users, url_prefix="/ngo")
 
     # Don't forget to return the app object

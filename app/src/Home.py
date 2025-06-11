@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 import streamlit as st
 from modules.nav import SideBarLinks
 
+import time
+
 # streamlit supports reguarl and wide layout (how the controls
 # are organized/displayed on the screen).
 st.set_page_config(layout = 'wide')
@@ -61,50 +63,70 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("We use real health data and machine learning to help users compare and understand global healthcare systems. Our platform lets you explore country profiles, visualize key trends, and get personalized recommendations based on your healthcare priorities.")
+
+def typewriter(text: str, speed: int):
+    tokens = text.split()
+    container = st.empty()
+    for index in range(len(tokens) + 1):
+        curr_full_text = " ".join(tokens[:index])
+        container.markdown(curr_full_text)
+        time.sleep(1 / speed)
+
+
+text = "We use real health data and machine learning to help users compare and understand global healthcare systems. Our platform lets you explore country profiles, visualize key trends, and get personalized recommendations based on your healthcare priorities."
+speed = 30
+typewriter(text=text, speed=speed)
+
 
 # Add space or content that appears lower on scroll
+st.write("")
 st.markdown("---")
-st.write('### Welcome!')
+st.header('Welcome!')
 st.write('\n')
-st.write('#### As which user would you like to log in?')
+st.write('#### Login as a ...')
 
 # For each of the user personas for which we are implementing
 # functionality, we put a button on the screen that the user 
 # can click to MIMIC logging in as that mock user. 
 
-if st.button("Act as Archibald, a Relocating Resident", 
-            type = 'primary', 
-            use_container_width=True):
-    # when user clicks the button, they are now considered authenticated
-    st.session_state['authenticated'] = True
-    # we set the role of the current user
-    st.session_state['role'] = 'resident'
-    # we add the first name of the user (so it can be displayed on 
-    # subsequent pages). 
-    st.session_state['first_name'] = 'Archibald'
-    # finally, we ask streamlit to switch to another page, in this case, the 
-    # landing page for this particular user type
-    logger.info("Logging in as Resident Persona")
-    st.switch_page('pages/00_Resident_Home.py')
+col1, col2, col3 = st.columns(3)
 
-if st.button('Act as Gale, a Global Health Student', 
-            type = 'primary', 
-            use_container_width=True):
-    st.session_state['authenticated'] = True
-    st.session_state['role'] = 'student'
-    st.session_state['first_name'] = 'Gale'
-    logger.info("Logging in as Student Persona")
-    st.switch_page('pages/10_Student_Home.py')
+with col1 :
 
-if st.button('Act as Nancy, a Policymaker', 
-            type = 'primary', 
-            use_container_width=True):
-    st.session_state['authenticated'] = True
-    st.session_state['role'] = 'policymaker'
-    st.session_state['first_name'] = 'Nancy'
-    logger.info("Logging in as Policymaker Persona")
-    st.switch_page('pages/20_Policymaker_Home.py')
+    if st.button("Relocating Resident", 
+                type = 'secondary', 
+                use_container_width=True):
+        # when user clicks the button, they are now considered authenticated
+        st.session_state['authenticated'] = True
+        # we set the role of the current user
+        st.session_state['role'] = 'resident'
+        # we add the first name of the user (so it can be displayed on 
+        # subsequent pages). 
+        st.session_state['name'] = 'Archibald'
+        # finally, we ask streamlit to switch to another page, in this case, the 
+        # landing page for this particular user type
+        logger.info("Logging in as Resident Persona")
+        st.switch_page('pages/00_Resident_Login.py')
+
+with col2 :
+    if st.button('Global Health Student', 
+                type = 'secondary', 
+                use_container_width=True):
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = 'student'
+        st.session_state['name'] = 'Gale'
+        logger.info("Logging in as Student Persona")
+        st.switch_page('pages/10_Student_Login.py')
+
+with col3 : 
+    if st.button('Policymaker', 
+                type = 'secondary', 
+                use_container_width=True):
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = 'policymaker'
+        st.session_state['name'] = 'Nancy'
+        logger.info("Logging in as Policymaker Persona")
+        st.switch_page('pages/20_Policymaker_Login.py')
 
 
 
