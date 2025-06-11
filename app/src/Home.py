@@ -72,7 +72,7 @@ def typewriter(text: str, speed: int):
         container.markdown(curr_full_text)
         time.sleep(1 / speed)
 
-#Sample Example
+
 text = "We use real health data and machine learning to help users compare and understand global healthcare systems. Our platform lets you explore country profiles, visualize key trends, and get personalized recommendations based on your healthcare priorities."
 speed = 30
 typewriter(text=text, speed=speed)
