@@ -13,6 +13,40 @@ Whether you're planning to move abroad, presenting in class, or shaping the next
 
 From policymakers to students and families, Care Compass adapts to diverse needs, enabling smarter decisions through data transparency and clarity.
 
+## Project Goals   
+Care Compass is designed to serve three primary user types, each with distinct needs and workflows when engaging with global healthcare data:
+
+### Student Researchers  
+Students use Care Compass to support academic research and classroom presentations on international health systems.
+
+**Key Goals:**  
+- Compare healthcare quality and outcomes across multiple countries.
+- Access key indicators such as general practitioners per capita, infant mortality rate, life expectancy, and more in one place.
+- Generate visualizations for use in assignments, reports, or presentations.
+- Project future trends in health outcomes using time-series forecasting tools.
+- Explore detailed country profiles that include not only quantitative indicators but also articles and external resources for deeper research.
+
+### Individuals Relocating Internationally  
+People planning to move abroad use Care Compass to find countries that align with their healthcare values and expectations.
+
+**Key Goals:**  
+- Customize healthcare priorities (e.g., emergency response, prevention) to receive personalized country recommendations.
+- Include their current country in the matching algorithm to blend familiarity with aspirational system qualities.
+- Explore visual maps and bar charts showing alignment between priorities and country performance.
+- Review country profile dashboards that include general country information, healthcare-specific context, and external resources for further research.
+- Identify countries with similar healthcare systems for broader relocation options.
+
+### Policymakers and Analysts   
+Public sector professionals and analysts use Care Compass to benchmark healthcare systems and inform policy decisions.
+
+**Key Goals:**  
+- Monitor how key healthcare indicators (e.g., health expenditure, life expectancy) have changed over time for specific countries using historical regression.
+- Forecast future values for selected indicators at defined time points based on historical trends and region-specific data.
+- Input custom target scores for health system factors and receive an estimated timeline for when those targets may be reached under current trajectory.
+- Identify which indicators are improving or stagnating and use these trends to inform policy recommendations.
+- Compare indicator projections across countries to prioritize evidence-based strategies and long-term planning.
+
+
 ## Prerequisites
 
 - A GitHub Account
