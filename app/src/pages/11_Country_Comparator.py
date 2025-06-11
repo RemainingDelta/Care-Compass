@@ -68,6 +68,7 @@ with col1:
         index=None,
         placeholder="Select Country 1 ..."
     )
+
 with col2: 
     country2 = st.selectbox(
         "Country 2:",
@@ -95,6 +96,8 @@ st.write("")
 if country1 :
     start_index = (str(country1)).index('-') + 1
     country1 = country1[start_index:]
+else:
+    st.info("Please select a country to proceed")
 
 if country2 :
     start_index = (str(country2)).index('-') + 1
