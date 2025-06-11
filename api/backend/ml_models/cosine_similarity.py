@@ -53,6 +53,16 @@ def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_sca
   except requests.exceptions.RequestException as e:
     print("API request failed:", e)
 
+  sum = 0
+  #scaling the weights correctly 
+  for x in weights_vect:
+    sum += x
+    
+  for i in range(len(weights_vect)):
+    weights_vect[i] = weights_vect[i]/sum
+    
+  #print("THIS IS MY ATTEMPT TO FIX THE WEIGHTS:", weights_vect)
+
   # which countries are most similar to the given country
   country_index = ghs_index_2021.index[ghs_index_2021['country'] == chosen_country].tolist()
   #print(f'Country index: {country_index}')

@@ -45,12 +45,6 @@ st.write("")
 options = ["Prevention","Health System","Rapid Response","Detection & Reporting", 
            "International Norms Compliance","Risk Environment"]
 
-#EX DATAFRAME
-df = pd.DataFrame(
-    np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],
-    columns=["countries","features"],
-)
-
 
 headers = {
     "User-Agent": "Python/requests",
@@ -98,7 +92,7 @@ chosen_country = st.selectbox("Select Country:",
                                 index=None)
 #st.write("FRONTEND SELECTED COUNTRY", chosen_country)
 
-st.subheader("Rank the healthcare factors (drag to reorder, top = 1, bottom = 6)")
+st.write("Drag to reorder factors (top = 1, bottom = 6)")
 
 factors = [
     "Prevention",
@@ -197,9 +191,10 @@ for i in range(6):
     st.write(f"{i+1}. {factor}: {weight}")
     weights_dict[factor] = float(weight/100)
 
+#Put the weights in a table 
 
 submit = st.button("Submit", type="primary")
-on = st.toggle("Bar Chart / Graident Map")
+on = st.toggle("Bar Chart / Gradient Map")
 bar_chart_display = pd.DataFrame()
 bar_chart_display['Country'] = []
 bar_chart_display['the_country_cosine'] = []
@@ -209,6 +204,7 @@ sorted_df_similar['Country'] = []
 sorted_df_similar['the_country_cosine'] = []
 sorted_df_similar['the_country_dot_product'] = []
 if submit:
+    #GET THE WEIGHTS IN HERE 
     weights_dict = json.dumps(weights_dict)
     #Calculating Similarity 
     api_url = f"http://host.docker.internal:4000/ml/ml/cosine/{chosen_country}/{weights_dict}"
@@ -229,7 +225,7 @@ if submit:
         st.session_state['similar_df'] = sorted_df_similar
     else:
         st.error(response.status_code)
-        st.error("It didn't work")
+        st.error("No data for the country available")
 if on and chosen_country is not None:
     country_url = "http://host.docker.internal:4000/country/countries"  
     try:
