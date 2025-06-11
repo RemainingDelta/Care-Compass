@@ -8,6 +8,9 @@ from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
 from backend.ml_models.regression import autoreg_predict
+from backend.ml_models.regression import create_xy_full
+from backend.ml_models.regression import autoreg_train
+from backend.ml_models.regression import autoreg_predict_full
 import pandas as pd
 import json
 
@@ -120,7 +123,8 @@ def get_regression(input):
 @ml.route("/ml/get_autoregressive/<input>", methods=["GET"])
 def get_autoregressive(input):
     inputs = [str(x.strip()) for x in input.split(',')]
-    result = autoreg_predict(dataframe(inputs[1]), inputs[0])
+    xy = create_xy_full(dataframe(inputs[1]))
+    result = autoreg_predict_full(result[0], result[1], autoreg_train(result[0], result[1]), inputs[2])
     print("Country received:", inputs[0])
 
     return jsonify(result)
