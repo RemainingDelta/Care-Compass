@@ -20,6 +20,23 @@ From policymakers to students and families, Care Compass adapts to diverse needs
 - VSCode with the Python Plugin
 - A distribution of Python running on your laptop. The distribution supported by the course is Anaconda or Miniconda.
 
+## Tech Stack  
+
+### Frontend  
+- **Framework:** Streamlit 
+- **State Management:** ``st.session_state`` with RBAC (Role-Based Access Control)
+- **Visualization:** Plotly, Matplotlib, Seaborn 
+
+### Backend  
+- **Framework:** Flask (Python)  
+- **Database:** MySQL 
+- **APIs:** RESTful API design for frontend-backend communication  
+- **Authentication:** Simulated roles (Relocating Resident, Global Health Student, Policymaker)
+
+### Machine Learning
+- Personalized Recommender: Cosine similarity on normalized Global Health Security Index vectors
+- Forecasting Models: Time-series regression to predict future health indicator values
+
 ## Structure of the Repo
 
 - The repo is organized into five main directories:
