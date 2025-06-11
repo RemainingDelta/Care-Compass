@@ -95,7 +95,6 @@ Different functionality is emphasized for different user types:
 - **Future residents** use sliders and country profiles to explore where to move.
 - **Policymakers** rely on forecasting and target-setting tools to guide reforms.
 
-
 ## Structure of the Repo
 
 - The repo is organized into five main directories:
@@ -105,6 +104,33 @@ Different functionality is emphasized for different user types:
   - `./datasets` - folder for storing datasets
   - `./ml-src` - folder for storing ML models
 - The repo also contains a `docker-compose.yaml` file that is used to set up the Docker containers for the front end app, the REST API, and MySQL database. This file is used to run the app and API in Docker containers.
+
+## Data Sources
+Care Compass is powered by real-world public health datasets, primarily sourced from the **World Health Organization (WHO)** and the **Global Health Security Index (GHS Index)**. These datasets form the foundation for our comparison engine, recommendation system, and forecasting models.
+
+### Key Sources Include:
+
+- **WHO Global Health Observatory**  
+  - Generalist medical practitioners per 10,000 population  
+  - Total health expenditure per capita  
+  - Life expectancy at birth (years)  
+  - Infant mortality rate (per 1,000 live births)  
+  - Households impoverished by out-of-pocket healthcare payments  
+  - Live births per 1,000 population  
+
+- **Global Health Security Index (2021 Edition)**  
+  - Country-level scores for six standardized dimensions:  
+    - Prevention  
+    - Detection & Reporting  
+    - Rapid Response  
+    - Health System  
+    - Compliance with International Norms  
+    - Risk Environment  
+
+### Access Methods:
+- WHO datasets were accessed through their public API (in JSON format).
+- GHS Index data was retrieved via web scraping and cleaned into a structured format for modeling and visualization.
+
 
 ## Prerequisites
 - A GitHub Account
