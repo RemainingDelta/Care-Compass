@@ -16,6 +16,7 @@ st.title(f"Welcome Student, {st.session_state['name']}.")
 st.write('')
 st.write('')
 st.write('### What would you like to do today?')
+st.write("")
 
 if st.button('Compare Countries', 
              type='primary',

@@ -62,3 +62,13 @@ with st.container(height=393, border=True):
             '''
         )
 
+col_a, col_b, col_c = st.columns(3)
+with col_a:
+    st.link_button("Supporting Article 1", "url", type="secondary", use_container_width=True)
+    st.link_button("Supporting Artcile 4", "url", type="secondary", use_container_width=True)
+with col_b:
+    st.link_button("Supporting Article 2", "url", type="secondary", use_container_width=True)
+    st.link_button("Supporting Artcile 5", "url", type="secondary", use_container_width=True)
+with col_c:
+    st.link_button("Supporting Article 3", "url", type="secondary", use_container_width=True)
+    st.link_button("Supporting Artcile 6", "url", type="secondary", use_container_width=True)

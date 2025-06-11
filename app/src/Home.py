@@ -94,7 +94,7 @@ col1, col2, col3 = st.columns(3)
 with col1 :
 
     if st.button("Relocating Resident", 
-                type = 'primary', 
+                type = 'secondary', 
                 use_container_width=True):
         # when user clicks the button, they are now considered authenticated
         st.session_state['authenticated'] = True
@@ -110,7 +110,7 @@ with col1 :
 
 with col2 :
     if st.button('Global Health Student', 
-                type = 'primary', 
+                type = 'secondary', 
                 use_container_width=True):
         st.session_state['authenticated'] = True
         st.session_state['role'] = 'student'
@@ -120,7 +120,7 @@ with col2 :
 
 with col3 : 
     if st.button('Policymaker', 
-                type = 'primary', 
+                type = 'secondary', 
                 use_container_width=True):
         st.session_state['authenticated'] = True
         st.session_state['role'] = 'policymaker'

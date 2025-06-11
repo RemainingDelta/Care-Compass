@@ -13,7 +13,7 @@ from modules.style import style_sidebar, set_background
 style_sidebar()
 
 # Show appropriate sidebar links for the role of the currently logged in user
-SideBarLinks()
+SideBarLinks(show_home=True)
 
 headers = {
     "User-Agent": "Python/requests",
