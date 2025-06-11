@@ -33,12 +33,9 @@ DROP TABLE IF EXISTS CountryInfo;
 CREATE TABLE CountryInfo
 (
     countryCode VARCHAR(50),
-    strengths   VARCHAR(50),
-    weaknesses  VARCHAR(50),
-    score       INT,
-    info        VARCHAR(50),
-    FOREIGN KEY (countryCode) REFERENCES Countries(code),
-    FOREIGN KEY (score) REFERENCES OverallScore(scoreID)
+    generalInfo        TEXT,
+    healthcareInfo      TEXT,
+    FOREIGN KEY (countryCode) REFERENCES Countries(code)
 );
 
 
