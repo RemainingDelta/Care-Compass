@@ -6,6 +6,7 @@ import pandas as pd
 import pydeck as pdk
 from urllib.error import URLError
 from modules.nav import SideBarLinks
+import requests
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -16,8 +17,84 @@ SideBarLinks()
 # add the logo
 #add_logo("assets/logo.png", height=400)
 
+headers = {
+    "User-Agent": "Python/requests",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
+# Get country code from session state
+country_code = st.session_state.get("selected_country_code")
+
+if country_code is None:
+    st.error("No Country selected")
+    st.button(
+        "Return to Country Directory",
+        on_click=lambda: st.switch_page("pages/03_Country_Directory.py"),
+    )
+else:
+    # API endpoint
+    API_URL = f"http://host.docker.internal:4000/country/countries/{country_code}"  
+
+    try:
+        # Fetch Country details
+        response = requests.get(API_URL)
+
+        if response.status_code == 200:
+            country = response.json()
+
+            # Display basic information
+            st.title(country["Name"], " Profile")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.subheader("Basic Information")
+                st.write(f"**Country:** {country['name']}")
+                st.write(f"**Region:** {country['region']}")
+
+            # Display Info
+            if country.get("info"):
+                st.subheader("Information")
+                for info in country["info"]:
+                    st.write(f"**General Information:** {info["generalInfo"]}")
+                    st.write(f"**Healthcare Information:** {info["healthcareInfo"]}")
+            else:
+                st.info("No information found for this Country")
+
+            # Display articles
+            if country.get("articles"):
+                st.subheader("Articles")
+                for article in country["Articles"]:
+                    st.write(f"**Title:** {article["article_title"]}")
+                    st.write(f"**Link:** {article["article_link"]}")
+                    st.write(f"**Source:** {article["source"]}")
+            else:
+                st.info("No articles found for this Country")
+
+        elif response.status_code == 404:
+            st.error("Country not found")
+        else:
+            st.error(
+                f"Error fetching Country data: {response.json().get('error', 'Unknown error')}"
+            )
+
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error connecting to the API: {str(e)}")
+        st.info("Please ensure the API server is running")
+
+"""
+# Add a button to return to the NGO Directory
+if st.button("Return to NGO Directory"):
+    # Clear the selected NGO ID from session state
+    if "selected_ngo_id" in st.session_state:
+        del st.session_state["selected_ngo_id"]
+    st.switch_page("pages/14_NGO_Directory.py")
+"""
+
+
 # set up the page
-st.title("<COUNTRY> PROFILE")
+st.title("%s PROFILE",())
 
 col1, col2 = st.columns([0.8,0.2],gap="large",vertical_alignment="top",border=True)
 
@@ -28,6 +105,8 @@ with col1 :
 
 with col2 : 
     st.markdown("Check out countries with similar scores.")
+
+
 
 with st.container(height=393, border=True):
     cols_mr = st.columns([10.9, 0.2, 10.9])
