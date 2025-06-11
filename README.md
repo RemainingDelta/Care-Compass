@@ -161,3 +161,14 @@ This will:
 - Run the Streamlit frontend
 
 Visit http://localhost:8501 in your browser to start using the app.
+
+
+## Future Plans
+
+- Integrate quality-of-life datasets (e.g., safety, cost of living, education) to enhance recommendations by identifying countries that align not only in healthcare but in overall living conditions relative to a user's country of origin.
+- Expand and enrich country profile pages with information sourced from organizations like WHO, World Bank, and OECD to provide deeper context beyond raw metrics.
+- Improve the similarity scoring algorithm by refining the cosine similarity logic
+- Add authentication and saved sessions so users can bookmark comparisons, track forecast scenarios, and revisit their priority sliders over time.
+- Support downloadable reports and visualizations to help users present or share findings in academic or policy settings.
+- Build interactive dashboards for instructors or facilitators to use the platform in classroom simulations or group workshops.
+- Introduce clustering and classification models to identify country “health system types” and allow users to explore these clusters instead of only ranked lists.
