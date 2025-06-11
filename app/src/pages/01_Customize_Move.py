@@ -38,7 +38,7 @@ st.markdown("""
 
 
 # You can access the session state to make a more customized/personalized app experience
-st.write(f"### Hi, {st.session_state['first_name']}. Rank the healthcare factors in order of priority -- 1 being the highest and 6 the lowest.")
+st.write(f"### Hi, {st.session_state['name']}. Rank the healthcare factors in order of priority -- 1 being the highest and 6 the lowest.")
 st.write("")
 st.write("")
 

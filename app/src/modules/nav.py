@@ -15,7 +15,6 @@ def AboutPageNav():
     st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠"
     )
 
-
 #### ------------------------ Examples for Role of Resident ------------------------
 def ResidentHomeNav():
     st.sidebar.page_link(
@@ -50,8 +49,6 @@ def SuggestedArticlesNav():
     st.sidebar.page_link(
         "pages/12_Suggested_Articles.py", label="Suggested Articles", icon="➕"
     )
-
-
 
 
 
@@ -93,6 +90,7 @@ def SideBarLinks(show_home=False):
             ResidentHomeNav()
             CustomizeMoveNav()
             CountryProfNav()
+                
 
         # If the user role is usaid worker, show the Api Testing page
         if st.session_state["role"] == "student":
@@ -108,13 +106,13 @@ def SideBarLinks(show_home=False):
             FeatOverTimeNav()
             TargetScoresNav()
 
+            
 
     # Always show the About page at the bottom of the list of links
     AboutPageNav()
 
-    if st.session_state["authenticated"]:
-        # Always show a logout button if there is a logged in user
-        if st.sidebar.button("Logout"):
-            del st.session_state["role"]
-            del st.session_state["authenticated"]
-            st.switch_page("Home.py")
+    # Always show a logout button if there is a logged in user
+    if st.sidebar.button("Logout"):
+        del st.session_state["role"]
+        del st.session_state["authenticated"]
+        st.switch_page("Home.py")

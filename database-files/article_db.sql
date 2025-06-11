@@ -1,3 +1,4 @@
+/*
 import pandas as pd
 
 CREATE TABLE health_articles (
@@ -26,3 +27,5 @@ with open("database-files/article_inserts.sql", "w", encoding='utf-8') as f:
         values.append(f"({id_}, '{country}', '{title}', '{link}', '{source}')")
 
     f.write(",\n".join(values) + ";\n")
+
+    */
