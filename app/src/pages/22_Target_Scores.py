@@ -5,6 +5,7 @@ import requests
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
 import time
+import pandas as pd
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -34,6 +35,7 @@ try:
     code_list = [item["code"] for item in data]
     #creates list of countrys and their corresponding country codes
     country_code_list = [item['name'] + '-' + item['code'] for item in data]
+
     print("Countries:", country_list)
 
 #throws errors if get request was unsuccessful
@@ -43,41 +45,90 @@ except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
 
-st.title("SET AND MONITOR TARGET Values")
+st.title("SET AND MONITOR TARGET VALUES")
 st.write("")
 
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([0.8,0.2], gap="Large",vertical_alignment="bottom")
 
 with col1:
     #creates the dropdown box and returns only the country code of the selected country
-    chosen_country2 = st.selectbox(
+    chosen_country = st.selectbox(
             "Choose Country:",
             country_code_list,
             index=None,
             placeholder="Select Country ..."
         )
-    if chosen_country2:
-        start_index = (str(chosen_country2)).index('-') + 1
-        chosen_country = chosen_country2[start_index:]
-        st.write("You selected ", chosen_country2)
-    else:
-        st.info("Please select a country to proceed")
-     #st.form_submit_button(
-        #  label="Submit", 
-         # help=None, 
-         # on_click=None, 
-         # args=None,  
-       # )
+    
+ #handles getting the country code needed for accessing each dataset 
+if chosen_country:
+    start_index = (str(chosen_country)).index('-') + 1
+    chosen_country = chosen_country[start_index:]
+
+else:
+    st.info("Please select a country to proceed")
+    #st.form_submit_button(
+    #  label="Submit", 
+        # help=None, 
+        # on_click=None, 
+        # args=None,  
+    # )
+
+master_df = pd.DataFrame()
+
+with col2:
     submit = st.button("Submit", type="primary")
 
-     
-    if submit:
-        col2.subheader("Current Scores for %s" %chosen_country)
-        col2.write("Scores")
+if submit:  
+    try:
+        headers = {
+            "User-Agent": "Python/requests",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+
+        countryurl = f"http://host.docker.internal:4000/country/features/{chosen_country}"
+        response = requests.get(countryurl)
+
+        if response.status_code == 200:
+            data_dict = response.json()
+
+            # Debug step — see what the API returned
+            # st.write(f"Raw API response for {country}:", data_dict)
+
+            # flatten dictionary row
+            flat_row = {}
+
+            for feature_name, feature_values in data_dict.items():
+                for k,v in feature_values.items():
+                    flat_row[f"{feature_name}"] = v
+    
+            df = pd.DataFrame([flat_row])
+            
+            master_df = pd.concat([master_df, df], ignore_index=True)
+
+        else:
+            st.error(f"Failed to fetch data for country: {chosen_country} (status code {response.status_code})")
+            
+    except Exception as e:
+        st.error(f"Error: {str(e)}")
+        st.write(f"URL that worked : {countryurl}")
+    
+    st.write("")
+    st.write("")
+    st.subheader("Current Scores for %s" %chosen_country)
+    st.dataframe(master_df,hide_index=True)
+    st.caption("*General Practitioners per 10,000 Population")
+    st.caption("** Total Health Expenditure per Capita")
+    st.caption("+Impoverished Households due to out-of-pocket healthcare payments")
+    st.caption("++ Live Births per 1000 Population")
+
+
+
+
 
 st.write("")
 st.write("")
-st.subheader("INPUT TARGET Values")
+st.subheader("Input Target Values")
 col_calculate, col_null = st.columns(2)
 #creates the calculate button for calculating target values
 with col_calculate:

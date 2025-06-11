@@ -37,9 +37,10 @@ st.markdown("""
 
 
 # You can access the session state to make a more customized/personalized app experience
-st.write(f"### Hi, {st.session_state['name']}. Rank the healthcare factors in order of priority -- 1 being the highest and 6 the lowest.")
+st.write(f"### Hi, {st.session_state['name']}.")
+st.write("Choose a country, and rank the healthcare factors in order of YOUR priority -- 1 being the highest and 6 the lowest. Then, you may adjust the weights accordingly.")
 st.write("")
-st.write("")
+
 
 options = ["Prevention","Health System","Rapid Response","Detection & Reporting", 
            "International Norms Compliance","Risk Environment"]
@@ -125,7 +126,7 @@ st.session_state.dragged_factors = sort_items(
 if "slot_weights" not in st.session_state:
     st.session_state.slot_weights = [100 - i * 20 for i in range(6)]
 
-st.markdown("### Adjust weight for each priority slot")
+st.markdown("### Adjust the weight for each priority slot")
 
 slider_range = (1, 10)
 

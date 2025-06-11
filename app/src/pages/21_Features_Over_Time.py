@@ -92,7 +92,7 @@ else:
 st.write("")
 st.write("")
 
-st.subheader("SELECT FEATURES TO CONSIDER")
+st.subheader("Select Features to Consider")
 col3,col4 = st.columns(2)
 
 #displays all graphical data through getting the regression values and using plotly to graph

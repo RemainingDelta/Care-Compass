@@ -57,7 +57,7 @@ except (KeyError, TypeError) as e:
 
 
 # CHOOSE COUNTRIES
-st.subheader("Select countries for comparison.")
+st.subheader("Select countries for comparison")
 features = []
 col1, col2, col3 = st.columns(3)
 
@@ -182,6 +182,7 @@ if table:
 
 st.write("")
 st.write("")
+
 
 
 # TRACK FEATURE OVER TIME
