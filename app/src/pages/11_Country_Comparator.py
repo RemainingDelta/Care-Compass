@@ -104,7 +104,7 @@ if country3 and country3_status :
     start_index = (str(country3)).index('-') + 1
     country3 = country3[start_index:]
 
-table = st.button("Submit", type="primary")
+table = st.button("Submit", type="primary", use_container_width=True)
 
 
 # TABLE FOR THREE COUNTRIES 
@@ -180,16 +180,23 @@ impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
 
 features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
 
+
 # TRACK FEATURE OVER TIME
-feature = st.selectbox(
-            "Track a feature over time:",
-            features,
-            index=None,
-            placeholder="Select Feature ..."
-        )
-st.write("Tracking %s over time" %feature)
+st.subheader("Track a feature over time")
 st.write("")
-plot = st.button("Plot", type="primary")
+
+col7, col3 = st.columns([0.7,0.3], gap="large", vertical_alignment="bottom")
+
+
+with col7:
+    feature = st.selectbox(
+                "Select Feature:",
+                features,
+                index=None
+            )
+
+with col3:
+    plot = st.button("Plot", type="primary",use_container_width=False)
 
 if plot:
     results = requests.get(f"http://web-api:4000/ml/predict/{feature}/{country1}") # need to do more for the other countries

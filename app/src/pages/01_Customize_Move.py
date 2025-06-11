@@ -17,7 +17,6 @@ import plotly.graph_objects as go
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
-set_background("assets/backdrop.jpg")
 
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
