@@ -9,6 +9,7 @@ from modules.nav import SideBarLinks
 import requests
 import random
 from streamlit_extras.stateful_button import button
+import json
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -16,21 +17,16 @@ style_sidebar()
 SideBarLinks()
 
 
-headers = {
-    "User-Agent": "Python/requests",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-}
-
 userID = st.session_state['id']
 
+#getting all the countries 
 country_url = "http://host.docker.internal:4000/country/countries"  
 
 country_list = []
 country_code_list = []
 
 try:
-    response = requests.get(country_url, headers=headers, timeout=10)
+    response = requests.get(country_url)
     response.raise_for_status()
     data = response.json()
 
@@ -54,6 +50,7 @@ selected_country = st.selectbox(
     index=None
 )
 
+#once the country is selected start getting the information 
 if selected_country :
     start_index = (str(selected_country)).index('-') + 1
     country_code = selected_country[start_index:]
@@ -86,9 +83,39 @@ if selected_country :
                 for info in country["info"]:
                     st.write(f'{info["healthcareInfo"]}')
                     st.write("")
-            
+            #display countries with similarity scores close to the given country 
             with col2 : 
                 st.markdown("Check out countries with similar scores.")
+                factors = [
+                    "Prevention",
+                    "Health System",
+                    "Rapid Response",
+                    "Detection & Reporting",
+                    "International Norms Compliance",
+                    "Risk Environment"
+                ]
+                weights = [95, 76, 52, 33, 10, 10]
+                weights_dict ={}
+                for i in range(6):
+                    weights_dict[factors[i]] = float(weights[i]/100)
+                weights_dict = json.dumps(weights_dict)
+                API_URL_2 = f"http://host.docker.internal:4000/ml/ml/cosine//{country_code}/{weights_dict}" 
+                response = requests.get(API_URL_2) 
+                
+                if response.status_code == 200:
+                    data = response.text  
+                    data_dict = json.loads(data)
+                    df_similar = pd.DataFrame(data_dict)
+                    sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
+                    display = sorted_df_similar[1:6]
+                    st.session_state['similar_df'] = sorted_df_similar
+                    for index, row in display.iterrows():
+                        st.write(row['Country'], ":", round(row['the_country_cosine'], 4))
+                else:
+                    st.error(response.status_code)
+                
+                    st.error("No data for the country available")
+                    st.error(response.text)
 
         elif response.status_code == 404:
             st.error("Country not found")
