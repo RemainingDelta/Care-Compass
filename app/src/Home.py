@@ -65,19 +65,8 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-@st.cache_resource
-def typewriter(text: str, speed: int):
-    tokens = text.split()
-    container = st.empty()
-    for index in range(len(tokens) + 1):
-        curr_full_text = " ".join(tokens[:index])
-        container.markdown(curr_full_text)
-        time.sleep(1 / speed)
-
-
 text = "We use real health data and machine learning to help users compare and understand global healthcare systems. Our platform lets you explore country profiles, visualize key trends, and get personalized recommendations based on your healthcare priorities."
-speed = 30
-typewriter(text=text, speed=speed)
+st.write(text)
 
 
 # Add space or content that appears lower on scroll
@@ -257,7 +246,7 @@ if policy:
 
 
 with col2 :
-  if st.button("Login Resident", type="primary",use_container_width=False) :
+  if st.button("Login", key="resident",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'resident'
     st.session_state['name'] = selected_name
@@ -273,7 +262,7 @@ with col2 :
     st.switch_page('pages/00_Resident_Home.py')
 
 with col4:
-  if st.button("Login Student", type="primary",use_container_width=False) :
+  if st.button("Login", key="student",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'student'
     st.session_state['name'] = selected_name
@@ -289,7 +278,7 @@ with col4:
     st.switch_page('pages/10_Student_Home.py')
 
 with col6:
-  if st.button("Login Policymaker", type="primary",use_container_width=False) :
+  if st.button("Login", key="policymaker",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'policymaker'
     st.session_state['name'] = selected_name
