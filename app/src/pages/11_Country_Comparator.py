@@ -8,6 +8,7 @@ import requests
 import pandas as pd
 import numpy as np
 import json
+import plotly.express as px
 
 st.set_page_config(layout="wide")
 
@@ -166,7 +167,7 @@ gen_practitioners = "General Practitioners per 10,000 Population"
 health_expend = "Total Health Expenditure per Capita"
 impov_house = "Impoverished Households due to out-of-pocket healthcare payments"
 
-features = [life_expectancy,inf_mortality,live_births,gen_practitioners,health_expend,impov_house]
+features = [live_births,gen_practitioners,health_expend]
 
 if table:
     if country1 == country2 or country1 == country3 or country2 == country3:
@@ -206,6 +207,56 @@ with col3:
     plot = st.button("Plot", type="primary",use_container_width=False)
 
 if plot:
-    results = requests.get(f"http://web-api:4000/ml/predict/{feature}/{country1}") # need to do more for the other countries
-    json_results = results.json()
-    st.dataframe(json_results)
+    def display_data(data_code, y_value, title, countries):
+        for chosen_country in countries:
+            get_graph = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{"2035"}"
+            #headers = {
+                #"User-Agent": "Python/requests",
+                #"Accept": "application/json",
+                #"Content-Type": "application/json"
+                #}
+            all_countries = requests.get(get_graph, timeout=10)
+            #print(all_countries.type())
+            all_country = requests.get(get_graph, timeout=10).text
+            #st.write(all_country)
+            if all_countries.status_code == 200:
+                #all_countries = all_countries.json
+                #all_countries = json.dumps(all_countries)
+                data_dict = json.loads(all_country)
+                data_dict = json.loads(data_dict)
+                #print(type(data_dict))
+
+                #data_series = pd.Series(all_countries)
+                #print(all_countries)
+                df_country = pd.DataFrame(data_dict)
+                #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
+                #print(df_graph)
+                df_graph = df_country #[(df_country['country'] == chosen_country)]
+                df_graph['YEAR'] = df_graph['YEAR'].astype(float)
+                X = np.array(df_graph['YEAR'])
+                y = np.array(df_graph['VALUE']) 
+                #predict_dict = json.loads(response_text)
+                #slope = predict_dict['slope']
+                #intercept = predict_dict['intercept']
+                
+                x = np.array(X).ravel()
+                y = np.array(y).ravel()
+                st.plotly_chart(px.line( x=x, y=y, labels={
+                        "x": "Time in Years",
+                        "y": y_value
+                    }, title = title))
+            else:
+                st.error(f"Error: {all_countries.status_code}")
+                st.write(all_countries.text)
+    if feature == live_births:
+        display_data("HFA_16", "Live Births per 1000 population", "Live Births Over Time", countries)
+
+    if feature == gen_practitioners: 
+        display_data("HLTHRES_67", "General Practitoners per 10,000 population", "General Practitioners Over Time", countries)  
+
+    if feature == health_expend:
+        display_data("HFA_570", "Total Health Expenditure per Capita", "Total Health Expenditure Over Time", countries)  
+
+    #results = requests.get(f"http://web-api:4000/ml/predict/{feature}/{country1}") # need to do more for the other countries
+    #json_results = results.json()
+    #st.dataframe(json_results)

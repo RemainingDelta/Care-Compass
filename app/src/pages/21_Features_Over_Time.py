@@ -206,7 +206,7 @@ with col4:
     if gen_prac:
         data_code = "HLTHRES_67"
         y_value = "General Practitoners per 10,000 population"
-        title = "General Practitioners per 10,000 population"
+        title = "General Practitioners Over Time"
         #st.write("Country Code", chosen_country) 
         api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
 
