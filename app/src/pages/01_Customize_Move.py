@@ -56,7 +56,7 @@ headers = {
 factor_descriptions = {}
 
 try:
-    response = requests.get("http://host.docker.internal:4000/recommendations/factors", headers=headers, timeout=10)
+    response = requests.get("http://host.docker.internal:4000/country/factor_descriptions", headers=headers, timeout=10)
     if response.status_code == 200:
         data = response.json()
         for item in data:

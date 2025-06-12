@@ -6,11 +6,7 @@ from logging.handlers import RotatingFileHandler
 
 from backend.db_connection import db
 from backend.country.country_routes import countries
-from backend.recommendations.recommendation_routes import recommendations
 from backend.ml.ml_routes import ml
-from backend.comparison.comparison_routes import comparison
-from backend.ngos.ngo_routes import ngos
-from backend.users.user_routes import users
 
 def create_app():
     app = Flask(__name__)
@@ -49,11 +45,7 @@ def create_app():
     # and give a url prefix to each
     app.logger.info("create_app(): registering blueprints with Flask app object.")
     app.register_blueprint(countries, url_prefix="/country")
-    app.register_blueprint(recommendations, url_prefix="/recommendations")
     app.register_blueprint(ml, url_prefix="/ml")
-    app.register_blueprint(comparison, url_prefix="/comparison")
-    app.register_blueprint(users, url_prefix="/users")
-    #app.register_blueprint(users, url_prefix="/ngo")
 
     # Don't forget to return the app object
     return app
