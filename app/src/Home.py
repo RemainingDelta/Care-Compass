@@ -61,7 +61,7 @@ st.markdown("""
     }
     </style>
     <div class="centered-title">
-        <div class="company-name">CARE COMPASS</div>
+        <div class="company-name">Care Compass</div>
     </div>
 """, unsafe_allow_html=True)
 
