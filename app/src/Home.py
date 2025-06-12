@@ -263,6 +263,12 @@ with col2 :
     st.session_state['name'] = selected_name
     st.session_state['last_name'] = last_name
     st.session_state['email'] = selected_email
+    email_API = st.session_state['email']
+
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID = userID_response.json()
+    st.session_state['id'] = userID
+
     logger.info("Logging in as Resident Persona")
     st.switch_page('pages/00_Resident_Home.py')
 
@@ -273,6 +279,12 @@ with col4:
     st.session_state['name'] = selected_name
     st.session_state['last_name'] = last_name
     st.session_state['email'] = selected_email
+    email_API = st.session_state['email']
+
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID = userID_response.json()
+    st.session_state['id'] = userID
+    
     logger.info("Logging in as Student Persona")
     st.switch_page('pages/10_Student_Home.py')
 
@@ -283,19 +295,13 @@ with col6:
     st.session_state['name'] = selected_name
     st.session_state['last_name'] = last_name
     st.session_state['email'] = selected_email
-    logger.info("Logging in as Policymaker Persona")
-    st.switch_page('pages/20_Policymaker_Home.py')
+    email_API = st.session_state['email']
 
-
-email_API = st.session_state['email']
-try:
     userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
     userID = userID_response.json()
     st.session_state['id'] = userID
     
-except requests.exceptions.RequestException as e:
-    print("API request failed:", e)
-except (KeyError, TypeError) as e:
-    print("Unexpected response format:", e)
+    logger.info("Logging in as Policymaker Persona")
+    st.switch_page('pages/20_Policymaker_Home.py')
 
 
