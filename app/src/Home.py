@@ -88,7 +88,7 @@ headers = {
 # API endpoint
 API_URL = "http://host.docker.internal:4000/users/users"  
 
-
+residents_email_list=[]
 # Get unique values for filters from the API
 #For resident login 
 try:
@@ -127,6 +127,7 @@ API_URL = "http://host.docker.internal:4000/users/users"
 
 
 # Get unique values for filters from the API
+students_email_list=[]
 try:
     response = requests.get(API_URL, headers=headers, timeout=10)
     response.raise_for_status()
@@ -162,7 +163,7 @@ except (KeyError, TypeError) as e:
 # API endpoint
 API_URL = "http://host.docker.internal:4000/users/users"  
 
-
+policy_email_list=[]
 # Get unique values for filters from the API
 try:
     response = requests.get(API_URL, headers=headers, timeout=10)
