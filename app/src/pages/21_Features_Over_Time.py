@@ -177,25 +177,24 @@ if chosen_country2:
     st.subheader("Select Features to Consider")
     col3, col4 = st.columns(2)
     
+    feature = []
     with col3:
         if st.button("Live Births per 1000 Population"):
             feature = FEATURES["live_births"]
             st.success("Hover over the graph below to see specific values")
-            display_data(feature["code"], feature["y_label"], feature["title"], 
-                        chosen_country, chosen_year)
     
     with col4:
         if st.button("General Practitioners per 10,000 Population"):
             feature = FEATURES["general_practitioners"]
             st.success("Hover over the graph below to see specific values")
-            display_data(feature["code"], feature["y_label"], feature["title"], 
-                        chosen_country, chosen_year)
         
         if st.button("Total Health Expenditure per Capita"):
             feature = FEATURES["health_expenditure"]
             st.success("Hover over the graph below to see specific values")
-            display_data(feature["code"], feature["y_label"], feature["title"], 
+    if len(feature) != 0:
+        display_data(feature["code"], feature["y_label"], feature["title"], 
                         chosen_country, chosen_year)
 else:
     st.info("Please select a country to proceed")
+
 
