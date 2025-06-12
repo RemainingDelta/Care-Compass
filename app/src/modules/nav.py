@@ -74,7 +74,7 @@ def SideBarLinks(show_home=False):
     st.sidebar.image("assets/logo.png", width=400)
 
     # If there is no logged in user, redirect to the Home (Landing) page
-    if "authenticated" not in st.session_state:
+    if 'authenticated' not in st.session_state:
         st.session_state.authenticated = False
         st.switch_page("Home.py")
 

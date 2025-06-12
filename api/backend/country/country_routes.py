@@ -497,7 +497,7 @@ def get_articles_by_country(country_code):
         cursor = db.get_db().cursor()
 
         query = """
-            SELECT article_title, source, article_link
+            SELECT id, article_title, source, article_link
             FROM CountryArticles
             WHERE country_code = %s
         """
@@ -506,6 +506,7 @@ def get_articles_by_country(country_code):
 
         result = [
             {
+                "id": row["id"],
                 "title": row["article_title"],
                 "source": row["source"],
                 "link": row["article_link"]
@@ -513,8 +514,74 @@ def get_articles_by_country(country_code):
             for row in articles
         ]
 
-
-
         return jsonify(result)
     except Error as e: 
         return jsonify({"error": str(e)}), 500
+    
+# Posts article in favorites table
+@countries.route('/articles/favorite', methods=['POST'])
+def favorite_articles():
+    try:
+        data = request.get_json()
+
+        # Validate required fields
+        required_fields = ["articleID"]
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        cursor = db.get_db().cursor()
+
+        # Insert new article 
+        query = """
+        INSERT INTO Favorites (articleID)
+        VALUES (%s)
+        """
+        cursor.execute(
+            query,
+            (
+                data["articleID"]
+            ),
+        )
+
+        db.get_db().commit()
+        fav_article_id = cursor.lastrowid
+        cursor.close()
+
+        return (
+            jsonify({"message": "Article favorited successfully", "article_id": fav_article_id}),
+            201,
+        )
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
+    
+# gets all favorite articles and information about them
+@countries.route('/articles/favorite', methods=['GET'])
+def get_fav_articles():
+    pass
+    # try:
+    #     cursor = db.get_db().cursor()
+
+    #     # Get country details
+    #     cursor.execute("SELECT * FROM Favorites WHERE 1=1")
+    #     articles = cursor.fetchall()
+
+    #     if not articles:
+    #         return jsonify({"error": "Articles not found"}), 404
+
+    #     # Get associated article info
+    #     cursor.execute("SELECT * FROM CountryArticles WHERE articleID = %s", (country_code,))
+    #     info = cursor.fetchall()
+
+    #     # Combine data from multiple related queries into one object to return (after jsonify)
+    #     country["info"] = info
+    #     country["articles"] = article
+
+    #     cursor.close()
+    #     return jsonify(country), 200
+    # except Error as e:
+    #     return jsonify({"error": str(e)}), 5
+
+@countries.route('/articles/favorite', methods=['DELETE'])
+def unfavorite_article():
+    pass
