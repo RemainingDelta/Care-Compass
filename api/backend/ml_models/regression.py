@@ -309,7 +309,7 @@ def create_xy_full(df):
                     #index = index_raw[0]
                 country_count.append(country)
     country_num = len(country_count)
-    print(country_count)
+    #print(country_count)
     #print(country_num)
     seen_country = []
     x_matrix_final = np.empty((0, country_num + 9))
@@ -339,10 +339,10 @@ def create_xy_full(df):
 def create_xy_select(df, country_input):
     #df['year'] = df['year'].astype(float)
     #sees how many different countries are in the dataset
-    print("dataframe")
-    print(df)
-    print("country input")
-    print(country_input)
+    #print("dataframe")
+    #print(df)
+    #print("country input")
+    #print(country_input)
     country_count = []
     for country in df['COUNTRY']:
 
@@ -362,8 +362,8 @@ def create_xy_select(df, country_input):
                 country_count.append(country)
     country_num = len(country_count)
     
-    print("Country Count")
-    print(country_count)
+    #print("Country Count")
+    #print(country_count)
     #print(country_num)
     #seen_country = []
     x_matrix_final = np.empty((0, country_num + 9))
