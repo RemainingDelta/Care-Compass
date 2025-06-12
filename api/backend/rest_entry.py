@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 from backend.db_connection import db
 from backend.country.country_routes import countries
 from backend.ml.ml_routes import ml
+from backend.users.user_routes import users
 
 def create_app():
     app = Flask(__name__)
@@ -46,6 +47,7 @@ def create_app():
     app.logger.info("create_app(): registering blueprints with Flask app object.")
     app.register_blueprint(countries, url_prefix="/country")
     app.register_blueprint(ml, url_prefix="/ml")
+    app.register_blueprint(users, url_prefix="/users")
 
     # Don't forget to return the app object
     return app
