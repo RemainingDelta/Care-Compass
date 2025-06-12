@@ -10,7 +10,7 @@ style_sidebar()
 
 SideBarLinks()
 
-st.title("SUGGESTED HEALTHCARE ARTICLES")
+st.title("FAVORITED HEALTHCARE ARTICLES")
 
 
 # CHANGE CODE

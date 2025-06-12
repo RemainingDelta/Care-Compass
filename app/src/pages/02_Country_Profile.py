@@ -126,6 +126,33 @@ if selected_country :
             st.container(border=True)
             st.image(get_random_thumbnail())
             st.markdown(f"**{article['title']}**")
-            st.markdown(f"*{article['source']}*")
-            st.markdown(f"[Read more]({article['link']})", unsafe_allow_html=True)
+            col_a, col_b = st.columns([0.85,0.15],gap="small")
+            with col_a:
+                st.markdown(f"*{article['source']}*")
+                st.markdown(f"[Read more]({article['link']})", unsafe_allow_html=True)
+            with col_b:
+                if 'is_bookmarked' not in st.session_state :
+                    st.session_state.is_bookmarked = False 
+                if st.button(":star:", key=f"{article['id']}bookmark_button"):
+                    st.session_state.is_bookmarked = not st.session_state.is_bookmarked
+                    favorite_data = {
+                        "articleID": article['id']
+                    }
 
+favorite_url = f"http://host.docker.internal:4000/country/articles/favorite
+try:
+    # Send POST request to API
+    response = requests.post(favorite_url, json=favorite_data)
+
+    if response.status_code == 201:
+        st.success("Article added successfully!")
+        # Clear the form
+        st.rerun()
+    else:
+        st.error(
+            f"Failed to add Article: {response.json().get('error', 'Unknown error')}"
+        )
+
+except requests.exceptions.RequestException as e:
+    st.error(f"Error connecting to the API: {str(e)}")
+    st.info("Please ensure the API server is running")
