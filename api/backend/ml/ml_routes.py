@@ -265,8 +265,8 @@ def cosine(chosen_country, weights_dict):
     weights_vect = []
     #weights_dict_dump = json.dumps(weights_dict) 
     weights_dict2 = json.loads(weights_dict)
-    #print("THIS IS WEIGHTS DICT 2")
-    #print(weights_dict2)
+    print("THIS IS WEIGHTS DICT 2")
+    print(weights_dict2)
     for key in weights_dict2:
         #print("ITERATION 1")
         if key == "Prevention":
