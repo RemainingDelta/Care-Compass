@@ -4,6 +4,8 @@ from mysql.connector import Error
 from flask import current_app
 from backend.ml_models.regression import dataframe
 import pandas as pd
+import streamlit as st
+
 
 countries = Blueprint("country_routes", __name__)
 
@@ -558,30 +560,58 @@ def favorite_articles():
 # gets all favorite articles and information about them
 @countries.route('/articles/favorite', methods=['GET'])
 def get_fav_articles():
-    pass
-    # try:
-    #     cursor = db.get_db().cursor()
+    try:
+        cursor = db.get_db().cursor()
 
-    #     # Get country details
-    #     cursor.execute("SELECT * FROM Favorites WHERE 1=1")
-    #     articles = cursor.fetchall()
+        userID = st.session_state['id']
 
-    #     if not articles:
-    #         return jsonify({"error": "Articles not found"}), 404
+        # Get country details
+        cursor.execute("SELECT * FROM Favorites WHERE userID = %s", (userID,))
 
-    #     # Get associated article info
-    #     cursor.execute("SELECT * FROM CountryArticles WHERE articleID = %s", (country_code,))
-    #     info = cursor.fetchall()
+        articles = cursor.fetchall()
 
-    #     # Combine data from multiple related queries into one object to return (after jsonify)
-    #     country["info"] = info
-    #     country["articles"] = article
+        if not articles:
+            return jsonify({"error": "Articles not found"}), 404
 
-    #     cursor.close()
-    #     return jsonify(country), 200
-    # except Error as e:
-    #     return jsonify({"error": str(e)}), 5
+        # Get associated article info
+        for items in articles :
+            cursor.execute("SELECT * FROM CountryArticles WHERE articleID = %s", (articles['id'],))
+            info = cursor.fetchall()
+            articles["info"] = info
 
-@countries.route('/articles/favorite', methods=['DELETE'])
-def unfavorite_article():
-    pass
+
+        cursor.close()
+        return jsonify(articles), 200
+    except Error as e:
+        return jsonify({"error": str(e)}), 5
+
+# unfavorite an article, deleting it from Favorites table
+@countries.route('/articles/favorite/<articleID>', methods=['DELETE'])
+def unfavorite_article(articleID):
+    try:
+        current_app.logger.info("Attempting to Unfavorite an Article %s", articleID)
+
+        cursor = db.get_db().cursor()
+        
+        userID = st.session_state['id']
+
+        # First, check if the article exists
+        cursor.execute("SELECT articleID FROM Favorites WHERE articleID = %s AND userID = %s", (articleID,userID,))
+        if not cursor.fetchone():
+            current_app.logger.warning("Article ID %s not found", articleID)
+            cursor.close()
+            return jsonify({"error": "Article not found"}), 404
+
+        # Delete the country
+        cursor.execute("DELETE FROM Favorites WHERE articleID = %s AND userID = %s", (articleID,userID,))
+        db.get_db().commit()
+        cursor.close()
+
+        current_app.logger.info("Successfully deleted articleID %s", articleID)
+        return jsonify({"message": f"Article {articleID} deleted successfully"}), 200
+
+    except Error as e:
+        current_app.logger.error("Database error in unfavorite_article: %s", str(e))
+        return jsonify({"error": str(e)}), 500
+
+    
