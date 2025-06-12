@@ -61,23 +61,12 @@ st.markdown("""
     }
     </style>
     <div class="centered-title">
-        <div class="company-name">CARE COMPASS</div>
+        <div class="company-name">Care Compass</div>
     </div>
 """, unsafe_allow_html=True)
 
-@st.cache_resource
-def typewriter(text: str, speed: int):
-    tokens = text.split()
-    container = st.empty()
-    for index in range(len(tokens) + 1):
-        curr_full_text = " ".join(tokens[:index])
-        container.markdown(curr_full_text)
-        time.sleep(1 / speed)
-
-
 text = "We use real health data and machine learning to help users compare and understand global healthcare systems. Our platform lets you explore country profiles, visualize key trends, and get personalized recommendations based on your healthcare priorities."
-speed = 30
-typewriter(text=text, speed=speed)
+st.write(text)
 
 
 # Add space or content that appears lower on scroll
@@ -233,50 +222,81 @@ with col5:
   )
   
 if resident:
-    name, _ = resident.split(" - ", 1)
+    name, email = resident.split(" - ", 1)
     selected_name = name
+    selected_email = email
+    first_name, last_name = name.split(" ", 1)
     #st.write("You are logging in as:", selected_name)
 
 if student:
-    name, _ = student.split(" - ", 1)
+    name, email = student.split(" - ", 1)
     selected_name = name
+    selected_email = email
+    first_name, last_name = name.split(" ", 1)
     #st.write("You are logging in as:", selected_name)
 
 if policy:
-    name, _ = policy.split(" - ", 1)
+    name, email = policy.split(" - ", 1)
     selected_name = name
+    selected_email = email
+    first_name, last_name = name.split(" ", 1)
     #st.write("You are logging in as:", selected_name)
 
 
+
+
 with col2 :
-  if st.button("Login Resident", type="primary",use_container_width=False) :
+  if st.button("Login", key="resident",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'resident'
     if selected_name is None:
        st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
+    st.session_state['last_name'] = last_name
+    st.session_state['email'] = selected_email
+    email_API = st.session_state['email']
+
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID = userID_response.json()
+    st.session_state['id'] = userID
+
     logger.info("Logging in as Resident Persona")
     st.switch_page('pages/00_Resident_Home.py')
 
 with col4:
-  if st.button("Login Student", type="primary",use_container_width=False) :
+  if st.button("Login", key="student",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'student'
     if selected_name is None:
        st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
+    st.session_state['last_name'] = last_name
+    st.session_state['email'] = selected_email
+    email_API = st.session_state['email']
+
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID = userID_response.json()
+    st.session_state['id'] = userID
+    
     logger.info("Logging in as Student Persona")
     st.switch_page('pages/10_Student_Home.py')
 
 with col6:
-  if st.button("Login Policymaker", type="primary",use_container_width=False) :
+  if st.button("Login", key="policymaker",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'policymaker'
     if selected_name is None:
        st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
+    st.session_state['last_name'] = last_name
+    st.session_state['email'] = selected_email
+    email_API = st.session_state['email']
+
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID = userID_response.json()
+    st.session_state['id'] = userID
+    
     logger.info("Logging in as Policymaker Persona")
     st.switch_page('pages/20_Policymaker_Home.py')
-
 
 

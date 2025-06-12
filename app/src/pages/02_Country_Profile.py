@@ -8,6 +8,7 @@ from urllib.error import URLError
 from modules.nav import SideBarLinks
 import requests
 import random
+from streamlit_extras.stateful_button import button
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -20,6 +21,8 @@ headers = {
     "Accept": "application/json",
     "Content-Type": "application/json"
 }
+
+userID = st.session_state['id']
 
 country_url = "http://host.docker.internal:4000/country/countries"  
 
@@ -131,28 +134,35 @@ if selected_country :
                 st.markdown(f"*{article['source']}*")
                 st.markdown(f"[Read more]({article['link']})", unsafe_allow_html=True)
             with col_b:
-                if 'is_bookmarked' not in st.session_state :
-                    st.session_state.is_bookmarked = False 
-                if st.button(":star:", key=f"{article['id']}bookmark_button"):
-                    st.session_state.is_bookmarked = not st.session_state.is_bookmarked
-                    favorite_data = {
-                        "articleID": article['id']
-                    }
+                # if 'is_bookmarked' not in st.session_state :
+                #     st.session_state.is_bookmarked = False 
 
-favorite_url = f"http://host.docker.internal:4000/country/articles/favorite
-try:
-    # Send POST request to API
-    response = requests.post(favorite_url, json=favorite_data)
+                favorite_icon = "⭐️"
 
-    if response.status_code == 201:
-        st.success("Article added successfully!")
-        # Clear the form
-        st.rerun()
-    else:
-        st.error(
-            f"Failed to add Article: {response.json().get('error', 'Unknown error')}"
-        )
+                button(favorite_icon, key=f"{article['id']}bookmark_button")
 
-except requests.exceptions.RequestException as e:
-    st.error(f"Error connecting to the API: {str(e)}")
-    st.info("Please ensure the API server is running")
+                # if favorite:
+                #      st.session_state.is_bookmarked = not st.session_state.is_bookmarked
+                
+                favorite_data = {
+                    "userID": userID,
+                    "articleID": article['id']
+                }
+
+                favorite_url = f"http://host.docker.internal:4000/country/articles/favorite"
+
+                try:
+                    # Send POST request to API
+                    response = requests.post(favorite_url, json=favorite_data)
+
+                    # if response.status_code == 201:
+                    #     st.success("Article added successfully!")
+                        
+                    # else:
+                    #     st.error(
+                    #         f"Failed to add Article: {response.json().get('error', 'Unknown error')}"
+                    #     )
+
+                except requests.exceptions.RequestException as e:
+                    st.error(f"Error connecting to the API: {str(e)}")
+                    st.info("Please ensure the API server is running")
