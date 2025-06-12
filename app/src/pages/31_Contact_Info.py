@@ -2,8 +2,7 @@ import streamlit as st
 from modules.nav import SideBarLinks
 import requests 
 import pandas as pd 
-import json
-#from api.backend.ngos import ngo_routes 
+import json 
 
 SideBarLinks()
 
