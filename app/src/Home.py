@@ -88,7 +88,7 @@ headers = {
 # API endpoint
 API_URL = "http://host.docker.internal:4000/users/users"  
 
-
+residents_email_list=[]
 # Get unique values for filters from the API
 #For resident login 
 try:
@@ -127,6 +127,7 @@ API_URL = "http://host.docker.internal:4000/users/users"
 
 
 # Get unique values for filters from the API
+students_email_list=[]
 try:
     response = requests.get(API_URL, headers=headers, timeout=10)
     response.raise_for_status()
@@ -162,7 +163,7 @@ except (KeyError, TypeError) as e:
 # API endpoint
 API_URL = "http://host.docker.internal:4000/users/users"  
 
-
+policy_email_list=[]
 # Get unique values for filters from the API
 try:
     response = requests.get(API_URL, headers=headers, timeout=10)
@@ -249,6 +250,8 @@ with col2 :
   if st.button("Login", key="resident",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'resident'
+    if selected_name is None:
+       st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
     st.session_state['last_name'] = last_name
     st.session_state['email'] = selected_email
@@ -265,6 +268,8 @@ with col4:
   if st.button("Login", key="student",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'student'
+    if selected_name is None:
+       st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
     st.session_state['last_name'] = last_name
     st.session_state['email'] = selected_email
@@ -281,6 +286,8 @@ with col6:
   if st.button("Login", key="policymaker",type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'policymaker'
+    if selected_name is None:
+       st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
     st.session_state['last_name'] = last_name
     st.session_state['email'] = selected_email

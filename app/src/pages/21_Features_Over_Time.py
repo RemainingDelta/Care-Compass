@@ -1,3 +1,4 @@
+import decimal
 import logging
 logger = logging.getLogger(__name__)
 import streamlit as st
@@ -22,20 +23,14 @@ st.title('FEATURES OVER TIME')
 st.write("Choose a region and your target country to view how including features changes scores over time.")
 st.write("")
 
-#headers to bypass requests 
-headers = {
-    "User-Agent": "Python/requests",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-}
-
 # Your backend endpoint URL - for getting all countries for the drop down 
 get_country_url = "http://host.docker.internal:4000/country/countries"  
 
 country_list = []
 
+#to display country dropdown
 try:
-    response = requests.get(get_country_url, headers=headers, timeout=10)
+    response = requests.get(get_country_url)
     response.raise_for_status()
     data = response.json()
 
@@ -58,7 +53,7 @@ regions = []
 time = []
 
 with col1: 
-    
+    #country selection 
     chosen_country2 = st.selectbox(
         "Country:",
         country_code_list,
@@ -98,75 +93,91 @@ col3,col4 = st.columns(2)
 #displays all graphical data through getting the regression values and using plotly to graph
 def display_data(data_code, y_value, title):
     get_graph = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
-    #headers = {
-        #"User-Agent": "Python/requests",
-        #"Accept": "application/json",
-        #"Content-Type": "application/json"
-        #}
-    all_countries = requests.get(get_graph, timeout=10)
-    #print(all_countries.type())
-    all_country = requests.get(get_graph, timeout=10).text
-    #st.write(all_country)
+    all_countries = requests.get(get_graph)
+    all_country = all_countries.text
     if all_countries.status_code == 200:
-        #all_countries = all_countries.json
-        #all_countries = json.dumps(all_countries)
         data_dict = json.loads(all_country)
         data_dict = json.loads(data_dict)
-        #print(type(data_dict))
-
-        #data_series = pd.Series(all_countries)
-        #print(all_countries)
         df_country = pd.DataFrame(data_dict)
-        #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
-        #print(df_graph)
-        df_graph = df_country #[(df_country['country'] == chosen_country)]
+        df_graph = df_country 
         df_graph['YEAR'] = df_graph['YEAR'].astype(float)
         X = np.array(df_graph['YEAR'])
         y = np.array(df_graph['VALUE']) 
-        #predict_dict = json.loads(response_text)
-        #slope = predict_dict['slope']
-        #intercept = predict_dict['intercept']
-        def show_fit(X, y, slope, intercept):
-            
-            # in case this wasn't done before, transform the input data into numpy arrays and flatten them
-            x = np.array(X).ravel()
-            y = np.array(y).ravel()
 
-            
-            # plot the actual data
-            figure1 = px.scatter(x=x, y=y, labels={
-                "x": "Time in Years",
-                "y": y_value
-            }, title = title)
-            
-            # compute linear predictions 
-            # x is a numpy array so each element gets multiplied by slope and intercept is added
-            x = np.linspace(1970, 2040, 10)
-            y_pred = slope * x + intercept
-            
-            #px.legend()
-            figure2 = go.Figure(data=[go.Scatter(x=x, y=y_pred, mode='lines', name='line of best fit')])
+        last_year = 2020
+        print("THIS IS DF COUNTRY:", df_country)
+        for index, row in df_country.iterrows():
+            d = decimal.Decimal(str(row['VALUE']))
+            #st.write("THIS IS D:", d)
+            if d.as_tuple().exponent <= -3:
+                last_year = row['YEAR']
+                break
 
-            figure3 = go.Figure(data = figure1.data + figure2.data)
-            figure3.update_layout(title=title, xaxis_title='Year', yaxis_title=y_value)
-
-            return figure3
-
-        #st.plotly_chart(show_fit(X, y, slope, intercept))
         x = np.array(X).ravel()
         y = np.array(y).ravel()
-        st.plotly_chart(px.line( x=x, y=y, labels={
-                "x": "Time in Years",
-                "y": y_value
-            }, title = title))
+        
+        pred_list = []
+        print("THE LAST YEAR:", last_year)
+        #st.write("The last year:", last_year)
+        for index, row in df_country.iterrows():
+            if row['YEAR'] >= last_year:
+                pred_list.append(True)
+            else:
+                pred_list.append(False)
+        df_country['IsPred'] = pred_list
+
+        # Split the data
+        df_actual = df_country[df_country['IsPred'] == False]
+        df_pred = df_country[df_country['IsPred'] == True]
+
+        # Create figure with both lines
+        fig = go.Figure()
+
+        # Get last point of historical data to connect to predicted data 
+        if not df_actual.empty and not df_pred.empty:
+            last_actual_year = df_actual.iloc[-1]['YEAR']
+            last_actual_value = df_actual.iloc[-1]['VALUE']
+
+            # add the last historical point to front of predicted values 
+            df_pred_with_bridge = pd.concat([
+                pd.DataFrame({'YEAR': [last_actual_year], 'VALUE': [last_actual_value]}),
+                df_pred[['YEAR', 'VALUE']]
+            ], ignore_index=True)
+        else:
+            df_pred_with_bridge = df_pred
+        
+        # Actual line (historical data)
+        fig.add_trace(go.Scatter(
+            x=df_actual['YEAR'],
+            y=df_actual['VALUE'],
+            mode='lines+markers',
+            name='Historical',
+            line=dict(color='blue')
+        ))
+
+        # Predicted line 
+        fig.add_trace(go.Scatter(
+            x=df_pred_with_bridge['YEAR'],
+            y=df_pred_with_bridge['VALUE'],
+            mode='lines+markers',
+            name='Predicted',
+            line=dict(color='red')
+        ))
+
+
+        # Final layout
+        fig.update_layout(
+            title=title,
+            xaxis_title='Year',
+            yaxis_title=y_value
+        )
+
+        st.plotly_chart(fig)
     else:
         st.error(f"Error: {all_countries.status_code}")
         st.write(all_countries.text)
 
 #creates booleans and empty values when deciding what to display
-life_exp_bool = False
-inf_mort_bool = False
-impov_house_bool = False
 expenditure_bool = False
 gen_prac_bool = False
 live_birth_bool = False
@@ -207,19 +218,11 @@ with col4:
         data_code = "HLTHRES_67"
         y_value = "General Practitoners per 10,000 population"
         title = "General Practitioners Over Time"
-        #st.write("Country Code", chosen_country) 
         api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
 
         try:
-            # headers = {
-            #     "User-Agent": "Python/requests",
-            #     "Accept": "application/json",
-            #     "Content-Type": "application/json"
-            # }
-#''', headers=headers, timeout=10'''
             response = requests.get(api_url)
             response_text = requests.get(api_url, timeout=10).text
-            #st.write(response.json())
 
             if response.status_code == 200:
                 data = response.json()  
@@ -230,14 +233,12 @@ with col4:
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
-            #st.error(response.text)
     
     health_expen = st.button("Total Health Expenditure per Capita")
     if health_expen:
         data_code = "HFA_570"
         y_value = "Total Health Expenditure per Capita"
         title = "Total Health Expenditure Over Time"
-        #st.write("Country Code", chosen_country) 
         api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
 
         try:
@@ -257,16 +258,6 @@ with col4:
 
 # Displaying relevant information if a button is pressed 
 if expenditure_bool or live_birth_bool or gen_prac_bool:
-    #st.success(f"""
-                #Here are the values for the line of best fit!  
-                #Slope: {round(data['slope'], 4)}  
-                #Intercept: {round(data['intercept'], 4)}
-                #""")
-    #st.badge(f"Mean Squared Error: {round(data['mse'], 4)}", color='violet')
-    #st.badge(f"Coefficient of Determination: {round(data['r2'], 4)}", color='violet')
-    #calculation = float(chosen_year)*data['slope'] + data['intercept']
-    #st.badge(f"The predicted value for your chosen date is: {round(calculation, 4)}", color='blue')
-    #st.json(data)
     st.success("Hover over the graph below to see specific values")
     display_data(data_code, y_value, title)
 
