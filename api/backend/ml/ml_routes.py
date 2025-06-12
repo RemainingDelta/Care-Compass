@@ -8,9 +8,12 @@ from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
 from backend.ml_models.regression import autoreg_predict
+from backend.ml_models.regression import create_xy
 from backend.ml_models.regression import create_xy_full
+from backend.ml_models.regression import create_xy_select
 from backend.ml_models.regression import autoreg_train
 from backend.ml_models.regression import autoreg_predict_full
+from backend.ml_models.regression import add_predict
 import pandas as pd
 import json
 
@@ -120,11 +123,66 @@ def get_regression(input):
 
 #model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/ml/get_autoregressive/<input>", methods=["GET"])
-def get_autoregressive(input):
+@ml.route("/ml/get_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["GET"])
+def get_autoregressive(chosen_country, data_code, chosen_year):
+
+    cursor = db.get_db().cursor()
+
+    if data_code == 'HFA_16':
+        query = """SELECT * FROM LiveBirths"""
+    elif data_code == 'HFA_570':
+        query = """SELECT * FROM HealthExpend"""
+    elif data_code == 'HLTHRES_67':
+        query = "SELECT * FROM GenPractitioners"
+    #print(query)
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    #print(rows)
+
+    # Convert to DataFrame
+    columns = ["COUNTRY", "YEAR", "VALUE"]
+    df = pd.DataFrame(rows, columns=columns)
+    value_list = []
+    for value in df["VALUE"]:
+        value_list.append(float(value))
+    
+    df["VALUE"] = value_list
+
+    #print("df")
+    #print(df)
+    
+    inputs = [chosen_country, data_code, chosen_year]
+    #xy = create_xy_full(dataframe(inputs[1]))
+    #df = dataframe(inputs[1])
+    df_country = df[(df['COUNTRY'] == inputs[0])]
+    #print("df_country")
+    #print(df_country)
+    df_filtered = df_country.reset_index(drop=True)
+    #print("df_filtered")
+    #print(df_filtered)
+    year = int(df_filtered.iloc[len(df_filtered) - 1]['YEAR'])
+    years = int(inputs[2]) - year
+    print("number of years")
+    print(years)
+    input = create_xy_select(df, inputs[0])
+    train = create_xy_full(df)
+    preds = autoreg_predict_full(input[0], input[1], autoreg_train(train[0], train[1]), years, train[2])
+    result = add_predict(df_country, preds, input[0])
+    print("Country received:", inputs[0])
+    result_final = result.to_dict()
+    result_final = json.dumps(result_final)
+    print("final data frame")
+    print(result_final)
+    return jsonify(result_final)
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
+@ml.route("/ml/get_autoregressive_all/<input>", methods=["GET"])
+def get_autoregressive_all(input):
     inputs = [str(x.strip()) for x in input.split(',')]
     xy = create_xy_full(dataframe(inputs[1]))
-    result = autoreg_predict_full(result[0], result[1], autoreg_train(result[0], result[1]), inputs[2])
+    inputs = create_xy(dataframe(inputs[1]), inputs[0])
+    result = autoreg_predict_full(inputs[0], inputs[1], autoreg_train(xy[0], xy[1]), inputs[2])
     print("Country received:", inputs[0])
 
     return jsonify(result)

@@ -203,22 +203,22 @@ def predict(df_expenditure, country_name):
 def create_xy(df, country_name):
 
     #df['year'] = df['year'].astype(float)
-    df_country = df[(df['country'] == country_name)]
+    df_country = df[(df['COUNTRY'] == country_name)]
     df_country = df_country.reset_index(drop=True)
     #X = np.array(df_country['year'])
     #y = np.array(df_country['value'])
-    start_year = str(int(df_country['year'].min()) + 10) # grab the earliest year (post lag) for the country
-    index_raw = df_country.index[df_country['year'] == start_year] # replace 1990 with start_year
+    start_year = (int(df_country['YEAR'].min()) + 10) # grab the earliest year (post lag) for the country
+    index_raw = df_country.index[df_country['YEAR'] == start_year] # replace 1990 with start_year
     if len(index_raw) != 0:
         index = index_raw[0]
     # if index is null, return empty x_matrix, y_matrix
-        y_vector = df_country[index :]['value'].tolist()
+        y_vector = df_country[index :]['VALUE'].tolist()
         x_matrix = []
         x_list = []
         while index < (len(df_country)):
             for i in range(1, 11):
                 temp_index = index - i
-                x_list.append(df_country.iloc[temp_index]['value'])
+                x_list.append(df_country.iloc[temp_index]['VALUE'])
             x_matrix.append(x_list) 
             x_list = []
             index += 1
@@ -226,8 +226,6 @@ def create_xy(df, country_name):
         x_matrix = np.array(x_matrix)
         y_vector = np.array(y_vector)
         return x_matrix, y_vector
-    
-    
     
     
 def autoreg_train(x_matrix, y_vector):
@@ -247,11 +245,9 @@ def autoreg_train(x_matrix, y_vector):
     #X = add_bias_column(x_matrix)
     X = x_matrix
     #calculates the vector whos values correspond to the slope and intercept of the line of best fit 
-    XtXinv = np.linalg.inv(np.matmul(X.T, X))
+    XtXinv = np.linalg.pinv(np.matmul(X.T, X))
     b = np.matmul(XtXinv, np.matmul(X.T, y_vector))
     return b
-
-
 
 
 def autoreg_predict(x_matrix, y_vector, b, num):
@@ -269,7 +265,7 @@ def autoreg_predict(x_matrix, y_vector, b, num):
     
     """
     #creates predicted values, residuals, mean squared error, and coefficient of determination
-    x_matrix = add_bias_column(x_matrix)
+    #x_matrix = add_bias_column(x_matrix)
     test_vec = x_matrix[len(x_matrix) - 1]
     test_vec = test_vec.tolist()
     y_pred = []
@@ -296,11 +292,25 @@ def create_xy_full(df):
     #df['year'] = df['year'].astype(float)
     #sees how many different countries are in the dataset
     country_count = []
-    for country in df['country']:
+    for country in df['COUNTRY']:
+
         if country not in country_count:
-            country_count.append(country)
+            df_country = df[(df['COUNTRY'] == country)]
+            df_country = df_country.reset_index(drop=True)
+            #X = np.array(df_country['year'])
+            #y = np.array(df_country['value'])
+            start_year = (int(df_country['YEAR'].min()) + 10) # grab the earliest year (post lag) for the country
+            #print("Start year")
+            #print(start_year)
+            index_raw = df_country.index[df_country['YEAR'] == start_year] # replace 1990 with start_year
+            #print(index_raw)
+            if len(index_raw) != 0:
+                #if index_raw[0] > 10:
+                    #index = index_raw[0]
+                country_count.append(country)
     country_num = len(country_count)
-    print(country_num)
+    print(country_count)
+    #print(country_num)
     seen_country = []
     x_matrix_final = np.empty((0, country_num + 9))
     y_vector_final = np.empty((0,1))
@@ -323,17 +333,64 @@ def create_xy_full(df):
                 y_vector_final = np.vstack((y_vector_final, y_vector))
     x_matrix_final = np.array(x_matrix_final)
     y_vector_final = np.array(y_vector_final)
+    return x_matrix_final, y_vector_final, country_num
+    
+
+def create_xy_select(df, country_input):
+    #df['year'] = df['year'].astype(float)
+    #sees how many different countries are in the dataset
+    print("dataframe")
+    print(df)
+    print("country input")
+    print(country_input)
+    country_count = []
+    for country in df['COUNTRY']:
+
+        if country not in country_count:
+            df_country = df[(df['COUNTRY'] == country)]
+            df_country = df_country.reset_index(drop=True)
+            #X = np.array(df_country['year'])
+            #y = np.array(df_country['value'])
+            start_year = (int(df_country['YEAR'].min()) + 10) # grab the earliest year (post lag) for the country
+            #print("start year")
+            #print(start_year)
+            index_raw = df_country.index[df_country['YEAR'] == start_year] # replace 1990 with start_year
+            #print(index_raw)
+            if len(index_raw) != 0:
+                #if index_raw[0] > 10:
+                    #index = index_raw[0]
+                country_count.append(country)
+    country_num = len(country_count)
+    
+    print("Country Count")
+    print(country_count)
+    #print(country_num)
+    #seen_country = []
+    x_matrix_final = np.empty((0, country_num + 9))
+    y_vector_final = np.empty((0,1))
+    #start_year = str(int(df_country['year'].min()) + 10) # grab the earliest year (post lag) for the country
+    #index_raw = df_country.index[df_country['year'] == start_year] # replace 1990 with start_year
+    #if len(index_raw) != 0:
+        #index = index_raw[0]
+    #for i in range(len(country_count)):
+    i = country_count.index(country_input)
+    x_matrix = create_xy(df, country_input)[0]
+    country_matrix = np.zeros((country_num-1, len(x_matrix)))
+    country_matrix[i : i+1] = 1
+    y_vector_final = create_xy(df, country_input)[1].reshape(-1,1)
+    x_matrix_final = np.hstack((country_matrix.T, x_matrix))
+    x_matrix_final = np.array(x_matrix_final)
+    y_vector_final = np.array(y_vector_final)
     return x_matrix_final, y_vector_final
     
 
-
-def autoreg_predict_full(x_matrix, y_vector, b, num):
+def autoreg_predict_full(x_matrix, y_vector, b, num, country_num):
 
     """
 
     """
     #creates predicted values, residuals, mean squared error, and coefficient of determination
-    x_matrix = add_bias_column(x_matrix)
+    #x_matrix = add_bias_column(x_matrix)
     test_vec = x_matrix[len(x_matrix) - 1]
     #test_vec = test_vec.tolist()
     #print(test_vec)
@@ -341,14 +398,28 @@ def autoreg_predict_full(x_matrix, y_vector, b, num):
     for i in range(num):
         #print(test_vec)
         test_vec = np.array(test_vec)
-        y_temp = np.dot(test_vec[i + 1: ], b)
+        y_temp = np.dot(test_vec, b)
         y_temp = y_temp[0]
         #print(y_temp)
         test_vec = test_vec.tolist()
-        test_vec.append(y_temp)
+        test_vec.insert(country_num, y_temp)
+        test_vec.pop()
         y_pred.append(y_temp)
     
     return y_pred
+   
+
+
+def add_predict(df, preds, country):
+    #df_country = df[(df['COUNTRY'] == country)]
+    #df = df_country.reset_index(drop=True)
+    for i in range(len(preds)):
+        year = int(df.iloc[len(df) - 1]['YEAR'])
+        year = year + 1
+        int_year = int(year)
+        new_row = {'COUNTRY': country, 'YEAR': int_year, 'VALUE': preds[i]}
+        df.loc[len(df)] = new_row
+    return df
    
 
  
