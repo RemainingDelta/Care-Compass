@@ -252,6 +252,8 @@ with col2 :
   if st.button("Login Resident", type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'resident'
+    if selected_name is None:
+       st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
     logger.info("Logging in as Resident Persona")
     st.switch_page('pages/00_Resident_Home.py')
@@ -260,6 +262,8 @@ with col4:
   if st.button("Login Student", type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'student'
+    if selected_name is None:
+       st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
     logger.info("Logging in as Student Persona")
     st.switch_page('pages/10_Student_Home.py')
@@ -268,6 +272,8 @@ with col6:
   if st.button("Login Policymaker", type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'policymaker'
+    if selected_name is None:
+       st.error("Please chosoe a user to log in as")
     st.session_state['name'] = selected_name
     logger.info("Logging in as Policymaker Persona")
     st.switch_page('pages/20_Policymaker_Home.py')
