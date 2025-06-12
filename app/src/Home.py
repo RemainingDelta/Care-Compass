@@ -65,7 +65,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-
+@st.cache_resource
 def typewriter(text: str, speed: int):
     tokens = text.split()
     container = st.empty()
@@ -83,9 +83,8 @@ typewriter(text=text, speed=speed)
 # Add space or content that appears lower on scroll
 st.write("")
 st.markdown("---")
-st.header('Welcome!')
 st.write('\n')
-st.write('#### Login as a ...')
+st.markdown('#### Login as a ...')
 
 # For each of the user personas for which we are implementing
 # functionality, we put a button on the screen that the user 
@@ -208,6 +207,8 @@ except (KeyError, TypeError) as e:
 
 
 col1, col2 = st.columns([0.7,0.3],vertical_alignment="bottom")
+col3, col4 = st.columns([0.7,0.3],vertical_alignment="bottom")
+col5, col6 = st.columns([0.7,0.3],vertical_alignment="bottom")
 
 # UI
 with col1 :
@@ -217,12 +218,14 @@ with col1 :
       index=None
   )
 
+with col3:
   student = st.selectbox(
       "Student:",
       students_email_list,
       index=None
   )
 
+with col5:
   policy = st.selectbox(
       "Policymaker:",
       policy_email_list,
@@ -252,16 +255,16 @@ with col2 :
     st.session_state['name'] = selected_name
     logger.info("Logging in as Resident Persona")
     st.switch_page('pages/00_Resident_Home.py')
-  st.write("")
-  st.write("")
+
+with col4:
   if st.button("Login Student", type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'student'
     st.session_state['name'] = selected_name
     logger.info("Logging in as Student Persona")
     st.switch_page('pages/10_Student_Home.py')
-  st.write("")
-  st.write("")
+
+with col6:
   if st.button("Login Policymaker", type="primary",use_container_width=False) :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'policymaker'
