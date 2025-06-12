@@ -85,7 +85,7 @@ if selected_country :
                     st.write("")
             #display countries with similarity scores close to the given country 
             with col2 : 
-                st.markdown("Check out countries with similar scores.")
+                st.markdown("Countries with similar scores:")
                 factors = [
                     "Prevention",
                     "Health System",
