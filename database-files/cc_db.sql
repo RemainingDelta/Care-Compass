@@ -48,14 +48,6 @@ CREATE TABLE CountryArticles(
     FOREIGN KEY (country_code) REFERENCES Countries(code)
 );
 
-DROP TABLE IF EXISTS Favorites;
-CREATE TABLE Favorites(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    articleID   INT, 
-    FOREIGN KEY (articleID) REFERENCES CountryArticles(id)
-);
-
-
 DROP TABLE IF EXISTS UserRoles;
 CREATE TABLE UserRoles
 (
@@ -78,6 +70,15 @@ CREATE TABLE Users
     FOREIGN KEY (roleID) REFERENCES UserRoles(roleID)
 );
 
+
+DROP TABLE IF EXISTS Favorites;
+CREATE TABLE Favorites(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userID  INT,
+    articleID   INT, 
+    FOREIGN KEY (articleID) REFERENCES CountryArticles(id),
+    FOREIGN KEY (userID) REFERENCES Users(id)
+);
 
 DROP TABLE IF EXISTS Factors;
 CREATE TABLE Factors

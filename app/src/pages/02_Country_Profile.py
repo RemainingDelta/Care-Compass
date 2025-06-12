@@ -136,10 +136,12 @@ if selected_country :
                 if st.button(":star:", key=f"{article['id']}bookmark_button"):
                     st.session_state.is_bookmarked = not st.session_state.is_bookmarked
                     favorite_data = {
+                        "userID": st.session_state['id'],
                         "articleID": article['id']
                     }
 
-favorite_url = f"http://host.docker.internal:4000/country/articles/favorite
+favorite_url = f"http://host.docker.internal:4000/country/articles/favorite"
+
 try:
     # Send POST request to API
     response = requests.post(favorite_url, json=favorite_data)
