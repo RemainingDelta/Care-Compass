@@ -124,41 +124,64 @@ st.markdown("### Adjust the weight for each priority slot")
 
 slider_range = (1, 10)
 
+
 for i in range(6):
     factor = st.session_state.dragged_factors[i]
-
     col_num, col_label, col_slider, col_input = st.columns([1, 3, 5, 2])
     with col_num:
         st.markdown(f"**{i+1}.**")
     with col_label:
         tooltip_keys = {
-            "prevention": "prevention",
-            "healthsystem": "healthsystem",
-            "rapidresponse": "rapidresponse",
-            "detection&reporting": "detectionandreporting",
-            "internationalnormscompliance": "compliancewithinternationalnorms",
-            "riskenvironment": "riskenvironment"
+        "prevention": "prevention",
+        "healthsystem": "healthsystem",
+        "rapidresponse": "rapidresponse",
+        "detection&reporting": "detectionandreporting",
+        "internationalnormscompliance": "compliancewithinternationalnorms",
+        "riskenvironment": "riskenvironment"
         }
-        lookup_key = tooltip_keys.get(factor.lower().replace(" ", "").strip(), "")
-        desc = factor_descriptions.get(lookup_key, "")
+    lookup_key = tooltip_keys.get(factor.lower().replace(" ", "").strip(), "")
+    desc = factor_descriptions.get(lookup_key, "")
 
-        col_text, col_icon = st.columns([8, 1])
-        with col_text:
-            st.markdown(f"**{factor}**", unsafe_allow_html=True)
-        with col_icon:
-            st.button(
-                label=" ", key=f"info_button_{i}", help=desc, icon="ℹ️", use_container_width=True
-            )
+    col_text, col_icon = st.columns([8, 1])
+    with col_text:
+        st.markdown(f"**{factor}**", unsafe_allow_html=True)
+    with col_icon:
+        st.button(
+            label=" ", key=f"info_button_{i}", help=desc, icon="ℹ️", use_container_width=True
+        )
 
+    # Unique session key per slider/input
+    val_key = f"val_{i}"
+    if val_key not in st.session_state:
+        st.session_state[val_key] = 5 # Default value
+
+    # Update value via slider
     with col_slider:
         slider_val = st.slider(
-            "_", 0, 10, 5, key=f"slider_{i}", label_visibility="collapsed"
+        "_", 0, 10,
+        value=st.session_state[val_key],
+        key=f"slider_{i}",
+        label_visibility="collapsed"
         )
+
+    # Update value via number input
     with col_input:
-        slider_val = st.number_input(
-            "_", min_value=0, max_value=10, value=slider_val,
-            step=1, key=f"input_{i}", label_visibility="collapsed"
+        input_val = st.number_input(
+        "_", min_value=0, max_value=10,
+        value=st.session_state[val_key],
+        step=1,
+        key=f"input_{i}",
+        label_visibility="collapsed"
         )
+
+    # Synchronize value from whichever was changed most recently
+    if input_val != st.session_state[val_key]:
+        st.session_state[val_key] = input_val
+    elif slider_val != st.session_state[val_key]:
+        st.session_state[val_key] = slider_val
+
+    val = st.session_state[val_key]
+
 
     if i == 0:
         true_weight = 90 + slider_val
@@ -192,6 +215,7 @@ for i in range(6):
     weights_dict[factor] = float(weight/100)
 
 #Put the weights in a table 
+
 
 submit = st.button("Submit", type="primary")
 on = st.toggle("Bar Chart / Gradient Map")
