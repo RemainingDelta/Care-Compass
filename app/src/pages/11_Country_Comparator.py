@@ -113,6 +113,13 @@ table = st.button("Submit", type="primary", use_container_width=True)
 
 # TABLE FOR THREE COUNTRIES 
 countries = [country1, country2, country3]
+#st.write(countries)
+countries_exist = []
+for item in countries:
+    if item:
+        countries_exist.append(item)
+#st.write(countries_exist)
+#st.write(len(countries_exist))
 
 if table:
     master_df = pd.DataFrame()
@@ -207,9 +214,11 @@ with col3:
     plot = st.button("Plot", type="primary",use_container_width=False)
 
 if plot:
-    def display_data(data_code, y_value, title, countries):
-        for chosen_country in countries:
-            get_graph = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{"2035"}"
+    def display_data(data_code, y_value, title, countries_exist):
+        dataframe_list = []
+        for chosen_country in countries_exist:
+            #st.write(countries_exist)
+            get_graph = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/2035"
             #headers = {
                 #"User-Agent": "Python/requests",
                 #"Accept": "application/json",
@@ -228,34 +237,45 @@ if plot:
 
                 #data_series = pd.Series(all_countries)
                 #print(all_countries)
+                #st.write(type(data_dict))
                 df_country = pd.DataFrame(data_dict)
                 #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
                 #print(df_graph)
                 df_graph = df_country #[(df_country['country'] == chosen_country)]
-                df_graph['YEAR'] = df_graph['YEAR'].astype(float)
-                X = np.array(df_graph['YEAR'])
-                y = np.array(df_graph['VALUE']) 
+                df_graph['COUNTRY'] = chosen_country
+                #print("individual dataframe length")
+                #st.write(type(df_graph))
+                dataframe_list.append(df_graph)
+            else:
+                st.error(f"Error: {all_countries.status_code}")
+                st.write(all_countries.text)
+        df_graph = pd.concat(dataframe_list, ignore_index=True)
+        #print(df_graph)
+        df_graph['YEAR'] = df_graph['YEAR'].astype(float)
+        #X = np.array(df_graph['YEAR'])
+        #y = np.array(df_graph['VALUE']) 
                 #predict_dict = json.loads(response_text)
                 #slope = predict_dict['slope']
                 #intercept = predict_dict['intercept']
                 
-                x = np.array(X).ravel()
-                y = np.array(y).ravel()
-                st.plotly_chart(px.line( x=x, y=y, labels={
-                        "x": "Time in Years",
-                        "y": y_value
-                    }, title = title))
-            else:
-                st.error(f"Error: {all_countries.status_code}")
-                st.write(all_countries.text)
+        #x = np.array(X).ravel()
+        #y = np.array(y).ravel()
+        #st.write(df_graph.dtypes)
+        #st.write(df_graph)
+        st.plotly_chart(px.line(df_graph, x='YEAR', y='VALUE', labels={
+                "x": "Time in Years",
+                "y": y_value}, color = 'COUNTRY', title = title))
     if feature == live_births:
-        display_data("HFA_16", "Live Births per 1000 population", "Live Births Over Time", countries)
+        st.subheader("Here are the projected live birth numbers for your compared countries up to 2035:")
+        display_data("HFA_16", "Live Births per 1000 population", "Live Births Over Time", countries_exist)
 
     if feature == gen_practitioners: 
-        display_data("HLTHRES_67", "General Practitoners per 10,000 population", "General Practitioners Over Time", countries)  
+        st.subheader("Here are the projected general practitioner numbers for your compared countries up to 2035:")
+        display_data("HLTHRES_67", "General Practitoners per 10,000 population", "General Practitioners Over Time", countries_exist)  
 
     if feature == health_expend:
-        display_data("HFA_570", "Total Health Expenditure per Capita", "Total Health Expenditure Over Time", countries)  
+        st.subheader("Here are the projected expenditures for your compared countries up to 2035:")
+        display_data("HFA_570", "Total Health Expenditure per Capita", "Total Health Expenditure Over Time", countries_exist)  
 
     #results = requests.get(f"http://web-api:4000/ml/predict/{feature}/{country1}") # need to do more for the other countries
     #json_results = results.json()
