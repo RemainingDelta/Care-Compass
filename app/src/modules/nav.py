@@ -15,6 +15,9 @@ def AboutPageNav():
     st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠"
     )
 
+def CSuite():
+    st.sidebar.page_link("pages/31_Contact_Info.py", label="C Suite", icon="📞")
+
 #### ------------------------ Examples for Role of Resident ------------------------
 def ResidentHomeNav():
     st.sidebar.page_link(
@@ -110,6 +113,9 @@ def SideBarLinks(show_home=False):
 
     # Always show the About page at the bottom of the list of links
     AboutPageNav()
+
+    #Always show contact information
+    CSuite()
 
     # Always show a logout button if there is a logged in user
     if st.session_state["authenticated"]:
