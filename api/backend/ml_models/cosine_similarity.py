@@ -24,11 +24,11 @@ def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_sca
 
   #ghs_index_2021 = ghs_index[(ghs_index['Year'] == 2021)]
 
-  print("This is the uncleaned ghs_index")
-  print(ghs_index_2021)
+  #print("This is the uncleaned ghs_index")
+  #print(ghs_index_2021)
 
-  print("This is the cleaned ghs_index")
-  print(ghs_index_2021_scaled)
+  #print("This is the cleaned ghs_index")
+  #print(ghs_index_2021_scaled)
 
   #converting country code to country
 # Your backend endpoint URL
@@ -45,7 +45,7 @@ def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_sca
     response.raise_for_status()
     data = response.json()
     df_country_and_code = pd.DataFrame(data)
-    print(df_country_and_code)
+    #print(df_country_and_code)
 
     for index, row in df_country_and_code.iterrows():
        if row['name'] == chosen_country:
@@ -53,12 +53,22 @@ def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_sca
   except requests.exceptions.RequestException as e:
     print("API request failed:", e)
 
+  sum = 0
+  #scaling the weights correctly 
+  for x in weights_vect:
+    sum += x
+    
+  for i in range(len(weights_vect)):
+    weights_vect[i] = weights_vect[i]/sum
+    
+  #print("THIS IS MY ATTEMPT TO FIX THE WEIGHTS:", weights_vect)
+
   # which countries are most similar to the given country
   country_index = ghs_index_2021.index[ghs_index_2021['country'] == chosen_country].tolist()
-  print(f'Country index: {country_index}')
+  #print(f'Country index: {country_index}')
   the_country_vec = ghs_index_2021_scaled.iloc[country_index].to_numpy()
-  print("This is the full data point for country:\n", the_country_vec)
-  print("WEIGHTS VECTOR:\n", weights_vect)
+  #print("This is the full data point for country:\n", the_country_vec)
+  #print("WEIGHTS VECTOR:\n", weights_vect)
   #doing the weight scaling for chosen country 
   the_country_vec = np.multiply(the_country_vec, weights_vect)
   #print(the_country_vec)
@@ -77,12 +87,12 @@ def get_similar(chosen_country, weights_vect, ghs_index_2021, ghs_index_2021_sca
 
     temp_country_vec = ghs_index_2021_scaled.iloc[country].to_numpy()
 
-    print("THE VECTOR BEFORE:", temp_country_vec.shape)
+    #print("THE VECTOR BEFORE:", temp_country_vec.shape)
     #doing the weight scaling for temp country 
     temp_country_vec = np.multiply(temp_country_vec, weights_vect)
-    print("This is the temp country vec as you can see:")
-    print(temp_country_vec)
-    print("THE VECTOR AFTER:", the_country_vec.shape)
+    #print("This is the temp country vec as you can see:")
+    #print(temp_country_vec)
+    #print("THE VECTOR AFTER:", the_country_vec.shape)
 
     temp_dot = np.dot(the_country_vec, temp_country_vec)
     temp_cos = temp_dot/(np.linalg.norm(the_country_vec) * np.linalg.norm(temp_country_vec))

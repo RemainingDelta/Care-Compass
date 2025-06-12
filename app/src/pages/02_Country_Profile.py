@@ -6,6 +6,8 @@ import pandas as pd
 import pydeck as pdk
 from urllib.error import URLError
 from modules.nav import SideBarLinks
+import requests
+import random
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
@@ -13,62 +15,182 @@ style_sidebar()
 SideBarLinks()
 
 
-# add the logo
-#add_logo("assets/logo.png", height=400)
+# # add the logo
+# #add_logo("assets/logo.png", height=400)
 
-# set up the page
-st.title("<COUNTRY> PROFILE")
+# headers = {
+#     "User-Agent": "Python/requests",
+#     "Accept": "application/json",
+#     "Content-Type": "application/json"
+# }
 
-col1, col2 = st.columns([0.8,0.2],gap="large",vertical_alignment="top",border=True)
+# # Get country code from session state
+# country_code = st.session_state.get("selected_country_code")
 
-with col1 :
-    st.subheader("General Information")
-    st.divider()
-    st.subheader("Healthcare Information")
+# if country_code is None:
+#     st.error("No Country selected")
+#     st.button(
+#         "Return to Country Directory",
+#         on_click=lambda: st.switch_page("pages/03_Country_Directory.py"),
+#     )
+# else:
+#     # API endpoint
+#     API_URL = f"http://host.docker.internal:4000/country/countries/{country_code}"  
 
-with col2 : 
-    st.markdown("Check out countries with similar scores.")
+#     try:
+#         # Fetch Country details
+#         response = requests.get(API_URL)
 
-with st.container(height=393, border=True):
-    cols_mr = st.columns([10.9, 0.2, 10.9])
-    with cols_mr[0].container(height=350, border=False):
-        st.write("Streamlit is an open-source Python framework for data scientists and AI/ML engineers to deliver dynamic data apps with only a few lines of code. Build and deploy powerful data apps in minutes. Let's get started!")
-        st.image('https://docs.streamlit.io/images/app_model.png')
-    with cols_mr[1]:
-        st.html(
-            '''
-                <div class="divider-vertical-line"></div>
-                <style>
-                    .divider-vertical-line {
-                        border-left: 2px solid rgba(49, 51, 63, 0.2);
-                        height: 320px;
-                        margin: auto;
-                    }
-                </style>
-            '''
-        )
-    with cols_mr[2].container(height=350, border=False):
-        st.write(
-            '''
-                Now that you know a little more about all the individual pieces, let's close the loop and review how it works together:
-                - Streamlit apps are Python scripts that run from top to bottom.
-                - Every time a user opens a browser tab pointing to your app, the script is executed and a new session starts.
-                - As the script executes, Streamlit draws its output live in a browser.
-                - Every time a user interacts with a widget, your script is re-executed and Streamlit redraws its output in the browser.
-                - The output value of that widget matches the new value during that rerun.
-                - Scripts use the Streamlit cache to avoid recomputing expensive functions, so updates happen very fast.
-                - Session State lets you save information that persists between reruns when you need more than a simple widget.
-                - Streamlit apps can contain multiple pages, which are defined in separate .py files in a pages folder.
-            '''
-        )
+#         if response.status_code == 200:
+#             country = response.json()
 
-col_a, col_b, col_c = st.columns(3)
-with col_a:
-    st.link_button("Supporting Article 1", "url", type="secondary", use_container_width=True)
-    st.link_button("Supporting Artcile 4", "url", type="secondary", use_container_width=True)
-with col_b:
-    st.link_button("Supporting Article 2", "url", type="secondary", use_container_width=True)
-    st.link_button("Supporting Artcile 5", "url", type="secondary", use_container_width=True)
-with col_c:
-    st.link_button("Supporting Article 3", "url", type="secondary", use_container_width=True)
-    st.link_button("Supporting Artcile 6", "url", type="secondary", use_container_width=True)
+#             # Display basic information
+#             st.title(country["Name"], " Profile")
+
+#             col1, col2 = st.columns(2)
+
+#             with col1:
+#                 st.subheader("Basic Information")
+#                 st.write(f"**Country:** {country['name']}")
+#                 st.write(f"**Region:** {country['region']}")
+
+#             # Display Info
+#             if country.get("info"):
+#                 st.subheader("Information")
+#                 for info in country["info"]:
+#                     st.write(f"**General Information:** {info["generalInfo"]}")
+#                     st.write(f"**Healthcare Information:** {info["healthcareInfo"]}")
+#             else:
+#                 st.info("No information found for this Country")
+
+#             # Display articles
+#             if country.get("articles"):
+#                 st.subheader("Articles")
+#                 for article in country["Articles"]:
+#                     st.write(f"**Title:** {article["article_title"]}")
+#                     st.write(f"**Link:** {article["article_link"]}")
+#                     st.write(f"**Source:** {article["source"]}")
+#             else:
+#                 st.info("No articles found for this Country")
+
+#         elif response.status_code == 404:
+#             st.error("Country not found")
+#         else:
+#             st.error(
+#                 f"Error fetching Country data: {response.json().get('error', 'Unknown error')}"
+#             )
+
+#     except requests.exceptions.RequestException as e:
+#         st.error(f"Error connecting to the API: {str(e)}")
+#         st.info("Please ensure the API server is running")
+
+# """
+# # Add a button to return to the NGO Directory
+# if st.button("Return to NGO Directory"):
+#     # Clear the selected NGO ID from session state
+#     if "selected_ngo_id" in st.session_state:
+#         del st.session_state["selected_ngo_id"]
+#     st.switch_page("pages/14_NGO_Directory.py")
+# """
+
+
+# # set up the page
+# st.title("%s PROFILE",())
+
+# col1, col2 = st.columns([0.8,0.2],gap="large",vertical_alignment="top",border=True)
+
+# with col1 :
+#     st.subheader("General Information")
+#     st.divider()
+#     st.subheader("Healthcare Information")
+
+# with col2 : 
+#     st.markdown("Check out countries with similar scores.")
+
+
+
+# with st.container(height=393, border=True):
+#     cols_mr = st.columns([10.9, 0.2, 10.9])
+#     with cols_mr[0].container(height=350, border=False):
+#         st.write("Streamlit is an open-source Python framework for data scientists and AI/ML engineers to deliver dynamic data apps with only a few lines of code. Build and deploy powerful data apps in minutes. Let's get started!")
+#         st.image('https://docs.streamlit.io/images/app_model.png')
+#     with cols_mr[1]:
+#         st.html(
+#             '''
+#                 <div class="divider-vertical-line"></div>
+#                 <style>
+#                     .divider-vertical-line {
+#                         border-left: 2px solid rgba(49, 51, 63, 0.2);
+#                         height: 320px;
+#                         margin: auto;
+#                     }
+#                 </style>
+#             '''
+#         )
+#     with cols_mr[2].container(height=350, border=False):
+#         st.write(
+#             '''
+#                 Now that you know a little more about all the individual pieces, let's close the loop and review how it works together:
+#                 - Streamlit apps are Python scripts that run from top to bottom.
+#                 - Every time a user opens a browser tab pointing to your app, the script is executed and a new session starts.
+#                 - As the script executes, Streamlit draws its output live in a browser.
+#                 - Every time a user interacts with a widget, your script is re-executed and Streamlit redraws its output in the browser.
+#                 - The output value of that widget matches the new value during that rerun.
+#                 - Scripts use the Streamlit cache to avoid recomputing expensive functions, so updates happen very fast.
+#                 - Session State lets you save information that persists between reruns when you need more than a simple widget.
+#                 - Streamlit apps can contain multiple pages, which are defined in separate .py files in a pages folder.
+#             '''
+#         )
+
+# col_a, col_b, col_c = st.columns(3)
+# with col_a:
+#     st.link_button("Supporting Article 1", "url", type="secondary", use_container_width=True)
+#     st.link_button("Supporting Artcile 4", "url", type="secondary", use_container_width=True)
+# with col_b:
+#     st.link_button("Supporting Article 2", "url", type="secondary", use_container_width=True)
+#     st.link_button("Supporting Artcile 5", "url", type="secondary", use_container_width=True)
+# with col_c:
+#     st.link_button("Supporting Article 3", "url", type="secondary", use_container_width=True)
+#     st.link_button("Supporting Artcile 6", "url", type="secondary", use_container_width=True)
+
+
+country_code = st.selectbox("Choose a country", [
+    "DZA", "AGO", "BEN", "BWA", "BFA", "BDI", "CMR", "CPV", "CAF", "TCD", "COM", "COG", "COD", "DJI", "EGY", "GNQ", "ERI", "ETH", "GAB", "GMB",
+    "GHA", "GIN", "GNB", "CIV", "KEN", "LSO", "LBR", "LBY", "MDG", "MWI", "MLI", "MRT", "MUS", "MAR", "MOZ", "NAM", "NER", "NGA", "RWA", "STP",
+    "SEN", "SYC", "SLE", "SOM", "ZAF", "SSD", "SDN", "SWZ", "TZA", "TGO", "TUN", "UGA", "ZMB", "ZWE", "AFG", "BHR", "BGD", "BTN", "BRN", "MMR",
+    "KHM", "CHI", "TLS", "HKG", "IND", "IDN", "IRN", "IRQ", "ISR", "JPN", "JOR", "KAZ", "PRK", "KOR", "KWT", "KGZ", "LAO", "LBN", "MYS", "MDV",
+    "MNG", "NPL", "OMN", "PAK", "PHL", "QAT", "RUS", "SAU", "SGP", "LKA", "SYR", "TWN", "TJK", "THA", "TUR", "TKM", "ARE", "UZB", "VNM", "YEM",
+    "ALB", "AND", "ARM", "AUT", "AZE", "BLR", "BEL", "BIH", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "GEO", "DEU", "GRC", "HUN",
+    "ISL", "IRL", "ITA", "LVA", "LIE", "LTU", "LUX", "MKD", "MLT", "MDA", "MCO", "MNE", "NLD", "NOR", "POL", "PRT", "ROU", "SMR", "SRB", "SVK",
+    "SVN", "ESP", "SWE", "CHE", "UKR", "GBR", "VAT", "ATG", "BHS", "BRB", "BLZ", "CAN", "CRI", "CUB", "DMA", "DOM", "SLV", "GRD", "GTM", "HTI",
+    "HND", "JAM", "MEX", "NIC", "PAN", "KNA", "LCA", "VCT", "TTO", "USA", "AUS", "FJI", "KIR", "MHL", "FSM", "NRU", "NZL", "PLW", "PNG", "WSM",
+    "SLB", "TON", "TUV", "VUT", "ARG", "BOL", "BRA", "CHL", "COL", "ECU", "GUY", "PRY", "PER", "SUR", "URY", "VEN"
+])
+
+
+def get_random_thumbnail():
+    names = [
+        "Book-Blue.png", "Book-Green.png", "Book-Orange.png", "Book-Purple.png", "Book-Red.png",
+        "ClipBoard-Blue.png", "ClipBoard-Green.png", "ClipBoard-Orange.png", "ClipBoard-Purple.png", "ClipBoard-Red.png",
+        "MagnifyingGlass-Blue.png", "MagnifyingGlass-Green.png", "MagnifyingGlass-Orange.png", "MagnifyingGlass-Purple.png", "MagnifyingGlass-Red.png"
+    ]
+    # Assuming you are running streamlit from the `app/` root and images are in `app/src/assets/`
+    return f"assets/{random.choice(names)}"
+
+res = requests.get(f"http://host.docker.internal:4000/country/countries/{country_code}/articles")
+articles = res.json()
+
+st.title(f"Healthcare Articles for {country_code}")
+
+# 3 columns
+cols = st.columns(3)
+
+for i, article in enumerate(articles):
+    col = cols[i % 3]
+    with col:
+        st.container(border=True)
+        st.image(get_random_thumbnail())
+        st.markdown(f"**{article['title']}**")
+        st.markdown(f"*{article['source']}*")
+        st.markdown(f"[Read more]({article['link']})", unsafe_allow_html=True)
+

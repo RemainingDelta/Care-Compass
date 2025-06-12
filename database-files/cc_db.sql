@@ -24,7 +24,6 @@ CREATE TABLE OverallScore(
     healthSys        FLOAT NOT NULL,
     intlNorms        FLOAT NOT NULL,
     riskEnv          FLOAT NOT NULL,
-
     FOREIGN KEY (country) REFERENCES Countries(code)
   );
 
@@ -32,12 +31,22 @@ CREATE TABLE OverallScore(
 DROP TABLE IF EXISTS CountryInfo;
 CREATE TABLE CountryInfo
 (
-    countryCode VARCHAR(50),
-    generalInfo        TEXT,
-    healthcareInfo      TEXT,
+    countryCode VARCHAR(3) NOT NULL PRIMARY KEY,
+    generalInfo        VARCHAR(700),
+    healthcareInfo      VARCHAR(700),
     FOREIGN KEY (countryCode) REFERENCES Countries(code)
-);
+); 
 
+DROP TABLE IF EXISTS CountryArticles;
+CREATE TABLE CountryArticles(
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    country_code        VARCHAR(3) NOT NULL,
+    article_title  VARCHAR(255) NOT NULL,
+    article_link   VARCHAR(1371) NOT NULL,
+    source         VARCHAR(100) NOT NULL,
+
+    FOREIGN KEY (country_code) REFERENCES Countries(code)
+);
 
 DROP TABLE IF EXISTS UserRoles;
 CREATE TABLE UserRoles
