@@ -97,16 +97,22 @@ col3,col4 = st.columns(2)
 
 #displays all graphical data through getting the regression values and using plotly to graph
 def display_data(data_code, y_value, title):
-    get_graph = f"http://host.docker.internal:4000/ml/ml/get_autoregressive/{chosen_country},{data_code},{chosen_year}"
-    headers = {
-        "User-Agent": "Python/requests",
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-        }
-    all_countries = requests.get(get_graph, headers=headers, timeout=10)
-    all_country = requests.get(get_graph, headers=headers, timeout=10).text
+    get_graph = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
+    #headers = {
+        #"User-Agent": "Python/requests",
+        #"Accept": "application/json",
+        #"Content-Type": "application/json"
+        #}
+    all_countries = requests.get(get_graph, timeout=10)
+    #print(all_countries.type())
+    all_country = requests.get(get_graph, timeout=10).text
+    #st.write(all_country)
     if all_countries.status_code == 200:
+        #all_countries = all_countries.json
+        #all_countries = json.dumps(all_countries)
         data_dict = json.loads(all_country)
+        data_dict = json.loads(data_dict)
+        #print(type(data_dict))
 
         #data_series = pd.Series(all_countries)
         #print(all_countries)
@@ -114,9 +120,9 @@ def display_data(data_code, y_value, title):
         #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
         #print(df_graph)
         df_graph = df_country #[(df_country['country'] == chosen_country)]
-        df_graph['year'] = df_graph['year'].astype(float)
-        X = np.array(df_graph['year'])
-        y = np.array(df_graph['value']) 
+        df_graph['YEAR'] = df_graph['YEAR'].astype(float)
+        X = np.array(df_graph['YEAR'])
+        y = np.array(df_graph['VALUE']) 
         #predict_dict = json.loads(response_text)
         #slope = predict_dict['slope']
         #intercept = predict_dict['intercept']
@@ -170,62 +176,7 @@ y_value = ""
 title = ""
 
 #each button when pressed calls the correct route to get regression values 
-with col3:
-    life_exp = st.button("Life Expectancy (years)")
-    if life_exp:
-        data_code = "H2020_17"
-        y_value = "Life Expectancy (years)"
-        title = "Life Expectancy Over Time"
-       # st.write("Country Code", chosen_country) 
-        api_url = f"http://host.docker.internal:4000/ml/ml/get_autoregressive/{chosen_country},{data_code},{chosen_year}"
-
-        try:
-            headers = {
-                "User-Agent": "Python/requests",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
-
-            response = requests.get(api_url, headers=headers, timeout=10)
-            response_text = requests.get(api_url, headers=headers, timeout=10).text
-
-            if response.status_code == 200:
-                data = response.json()  
-                life_exp_bool = True
-            else:
-                st.error(f"Error: {response.status_code}")
-                st.error(f"No life expectancy data for: {chosen_country}")
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-            st.write(f"URL that worked : {api_url}")   
-
-    inf_mort = st.button("Infant Mortality Rate")
-    if inf_mort:
-        data_code = "H2020_19"
-        y_value = "Infant Mortality Rate (%)"
-        title = "Infant Mortality Rate Over Time"
-        #st.write("Country Code", chosen_country) 
-        api_url = f"http://host.docker.internal:4000/ml/ml/get_autoregressive/{chosen_country},{data_code},{chosen_year}"
-
-        try:
-            headers = {
-                "User-Agent": "Python/requests",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
-
-            response = requests.get(api_url, headers=headers, timeout=10)
-            response_text = requests.get(api_url, headers=headers, timeout=10).text
-
-            if response.status_code == 200:
-                data = response.json()  
-                inf_mort_bool = True
-            else:
-                st.error(f"Error: {response.status_code}")
-                st.error(f"No infant mortality data for: {chosen_country}")
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-            st.write(f"URL that worked : {api_url}")
+with col3:   
 
     live_birth = st.button("Live Births per 1000 Population")
     if live_birth:
@@ -233,17 +184,12 @@ with col3:
         y_value = "Live Births per 1000 population"
         title = "Live Births Over Time"
         #st.write("Country Code", chosen_country) 
-        api_url = f"http://host.docker.internal:4000/ml/ml/get_autoregressive/{chosen_country},{data_code},{chosen_year}"
+        api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
 
         try:
-            headers = {
-                "User-Agent": "Python/requests",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
 
-            response = requests.get(api_url, headers=headers, timeout=10)
-            response_text = requests.get(api_url, headers=headers, timeout=10).text
+            response = requests.get(api_url, timeout=10)
+            response_text = requests.get(api_url, timeout=10).text
 
             if response.status_code == 200:
                 data = response.json()  
@@ -260,7 +206,7 @@ with col4:
     if gen_prac:
         data_code = "HLTHRES_67"
         y_value = "General Practitoners per 10,000 population"
-        title = "Life Expectancy Over Time"
+        title = "General Practitioners per 10,000 population"
         #st.write("Country Code", chosen_country) 
         api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
 
@@ -272,8 +218,8 @@ with col4:
             # }
 #''', headers=headers, timeout=10'''
             response = requests.get(api_url)
-            response_text = requests.get(api_url, headers=headers, timeout=10).text
-            st.write(response.json())
+            response_text = requests.get(api_url, timeout=10).text
+            #st.write(response.json())
 
             if response.status_code == 200:
                 data = response.json()  
@@ -284,7 +230,7 @@ with col4:
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
-            st.error(response.text)
+            #st.error(response.text)
     
     health_expen = st.button("Total Health Expenditure per Capita")
     if health_expen:
@@ -292,17 +238,12 @@ with col4:
         y_value = "Total Health Expenditure per Capita"
         title = "Total Health Expenditure Over Time"
         #st.write("Country Code", chosen_country) 
-        api_url = f"http://host.docker.internal:4000/ml/ml/get_autoregressive/{chosen_country},{data_code},{chosen_year}"
+        api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
 
         try:
-            headers = {
-                "User-Agent": "Python/requests",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
 
-            response = requests.get(api_url, headers=headers, timeout=10)
-            response_text = requests.get(api_url, headers=headers, timeout=10).text
+            response = requests.get(api_url, timeout=10)
+            response_text = requests.get(api_url, timeout=10).text
 
             if response.status_code == 200:
                 data = response.json()  
@@ -313,42 +254,14 @@ with col4:
         except Exception as e:
             st.error(f"Error: {str(e)}")
             st.write(f"URL that worked : {api_url}")
-    
-    impov_house = st.button("Impoverished Households")
-    if impov_house:
-        data_code = "UHCFP_2"
-        y_value = "Impoverished Households due to out-of-pocket healthcare payments"
-        title = "Impoverished Households Over Time"
-        #st.write("Country Code", chosen_country) 
-        api_url = f"http://host.docker.internal:4000/ml/ml/get_autoregressive/{chosen_country},{data_code},{chosen_year}"
-
-        try:
-            headers = {
-                "User-Agent": "Python/requests",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
-
-            response = requests.get(api_url, headers=headers, timeout=10)
-            response_text = requests.get(api_url, headers=headers, timeout=10).text
-
-            if response.status_code == 200:
-                data = response.json()  
-                impov_house_bool = True 
-            else:
-                st.error(f"Error: {response.status_code}")
-                st.error(f"No impoverished households data for: {chosen_country}")
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-            st.write(f"URL that worked : {api_url}")
 
 # Displaying relevant information if a button is pressed 
-if inf_mort_bool or expenditure_bool or life_exp_bool or live_birth_bool or impov_house_bool or gen_prac_bool:
-    st.success(f"""
-                Here are the values for the line of best fit!  
-                Slope: {round(data['slope'], 4)}  
-                Intercept: {round(data['intercept'], 4)}
-                """)
+if expenditure_bool or live_birth_bool or gen_prac_bool:
+    #st.success(f"""
+                #Here are the values for the line of best fit!  
+                #Slope: {round(data['slope'], 4)}  
+                #Intercept: {round(data['intercept'], 4)}
+                #""")
     #st.badge(f"Mean Squared Error: {round(data['mse'], 4)}", color='violet')
     #st.badge(f"Coefficient of Determination: {round(data['r2'], 4)}", color='violet')
     #calculation = float(chosen_year)*data['slope'] + data['intercept']
