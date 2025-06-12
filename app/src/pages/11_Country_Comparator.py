@@ -1,4 +1,5 @@
 import logging
+import decimal
 
 logger = logging.getLogger(__name__)
 
@@ -9,11 +10,95 @@ import pandas as pd
 import numpy as np
 import json
 import plotly.express as px
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+import plotly.graph_objects as go
+from contextlib import contextmanager
+from modules.style import style_sidebar
+
 
 st.set_page_config(layout="wide")
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
+
+
+# Constants for feature configurations
+FEATURES = {
+    "live_births": {
+        "code": "HFA_16",
+        "title": "Live Births Over Time",
+        "y_label": "Live Births per 1000 population"
+    },
+    "general_practitioners": {
+        "code": "HLTHRES_67",
+        "title": "General Practitioners Over Time",
+        "y_label": "General Practitioners per 10,000 population"
+    },
+    "health_expenditure": {
+        "code": "HFA_570",
+        "title": "Total Health Expenditure Over Time",
+        "y_label": "Total Health Expenditure per Capita"
+    }
+}
+
+@contextmanager
+def get_session():
+    """Create a fresh session for each request"""
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504])
+    session.mount('http://', HTTPAdapter(max_retries=retries))
+    try:
+        yield session
+    finally:
+        session.close()
+
+def fetch_countries(url):
+    """Fetch country data from API"""
+    with get_session() as session:
+        logger.info(f"Attempting to connect to {url}")
+        response = session.get(url, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        return [item["name"] for item in data], [item["code"] for item in data], [f"{item['name']}-{item['code']}" for item in data]
+
+feature2 = []
+
+def display_data(data_code, y_value, title, countries_exist, chosen_year):
+
+    dataframe_list = []
+    for chosen_country in countries_exist:
+        api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
+        logger.info(f"Attempting to fetch data from: {api_url}")
+        
+        try:
+            with get_session() as session:
+                response = session.get(api_url, timeout=30, headers={'Accept': 'application/json'})
+                logger.info(f"API response status code: {response.status_code}")
+                
+                if response.status_code != 200:
+                    st.error(f"API returned status code {response.status_code}")
+                    return
+                
+                data = response.json()
+                if isinstance(data, str):
+                    data = json.loads(data)
+                
+                df_country = pd.DataFrame(data)
+                df_graph = df_country #[(df_country['country'] == chosen_country)]
+                df_graph['COUNTRY'] = chosen_country
+                dataframe_list.append(df_graph)
+            
+                
+        except Exception as e:
+            logger.error(f"Error fetching/processing data: {str(e)}")
+            st.error(f"Failed to process data: {str(e)}")
+    df_graph = pd.concat(dataframe_list, ignore_index=True)
+    df_graph['YEAR'] = df_graph['YEAR'].astype(float)
+            
+    st.plotly_chart(px.line(df_graph, x='YEAR', y='VALUE', labels={
+                "x": "Time in Years",
+                "y": y_value}, color = 'COUNTRY', title = title))
 
 
 # Display the appropriate sidebar links for the role of the logged in user
@@ -23,38 +108,19 @@ st.title("COUNTRY COMPARATOR")
 st.write("")
 st.write("")
 
-headers = {
-    "User-Agent": "Python/requests",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-}
 
 
-# Your backend endpoint URL
-country_url = "http://host.docker.internal:4000/country/countries"  
-
-country_list = []
-country_code_list = []
 country3_list = ["N/A"]
 
+# Fetch Countries
 try:
-    response = requests.get(country_url, headers=headers, timeout=10)
-    response.raise_for_status()
-    data = response.json()
+    country_list, code_list, country_code_list = fetch_countries("http://web-api:4000/country/countries")
+except Exception as e:
+    logger.error(f"Failed to fetch countries: {str(e)}")
+    st.error("Failed to load country data. Please try again later.")
+    country_list, code_list, country_code_list = [], [], []
 
-    country_list = [item["name"] for item in data]
-    code_list = [item["code"] for item in data]
-    country_code_list = [item['name'] + '-' + item['code'] for item in data]
-
-    country3_list += country_code_list
-
-    print("Countries:", country_list)
-
-
-except requests.exceptions.RequestException as e:
-    print("API request failed:", e)
-except (KeyError, TypeError) as e:
-    print("Unexpected response format:", e)
+country3_list += country_code_list
 
 
 # CHOOSE COUNTRIES
@@ -118,20 +184,13 @@ countries_exist = []
 for item in countries:
     if item:
         countries_exist.append(item)
-#st.write(countries_exist)
-#st.write(len(countries_exist))
+
 
 if table:
     master_df = pd.DataFrame()
 
     for country in countries:
         try:
-            headers = {
-                "User-Agent": "Python/requests",
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
-
             countryurl = f"http://host.docker.internal:4000/country/features/{country}"
             response = requests.get(countryurl)
 
@@ -214,69 +273,23 @@ with col3:
     plot = st.button("Plot", type="primary",use_container_width=False)
 
 if plot:
-    def display_data(data_code, y_value, title, countries_exist):
-        dataframe_list = []
-        for chosen_country in countries_exist:
-            #st.write(countries_exist)
-            get_graph = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/2035"
-            #headers = {
-                #"User-Agent": "Python/requests",
-                #"Accept": "application/json",
-                #"Content-Type": "application/json"
-                #}
-            all_countries = requests.get(get_graph, timeout=10)
-            #print(all_countries.type())
-            all_country = requests.get(get_graph, timeout=10).text
-            #st.write(all_country)
-            if all_countries.status_code == 200:
-                #all_countries = all_countries.json
-                #all_countries = json.dumps(all_countries)
-                data_dict = json.loads(all_country)
-                data_dict = json.loads(data_dict)
-                #print(type(data_dict))
-
-                #data_series = pd.Series(all_countries)
-                #print(all_countries)
-                #st.write(type(data_dict))
-                df_country = pd.DataFrame(data_dict)
-                #df_graph = pd.concat([df_graph, data_dict.to_frame().T], ignore_index=True)
-                #print(df_graph)
-                df_graph = df_country #[(df_country['country'] == chosen_country)]
-                df_graph['COUNTRY'] = chosen_country
-                #print("individual dataframe length")
-                #st.write(type(df_graph))
-                dataframe_list.append(df_graph)
-            else:
-                st.error(f"Error: {all_countries.status_code}")
-                st.write(all_countries.text)
-        df_graph = pd.concat(dataframe_list, ignore_index=True)
-        #print(df_graph)
-        df_graph['YEAR'] = df_graph['YEAR'].astype(float)
-        #X = np.array(df_graph['YEAR'])
-        #y = np.array(df_graph['VALUE']) 
-                #predict_dict = json.loads(response_text)
-                #slope = predict_dict['slope']
-                #intercept = predict_dict['intercept']
-                
-        #x = np.array(X).ravel()
-        #y = np.array(y).ravel()
-        #st.write(df_graph.dtypes)
-        #st.write(df_graph)
-        st.plotly_chart(px.line(df_graph, x='YEAR', y='VALUE', labels={
-                "x": "Time in Years",
-                "y": y_value}, color = 'COUNTRY', title = title))
     if feature == live_births:
+        feature2 = FEATURES["live_births"]
         st.subheader("Here are the projected live birth numbers for your compared countries up to 2035:")
-        display_data("HFA_16", "Live Births per 1000 population", "Live Births Over Time", countries_exist)
+        #display_data("HFA_16", "Live Births per 1000 population", "Live Births Over Time", countries_exist)
 
     if feature == gen_practitioners: 
+        feature2 = FEATURES["general_practitioners"]
         st.subheader("Here are the projected general practitioner numbers for your compared countries up to 2035:")
-        display_data("HLTHRES_67", "General Practitoners per 10,000 population", "General Practitioners Over Time", countries_exist)  
+        #display_data("HLTHRES_67", "General Practitoners per 10,000 population", "General Practitioners Over Time", countries_exist)  
 
     if feature == health_expend:
+        feature2 = FEATURES["health_expenditure"]
         st.subheader("Here are the projected expenditures for your compared countries up to 2035:")
-        display_data("HFA_570", "Total Health Expenditure per Capita", "Total Health Expenditure Over Time", countries_exist)  
-
+        #display_data("HFA_570", "Total Health Expenditure per Capita", "Total Health Expenditure Over Time", countries_exist)  
+    if len(feature2) != 0:
+        display_data(feature2["code"], feature2["y_label"], feature2["title"], 
+                        countries_exist, 2035)
     #results = requests.get(f"http://web-api:4000/ml/predict/{feature}/{country1}") # need to do more for the other countries
     #json_results = results.json()
     #st.dataframe(json_results)
