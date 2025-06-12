@@ -45,9 +45,9 @@ def CountryComparatorNav():
     )
 
 
-def SuggestedArticlesNav():
+def FavoriteArticlesNav():
     st.sidebar.page_link(
-        "pages/12_Suggested_Articles.py", label="Suggested Articles", icon="➕"
+        "pages/12_Favorite_Articles.py", label="Favorite Articles", icon="➕"
     )
 
 
@@ -96,8 +96,9 @@ def SideBarLinks(show_home=False):
         if st.session_state["role"] == "student":
             StudentHomeNav()
             CountryComparatorNav()
-            SuggestedArticlesNav()
             CountryProfNav()
+            FavoriteArticlesNav()
+
 
 
         # If the user is an administrator, give them access to the administrator pages
