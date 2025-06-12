@@ -233,19 +233,27 @@ with col5:
   )
   
 if resident:
-    name, _ = resident.split(" - ", 1)
+    name, email = resident.split(" - ", 1)
     selected_name = name
+    selected_email = email
+    first_name, last_name = name.split(" ", 1)
     #st.write("You are logging in as:", selected_name)
 
 if student:
-    name, _ = student.split(" - ", 1)
+    name, email = student.split(" - ", 1)
     selected_name = name
+    selected_email = email
+    first_name, last_name = name.split(" ", 1)
     #st.write("You are logging in as:", selected_name)
 
 if policy:
-    name, _ = policy.split(" - ", 1)
+    name, email = policy.split(" - ", 1)
     selected_name = name
+    selected_email = email
+    first_name, last_name = name.split(" ", 1)
     #st.write("You are logging in as:", selected_name)
+
+
 
 
 with col2 :
@@ -253,6 +261,8 @@ with col2 :
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'resident'
     st.session_state['name'] = selected_name
+    st.session_state['last_name'] = last_name
+    st.session_state['email'] = selected_email
     logger.info("Logging in as Resident Persona")
     st.switch_page('pages/00_Resident_Home.py')
 
@@ -261,6 +271,8 @@ with col4:
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'student'
     st.session_state['name'] = selected_name
+    st.session_state['last_name'] = last_name
+    st.session_state['email'] = selected_email
     logger.info("Logging in as Student Persona")
     st.switch_page('pages/10_Student_Home.py')
 
@@ -269,8 +281,21 @@ with col6:
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'policymaker'
     st.session_state['name'] = selected_name
+    st.session_state['last_name'] = last_name
+    st.session_state['email'] = selected_email
     logger.info("Logging in as Policymaker Persona")
     st.switch_page('pages/20_Policymaker_Home.py')
 
+
+email_API = st.session_state['email']
+try:
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID = userID_response.json()
+    st.session_state['id'] = userID
+    
+except requests.exceptions.RequestException as e:
+    print("API request failed:", e)
+except (KeyError, TypeError) as e:
+    print("Unexpected response format:", e)
 
 

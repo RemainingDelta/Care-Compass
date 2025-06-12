@@ -61,3 +61,20 @@ def get_ngo(user_id):
     except Error as e:
         return jsonify({"error": str(e)}), 500
 
+# get user id from last name
+@users.route("/users/id/<input>", methods=["GET"])
+def get_user_id(input):
+    try:
+        cursor = db.get_db().cursor()
+
+        cursor.execute("SELECT id FROM Users WHERE email = %s", (input,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        cursor.close()
+        return jsonify(user), 200
+        
+    except Error as e:
+        return jsonify({"error": "User not found"}), 404
