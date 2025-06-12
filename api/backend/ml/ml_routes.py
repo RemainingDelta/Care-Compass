@@ -197,6 +197,66 @@ def get_autoregressive_all(input):
 
 #model calls post to put weights in database
 # adds new regression weight from model to database
+@ml.route("/ml/store_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["PUT"])
+def store_autoregressive(chosen_country, data_code, chosen_year):
+
+    cursor = db.get_db().cursor()
+    #print("the chosen year")
+    #print(chosen_year)
+    if data_code == 'HFA_16':
+        query = """SELECT * FROM LiveBirths"""
+    elif data_code == 'HFA_570':
+        query = """SELECT * FROM HealthExpend"""
+    elif data_code == 'HLTHRES_67':
+        query = "SELECT * FROM GenPractitioners"
+    #print(query)
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    #print(rows)
+
+    # Convert to DataFrame
+    columns = ["COUNTRY", "YEAR", "VALUE"]
+    df = pd.DataFrame(rows, columns=columns)
+    value_list = []
+    for value in df["VALUE"]:
+        value_list.append(float(value))
+    
+    df["VALUE"] = value_list
+    #print("the chosen country")
+    #print(chosen_country)
+    #print("df")
+    #print(df)
+    
+    inputs = [chosen_country, data_code, chosen_year]
+    #xy = create_xy_full(dataframe(inputs[1]))
+    #df = dataframe(inputs[1])
+    #df_country = df[(df['COUNTRY'] == inputs[0])]
+    df_country = df[df['COUNTRY'] == inputs[0]]
+    #print("df_country")
+    #print(df_country)
+    #print("df_country")
+    #print(df_country)
+    df_filtered = df_country.reset_index(drop=True)
+    print("filtered dataframe")
+    print(df_filtered)
+    #print("df_filtered")
+    #print(df_filtered)
+    year = int(df_filtered.iloc[len(df_filtered) - 1]['YEAR'])
+    years = int(inputs[2]) - year
+    #print("number of years")
+    #print(years)
+    input = create_xy_select(df, inputs[0])
+    train = create_xy_full(df)
+    result = autoreg_train(train[0], train[1])
+    print("Country received:", inputs[0])
+    result_final = result.to_json()
+    #result_final = result.to_dict()
+    #result_final = json.dumps(result_final)
+    print(result_final)
+    return jsonify(result_final)
+
+#model calls post to put weights in database
+# adds new regression weight from model to database
 @ml.route("/ml/get_graph_data/<input>", methods=["GET"])
 def get_graph_data(input):
     result = dataframe(input)
