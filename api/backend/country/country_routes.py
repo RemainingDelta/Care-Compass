@@ -339,3 +339,37 @@ def unfavorite_article(articleID):
         current_app.logger.error("Database error in unfavorite_article: %s", str(e))
         return jsonify({"error": str(e)}), 500
 
+# Get list of all recommendation factors with descriptions
+# Example: /country/factor_descriptions
+@countries.route("/factor_descriptions", methods=["GET"])
+def get_factor_descriptions():
+    try:
+        factors = [
+            {
+                "name": "Prevention",
+                "description": "Measures to prevent the emergence and spread of infectious diseases"
+            },
+            {
+                "name": "Detection and Reporting",
+                "description": "Capacity for early detection, testing, and transparent reporting of health threats"
+            },
+            {
+                "name": "Rapid Response",
+                "description": "Readiness and speed of response to outbreaks and emergencies"
+            },
+            {
+                "name": "Health System",
+                "description": "Availability, accessibility, and strength of healthcare infrastructure and services"
+            },
+            {
+                "name": "Compliance with International Norms",
+                "description": "Degree of compliance with WHO and other global health regulations"
+            },
+            {
+                "name": "Risk Environment",
+                "description": "The country's social, political, and environmental vulnerability to health threats"
+            }
+        ]
+        return jsonify(factors), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
