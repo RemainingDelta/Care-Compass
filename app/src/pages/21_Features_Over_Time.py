@@ -141,7 +141,7 @@ SideBarLinks()
 
 # Page Title and Description
 st.title('FEATURES OVER TIME')
-st.write("Choose a region and your target country to view how including features changes scores over time.")
+st.write("Choose a country and your target year to view how healthcare features change over time.")
 st.write("")
 
 # Fetch Countries
