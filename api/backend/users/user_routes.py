@@ -59,3 +59,44 @@ def user_id(input):
         
     except Error as e:
         return jsonify({"error": "User not found"}), 404
+    
+
+# Update a user's healthcare factor preferences
+@users.route("/users/<int:user_id>/preferences", methods=["PUT"])
+def update_user_preferences(user_id):
+    try:
+        current_app.logger.info(f"Updating preferences for user ID {user_id}")
+        cursor = db.get_db().cursor()
+
+        data = request.get_json()
+        quality = data.get("qualityWeight")
+        accessibility = data.get("accessibilityWeight")
+        affordability = data.get("affordabilityWeight")
+        outcome = data.get("outcomeWeight")
+
+        # Basic validation
+        if not all(isinstance(val, (int, float)) for val in [quality, accessibility, affordability, outcome]):
+            return jsonify({"error": "All weights must be numbers."}), 400
+
+        update_query = """
+            UPDATE Users
+            SET qualityWeight = %s,
+                accessibilityWeight = %s,
+                affordabilityWeight = %s,
+                outcomeWeight = %s
+            WHERE id = %s
+        """
+        cursor.execute(update_query, (quality, accessibility, affordability, outcome, user_id))
+        db.get_db().commit()
+
+        if cursor.rowcount == 0:
+            current_app.logger.warning(f"No user found with ID {user_id}")
+            return jsonify({"error": "User not found."}), 404
+
+        current_app.logger.info(f"Successfully updated preferences for user ID {user_id}")
+        return jsonify({"message": "Preferences updated successfully."}), 200
+
+    except Error as e:
+        current_app.logger.error(f"Database error in update_user_preferences: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
