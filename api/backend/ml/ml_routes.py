@@ -426,4 +426,62 @@ def cosine_for_user(user_id):
         return jsonify({"error": str(e)}), 500
     
 
+@ml.route("/cosine/custom", methods=["POST"])
+def custom_cosine():
+    try:
+        data = request.get_json()
+        origin_country = data.get("origin_country")
+        use_origin_toggle = data.get("use_origin_toggle", False)
+        weights = data.get("weights")
+
+        if not origin_country or not weights:
+            return jsonify({"error": "Missing data"}), 400
+
+        weights_vect = [
+            float(weights["preventionWeight"]),
+            float(weights["detectReportWeight"]),
+            float(weights["rapidRespWeight"]),
+            float(weights["healthSysWeight"]),
+            float(weights["intlNormsWeight"]),
+            float(weights["riskEnvWeight"])
+        ]
+
+        # Fetch scores
+        cursor = db.get_db().cursor()
+        cursor.execute("""
+            SELECT 
+                country,
+                prevention,
+                detectReport,
+                rapidResp,
+                healthSys,
+                intlNorms,
+                riskEnv
+            FROM OverallScore
+        """)
+        rows = cursor.fetchall()
+        columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
+        df_unscaled = pd.DataFrame(rows, columns=columns)
+
+        df_scaled = df_unscaled[columns[1:]].copy()  # Keep raw, unnormalized
+
+
+        df_weightsim = get_similar(origin_country, weights_vect, df_unscaled, df_scaled)
+        df_weightsim.columns = ["country", "dot_weight", "cosine_weight"]
+
+        if use_origin_toggle:
+            df_originsim = get_similar(origin_country, [1,1,1,1,1,1], df_unscaled, df_scaled)
+            df_originsim.columns = ["country", "dot_origin", "cosine_origin"]
+
+            merged = pd.merge(df_weightsim, df_originsim, on="country")
+            merged["final_score"] = 0.75 * merged["cosine_weight"] + 0.25 * merged["cosine_origin"]
+            result_df = merged[merged["country"] != origin_country].sort_values(by="final_score", ascending=False)
+        else:
+            df_weightsim["final_score"] = df_weightsim["cosine_weight"]
+            result_df = df_weightsim[df_weightsim["country"] != origin_country].sort_values(by="final_score", ascending=False)
+
+        return jsonify(result_df.head(5).to_dict(orient="records")), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
