@@ -127,70 +127,73 @@ slider_range = (1, 10)
 
 for i in range(6):
     factor = st.session_state.dragged_factors[i]
-    col_num, col_label, col_slider, col_input = st.columns([1, 3, 5, 2])
-    with col_num:
-        st.markdown(f"**{i+1}.**")
-    with col_label:
-        tooltip_keys = {
+    
+    # Set keys and defaults
+    val_key = f"val_{i}"
+    if val_key not in st.session_state:
+        st.session_state[val_key] = 5  # Default slider/input value
+
+    slider_val = st.session_state[val_key]
+
+    # Normalize tooltip key
+    tooltip_keys = {
         "prevention": "prevention",
         "healthsystem": "healthsystem",
         "rapidresponse": "rapidresponse",
         "detection&reporting": "detectionandreporting",
         "internationalnormscompliance": "compliancewithinternationalnorms",
         "riskenvironment": "riskenvironment"
-        }
+    }
     lookup_key = tooltip_keys.get(factor.lower().replace(" ", "").strip(), "")
     desc = factor_descriptions.get(lookup_key, "")
 
-    col_text, col_icon = st.columns([8, 1])
-    with col_text:
-        st.markdown(f"**{factor}**", unsafe_allow_html=True)
-    with col_icon:
-        st.button(
-            label=" ", key=f"info_button_{i}", help=desc, icon="ℹ️", use_container_width=True
-        )
+    # Layout: label + ℹ️ on left, slider + input on right
+    col_label, col_slider, col_input = st.columns([4, 5, 2])
+    
+    with col_label:
+        row = st.columns([5, 1])  # 5 parts label, 1 part icon
+        with row[0]:
+            st.markdown(f"**{i+1}. {factor}**")
+        with row[1]:
+            st.button("ℹ️", key=f"info_button_{i}", help=desc)
 
-    # Unique session key per slider/input
-    val_key = f"val_{i}"
-    if val_key not in st.session_state:
-        st.session_state[val_key] = 5 # Default value
-
-    # Update value via slider
     with col_slider:
-        slider_val = st.slider(
-        "_", 0, 10,
-        value=st.session_state[val_key],
-        key=f"slider_{i}",
-        label_visibility="collapsed"
+        new_slider = st.slider(
+            label="",
+            min_value=0,
+            max_value=10,
+            value=slider_val,
+            key=f"slider_{i}",
+            label_visibility="collapsed"
         )
-
-    # Update value via number input
+        
     with col_input:
-        input_val = st.number_input(
-        "_", min_value=0, max_value=10,
-        value=st.session_state[val_key],
-        step=1,
-        key=f"input_{i}",
-        label_visibility="collapsed"
+        new_input = st.number_input(
+            label="",
+            min_value=0,
+            max_value=10,
+            value=slider_val,
+            step=1,
+            key=f"input_{i}",
+            label_visibility="collapsed"
         )
 
-    # Synchronize value from whichever was changed most recently
-    if input_val != st.session_state[val_key]:
-        st.session_state[val_key] = input_val
-    elif slider_val != st.session_state[val_key]:
-        st.session_state[val_key] = slider_val
+    # Sync slider/input
+    if new_input != st.session_state[val_key]:
+        st.session_state[val_key] = new_input
+    elif new_slider != st.session_state[val_key]:
+        st.session_state[val_key] = new_slider
 
-    val = st.session_state[val_key]
-
-
+    # Calculate weighted priority
     if i == 0:
-        true_weight = 90 + slider_val
+        true_weight = 90 + st.session_state[val_key]
     elif i == 5:
-        true_weight = slider_val
+        true_weight = st.session_state[val_key]
     else:
-        true_weight = 90 - 20 * i + 2 * slider_val
+        true_weight = 90 - 20 * i + 2 * st.session_state[val_key]
 
     st.session_state.slot_weights[i] = true_weight
+
 
 
 
@@ -311,7 +314,6 @@ elif not on and chosen_country is not None:
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
 
 
 
