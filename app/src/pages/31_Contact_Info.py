@@ -9,6 +9,7 @@ style_sidebar()
 
 SideBarLinks()
 
+st.link_button("Care Compass Blog", 'https://arthur-t-huang.github.io/Care-Compass-Blog/')
 st.title("Meet our Team Members!")
 st.write('\n\n')
 st.write("## Anoushka Abroal")
@@ -30,8 +31,9 @@ st.write("## Shiven Ajwaliya")
 st.link_button('Email: ajwaliya.s@northeastern.edu', 'ajwaliya.s@northeastern.edu')
 st.write('Hi, my name is Shiven Ajwaliya, a CS student at Northeastern University who loves learning new things and traveling. I’m passionate about building meaningful tech products, exploring different cultures, and discovering new places through local food and history.')
 
-
-
+# Add a button to return to home page
+if st.button("Return to Home", type="primary"):
+    st.switch_page("Home.py")
 
 
 
