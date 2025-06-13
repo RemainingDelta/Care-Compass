@@ -411,9 +411,19 @@ def cosine_for_user(user_id):
             df_scaled[feat] = (df_scaled[feat] - df_scaled[feat].mean()) / df_scaled[feat].std()
 
         # Step 4: Get recommendations
-        chosen_country = df_unscaled["country"].iloc[0]  # optional: override if needed
+        chosen_country = df_unscaled["country"].iloc[23]  # optional: override if needed
         result_df = get_similar(chosen_country, weights_vect, df_unscaled, df_scaled)
-        return jsonify(result_df.to_dict()), 200
+        # Sort by cosine similarity descending
+        sorted_df = result_df.sort_values(by="the_country_cosine", ascending=False)
+
+        # Return only top N if desired
+        top_n = 5
+        result_json = sorted_df.head(top_n).to_dict(orient="records")
+        return jsonify(result_json), 200
+
 
     except Error as e:
         return jsonify({"error": str(e)}), 500
+    
+
+
