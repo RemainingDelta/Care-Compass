@@ -2,14 +2,17 @@ import logging
 logger = logging.getLogger(__name__)
 import streamlit as st
 import requests
+from urllib.error import URLError
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
 import random
+import json
 
 from modules.style import style_sidebar, set_background
 style_sidebar()
 
 SideBarLinks()
+
 
 st.title("FAVORITE HEALTHCARE ARTICLES")
 
@@ -23,30 +26,33 @@ def get_random_thumbnail():
     # Assuming you are running streamlit from the `app/` root and images are in `app/src/assets/`
     return f"assets/{random.choice(names)}"
 
+userID = st.session_state["id"]
+# fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite"
+fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite?userID={userID}"
 
-fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite"
- 
+# Confirm the structure
+st.write("userID from session:", st.session_state["id"])
+
 try:
     # Fetch Articles details
     response = requests.get(fav_articles_URL)
 
     if response.status_code == 200:
-        articles = response.json()
+        favorites = response.json()
 
         cols = st.columns(3)
 
-        for i, article in enumerate(articles):
+        for i, article in enumerate(favorites):
             col = cols[i % 3]
             with col:
                 st.container(border=True)
                 st.image(get_random_thumbnail())
-                st.markdown(f"**{article['title']}**")
+                st.markdown(f"**{article['article_title']}**")
                 col_a, col_b = st.columns([0.85,0.15],gap="small")
                 with col_a:
                     st.markdown(f"*{article['source']}*")
-                    st.markdown(f"[Read more]({article['link']})", unsafe_allow_html=True)
+                    st.markdown(f"[Read more]({article['article_link']})", unsafe_allow_html=True)
 
-            
         
 
     elif response.status_code == 404:

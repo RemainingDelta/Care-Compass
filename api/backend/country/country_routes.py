@@ -250,9 +250,11 @@ def articles_by_country(country_code):
 def favorite_articles():
     try:
         data = request.get_json()
+        print("Received data:", data)
+        print("Type of data:", type(data))
 
         # Validate required fields
-        required_fields = ["userID", "articleID"]
+        required_fields = ["articleID"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -261,16 +263,14 @@ def favorite_articles():
 
         # Insert new article 
         query = """
-            INSERT INTO Favorites (userID, articleID)
-            VALUES (%s,%s)
-        """
-        cursor.execute(
-            query,
-            (
-                data["userID"],
-                data["articleID"]
-            )
-        )
+            INSERT INTO Favorites (articleID)
+            VALUES (%s)
+            """
+
+        params = (data["articleID"],)
+        
+        cursor.execute(query,
+                       (data["articleID"],))
 
         db.get_db().commit()
         fav_article_id = cursor.lastrowid
@@ -290,27 +290,33 @@ def get_fav_articles():
     try:
         cursor = db.get_db().cursor()
 
-        userID = st.session_state['id']
+        userID = request.args.get("userID")
 
+        if not userID:
+            return jsonify({"error": "Missing userID"}), 400
+        
         # Get country details
         cursor.execute("SELECT * FROM Favorites WHERE userID = %s", (userID,))
 
-        articles = cursor.fetchall()
+        favorites = cursor.fetchall()
 
-        if not articles:
+        if not favorites:
             return jsonify({"error": "Articles not found"}), 404
 
+        articles = []
         # Get associated article info
-        for items in articles :
-            cursor.execute("SELECT * FROM CountryArticles WHERE articleID = %s", (articles['id'],))
-            info = cursor.fetchall()
-            articles["info"] = info
-
+        for article in favorites :
+            articleID = article["articleID"]
+            cursor.execute("SELECT * FROM CountryArticles WHERE articleID = %s", (articleID,))
+            info = cursor.fetchone()
+            if info:
+                articles.append(info)
 
         cursor.close()
-        return jsonify(articles), 200
+        return jsonify(favorites), 200
     except Error as e:
-        return jsonify({"error": str(e)}), 5
+        return jsonify({"error": str(e)}), 500
+    
 
 # unfavorite an article, deleting it from Favorites table
 @countries.route('/articles/favorite/<articleID>', methods=['DELETE'])

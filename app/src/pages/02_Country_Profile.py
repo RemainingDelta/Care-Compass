@@ -168,9 +168,10 @@ if selected_country :
 
                 if button(favorite_icon, key=f"{article['id']}bookmark_button") : 
                     favorite_data = {
-                        "userID": userID,
-                        "articleID": article['id']
+                        "userID": userID["id"], 
+                        "articleID": article["id"]
                     }
+                    st.write("favorite_data =", favorite_data)
 
                     favorite_url = "http://host.docker.internal:4000/country/articles/favorite"
 
