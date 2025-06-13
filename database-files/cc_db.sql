@@ -228,3 +228,14 @@ CREATE TABLE InfantMortality(
 
     FOREIGN KEY (COUNTRY) REFERENCES Countries(code)
 );
+
+DROP TABLE IF EXISTS UserWeights;
+CREATE TABLE UserWeights (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    qualityWeight FLOAT DEFAULT 0.0,
+    accessibilityWeight FLOAT DEFAULT 0.0,
+    affordabilityWeight FLOAT DEFAULT 0.0,
+    outcomeWeight FLOAT DEFAULT 0.0,
+    FOREIGN KEY (userID) REFERENCES Users(id)
+);
