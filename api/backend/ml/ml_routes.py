@@ -354,3 +354,66 @@ def cosine(chosen_country, weights_dict):
 
     result = df.to_dict()
     return jsonify(result)
+
+
+@ml.route("/cosine/<int:user_id>", methods=["GET"])
+def cosine_for_user(user_id):
+    try:
+        # Step 1: Fetch user weights from the DB
+        cursor = db.get_db().cursor()
+        cursor.execute("""
+            SELECT 
+                preventionWeight,
+                detectReportWeight,
+                rapidRespWeight,
+                healthSysWeight,
+                intlNormsWeight,
+                riskEnvWeight
+            FROM UserWeights WHERE userID = %s
+        """, (user_id,))
+        row = cursor.fetchone()
+
+        if not row:
+            cursor.close()
+            return jsonify({"error": "User preferences not found."}), 404
+
+        weights_vect = [
+            float(row["preventionWeight"]),
+            float(row["detectReportWeight"]),
+            float(row["rapidRespWeight"]),
+            float(row["healthSysWeight"]),
+            float(row["intlNormsWeight"]),
+            float(row["riskEnvWeight"])
+        ]
+
+        cursor.close()
+
+        # Step 2: Fetch GHS scores for each country
+        cursor = db.get_db().cursor()
+        cursor.execute("""
+            SELECT 
+                country,
+                prevention,
+                detectReport,
+                rapidResp,
+                healthSys,
+                intlNorms,
+                riskEnv
+            FROM OverallScore
+        """)
+        rows = cursor.fetchall()
+        columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
+        df_unscaled = pd.DataFrame(rows, columns=columns)
+
+        # Step 3: Normalize the scores
+        df_scaled = df_unscaled[["prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]].copy()
+        for feat in df_scaled.columns:
+            df_scaled[feat] = (df_scaled[feat] - df_scaled[feat].mean()) / df_scaled[feat].std()
+
+        # Step 4: Get recommendations
+        chosen_country = df_unscaled["country"].iloc[0]  # optional: override if needed
+        result_df = get_similar(chosen_country, weights_vect, df_unscaled, df_scaled)
+        return jsonify(result_df.to_dict()), 200
+
+    except Error as e:
+        return jsonify({"error": str(e)}), 500
