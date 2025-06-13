@@ -28,10 +28,10 @@ if st.button('View Country Profile',
              use_container_width=True):
   st.switch_page('pages/02_Country_Profile.py')
 
-if st.button('See Favorite Healthcare Articles', 
-            type='primary',
-            use_container_width=True):
-  st.switch_page('pages/12_Favorite_Articles.py')
+# if st.button('See Favorite Healthcare Articles', 
+#             type='primary',
+#             use_container_width=True):
+#   st.switch_page('pages/12_Favorite_Articles.py')
 
 
 
