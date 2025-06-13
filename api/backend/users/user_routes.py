@@ -68,67 +68,75 @@ def update_user_preferences(user_id):
         cursor = db.get_db().cursor()
 
         data = request.get_json()
-        quality = data.get("qualityWeight")
-        accessibility = data.get("accessibilityWeight")
-        affordability = data.get("affordabilityWeight")
-        outcome = data.get("outcomeWeight")
+        prevention = data.get("preventionWeight")
+        detect = data.get("detectReportWeight")
+        rapid = data.get("rapidRespWeight")
+        health = data.get("healthSysWeight")
+        intl = data.get("intlNormsWeight", 1.0)
+        risk = data.get("riskEnvWeight", 1.0)
 
-        if not all(isinstance(val, (int, float)) for val in [quality, accessibility, affordability, outcome]):
+        if not all(isinstance(val, (int, float)) for val in [prevention, detect, rapid, health, intl, risk]):
             return jsonify({"error": "All weights must be numbers."}), 400
 
-        # Check if row exists
         cursor.execute("SELECT id FROM UserWeights WHERE userID = %s", (user_id,))
         existing = cursor.fetchone()
 
         if existing:
             update_query = """
                 UPDATE UserWeights
-                SET qualityWeight = %s,
-                    accessibilityWeight = %s,
-                    affordabilityWeight = %s,
-                    outcomeWeight = %s
+                SET preventionWeight = %s,
+                    detectReportWeight = %s,
+                    rapidRespWeight = %s,
+                    healthSysWeight = %s,
+                    intlNormsWeight = %s,
+                    riskEnvWeight = %s
                 WHERE userID = %s
             """
-            cursor.execute(update_query, (quality, accessibility, affordability, outcome, user_id))
+            cursor.execute(update_query, (prevention, detect, rapid, health, intl, risk, user_id))
         else:
             insert_query = """
-                INSERT INTO UserWeights (userID, qualityWeight, accessibilityWeight, affordabilityWeight, outcomeWeight)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO UserWeights (userID, preventionWeight, detectReportWeight, rapidRespWeight, healthSysWeight, intlNormsWeight, riskEnvWeight)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
-            cursor.execute(insert_query, (user_id, quality, accessibility, affordability, outcome))
+            cursor.execute(insert_query, (user_id, prevention, detect, rapid, health, intl, risk))
 
         db.get_db().commit()
         cursor.close()
-
         return jsonify({"message": "Preferences saved successfully."}), 200
 
     except Error as e:
         current_app.logger.error(f"Database error in update_user_preferences: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
     
 @users.route("/users/<int:user_id>/preferences", methods=["GET"])
 def get_user_preferences(user_id):
     try:
         cursor = db.get_db().cursor()
         cursor.execute("""
-            SELECT qualityWeight, accessibilityWeight, affordabilityWeight, outcomeWeight
+            SELECT 
+                preventionWeight,
+                detectReportWeight,
+                rapidRespWeight,
+                healthSysWeight,
+                intlNormsWeight,
+                riskEnvWeight
             FROM UserWeights WHERE userID = %s
         """, (user_id,))
         row = cursor.fetchone()
-        cursor.close()
 
         if not row:
             return jsonify({"message": "No preferences set yet."}), 404
 
-        # Manually map row to dictionary
+
         weights = {
-            "qualityWeight": row["qualityWeight"],
-            "accessibilityWeight": row["accessibilityWeight"],
-            "affordabilityWeight": row["affordabilityWeight"],
-            "outcomeWeight": row["outcomeWeight"]
+            "preventionWeight": row["preventionWeight"],
+            "detectReportWeight": row["detectReportWeight"],
+            "rapidRespWeight": row["rapidRespWeight"],
+            "healthSysWeight": row["healthSysWeight"],
+            "intlNormsWeight": row["intlNormsWeight"],
+            "riskEnvWeight": row["riskEnvWeight"]
         }
-
-
 
         return jsonify(weights), 200
 

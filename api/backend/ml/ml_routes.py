@@ -354,5 +354,3 @@ def cosine(chosen_country, weights_dict):
 
     result = df.to_dict()
     return jsonify(result)
-
-
