@@ -100,7 +100,7 @@ def SideBarLinks(show_home=False):
             StudentHomeNav()
             CountryComparatorNav()
             CountryProfNav()
-            FavoriteArticlesNav()
+            #FavoriteArticlesNav()
 
 
 

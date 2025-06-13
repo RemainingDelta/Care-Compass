@@ -171,28 +171,30 @@ if selected_country :
                         "userID": userID["id"], 
                         "articleID": article["id"]
                     }
-                    st.write("favorite_data =", favorite_data)
+                    #st.write("favorite_data =", favorite_data)
 
                     favorite_url = "http://host.docker.internal:4000/country/articles/favorite"
+                    
+                    response = requests.post(favorite_url, json=favorite_data)
 
-                    try:
-                        # Send POST request to API
-                        response = requests.post(favorite_url, json=favorite_data)
+                    # try:
+                    #     # Send POST request to API
+                    #     response = requests.post(favorite_url, json=favorite_data)
 
-                        if response.status_code == 201:
-                            st.success("Article added successfully!")
-                        elif response.status_code == 409:
-                            st.warning("This article is already in your favorites.")
-                        else:
-                            try:
-                                error_message = response.json().get("error", "Unknown error")
-                            except ValueError:
-                                error_message = f"Non-JSON response: {response.text}"
+                    #     if response.status_code == 201:
+                    #         st.success("Article added successfully!")
+                    #     elif response.status_code == 409:
+                    #         st.warning("This article is already in your favorites.")
+                    #     else:
+                    #         try:
+                    #             error_message = response.json().get("error", "Unknown error")
+                    #         except ValueError:
+                    #             error_message = f"Non-JSON response: {response.text}"
                             
-                            st.error(f"Failed to add Article: {error_message}")
+                    #         st.error(f"Failed to add Article: {error_message}")
 
-                    except requests.exceptions.RequestException as e:
-                        st.error(f"Error connecting to the API: {str(e)}")
-                        st.info("Please ensure the API server is running")
+                    # except requests.exceptions.RequestException as e:
+                    #     st.error(f"Error connecting to the API: {str(e)}")
+                        # st.info("Please ensure the API server is running")
 
               
