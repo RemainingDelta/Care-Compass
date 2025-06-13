@@ -4,6 +4,9 @@ import requests
 import pandas as pd 
 import json 
 
+from modules.style import style_sidebar
+style_sidebar()
+
 SideBarLinks()
 
 st.title("Meet our Team Members!")

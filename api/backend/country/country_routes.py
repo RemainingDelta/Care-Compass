@@ -12,9 +12,9 @@ countries = Blueprint("country_routes", __name__)
 # Get list of all countries
 # Example: /country/countries 
 @countries.route("/countries", methods=["GET"])
-def get_all_countries():
+def all_countries():
     try:
-        current_app.logger.info('Starting get_all_countries request')
+        current_app.logger.info('Starting all_countries request')
         cursor = db.get_db().cursor()
 
         # Get query parameters for filtering
@@ -35,10 +35,10 @@ def get_all_countries():
         current_app.logger.info(f'Successfully retrieved {len(countries)} Countries')
         return jsonify(countries), 200
     except Error as e:
-        current_app.logger.error(f'Database error in get_all_countries: {str(e)}')
+        current_app.logger.error(f'Database error in all_countries: {str(e)}')
         return jsonify({"error": str(e)}), 500
 
-
+# Helper for /features/<input> route
 def is_value(pair) :
     value_key = 'VALUE'
     key, value = pair
@@ -50,9 +50,9 @@ def is_value(pair) :
 #get route for six features for a given country
 #input is country
 @countries.route("/features/<input>", methods=["GET"])
-def get_all_features(input):
+def all_features(input):
     try:
-        current_app.logger.info('Starting get_all_features request')
+        current_app.logger.info('Starting all_features request')
         cursor = db.get_db().cursor()
 
         # LiveBirths
@@ -189,7 +189,7 @@ def get_all_features(input):
 # Get detailed information about a specific country including its projects and donors
 # Example: /country/countries/ARG
 @countries.route("/countries/<country_code>", methods=["GET"])
-def get_country(country_code):
+def country_info(country_code):
     try:
         cursor = db.get_db().cursor()
 
@@ -218,7 +218,7 @@ def get_country(country_code):
 
 
 @countries.route('/countries/<country_code>/articles', methods=['GET'])
-def get_articles_by_country(country_code):
+def articles_by_country(country_code):
     try:
 
         cursor = db.get_db().cursor()
@@ -252,7 +252,7 @@ def favorite_articles():
         data = request.get_json()
 
         # Validate required fields
-        required_fields = ["articleID"]
+        required_fields = ["userID", "articleID"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -261,14 +261,15 @@ def favorite_articles():
 
         # Insert new article 
         query = """
-        INSERT INTO Favorites (articleID)
-        VALUES (%s)
+            INSERT INTO Favorites (userID, articleID)
+            VALUES (%s,%s)
         """
         cursor.execute(
             query,
             (
+                data["userID"],
                 data["articleID"]
-            ),
+            )
         )
 
         db.get_db().commit()
@@ -281,6 +282,7 @@ def favorite_articles():
         )
     except Error as e:
         return jsonify({"error": str(e)}), 500
+    
     
 # gets all favorite articles and information about them
 @countries.route('/articles/favorite', methods=['GET'])
@@ -342,7 +344,7 @@ def unfavorite_article(articleID):
 # Get list of all recommendation factors with descriptions
 # Example: /country/factor_descriptions
 @countries.route("/factor_descriptions", methods=["GET"])
-def get_factor_descriptions():
+def factor_descriptions():
     try:
         factors = [
             {
