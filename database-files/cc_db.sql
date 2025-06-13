@@ -233,9 +233,12 @@ DROP TABLE IF EXISTS UserWeights;
 CREATE TABLE UserWeights (
     id INT AUTO_INCREMENT PRIMARY KEY,
     userID INT,
-    qualityWeight FLOAT DEFAULT 0.0,
-    accessibilityWeight FLOAT DEFAULT 0.0,
-    affordabilityWeight FLOAT DEFAULT 0.0,
-    outcomeWeight FLOAT DEFAULT 0.0,
+    preventionWeight FLOAT DEFAULT 0.0,
+    detectReportWeight FLOAT DEFAULT 0.0,
+    rapidRespWeight FLOAT DEFAULT 0.0,
+    healthSysWeight FLOAT DEFAULT 0.0,
+    intlNormsWeight FLOAT DEFAULT 0.0,
+    riskEnvWeight FLOAT DEFAULT 0.0,
     FOREIGN KEY (userID) REFERENCES Users(id)
 );
+
