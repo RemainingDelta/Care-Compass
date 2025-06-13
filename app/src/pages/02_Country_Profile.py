@@ -156,40 +156,42 @@ if selected_country :
             st.container(border=True)
             st.image(get_random_thumbnail())
             st.markdown(f"**{article['title']}**")
+
             col_a, col_b = st.columns([0.85,0.15],gap="small")
+
             with col_a:
                 st.markdown(f"*{article['source']}*")
                 st.markdown(f"[Read more]({article['link']})", unsafe_allow_html=True)
-            with col_b:
-                # if 'is_bookmarked' not in st.session_state :
-                #     st.session_state.is_bookmarked = False 
 
+            with col_b:
                 favorite_icon = "⭐️"
 
-                button(favorite_icon, key=f"{article['id']}bookmark_button")
+                if button(favorite_icon, key=f"{article['id']}bookmark_button") : 
+                    favorite_data = {
+                        "userID": userID,
+                        "articleID": article['id']
+                    }
 
-                # if favorite:
-                #      st.session_state.is_bookmarked = not st.session_state.is_bookmarked
-                
-                favorite_data = {
-                    "userID": userID,
-                    "articleID": article['id']
-                }
+                    favorite_url = "http://host.docker.internal:4000/country/articles/favorite"
 
-                favorite_url = f"http://host.docker.internal:4000/country/articles/favorite"
+                    try:
+                        # Send POST request to API
+                        response = requests.post(favorite_url, json=favorite_data)
 
-                try:
-                    # Send POST request to API
-                    response = requests.post(favorite_url, json=favorite_data)
+                        if response.status_code == 201:
+                            st.success("Article added successfully!")
+                        elif response.status_code == 409:
+                            st.warning("This article is already in your favorites.")
+                        else:
+                            try:
+                                error_message = response.json().get("error", "Unknown error")
+                            except ValueError:
+                                error_message = f"Non-JSON response: {response.text}"
+                            
+                            st.error(f"Failed to add Article: {error_message}")
 
-                    # if response.status_code == 201:
-                    #     st.success("Article added successfully!")
-                        
-                    # else:
-                    #     st.error(
-                    #         f"Failed to add Article: {response.json().get('error', 'Unknown error')}"
-                    #     )
+                    except requests.exceptions.RequestException as e:
+                        st.error(f"Error connecting to the API: {str(e)}")
+                        st.info("Please ensure the API server is running")
 
-                except requests.exceptions.RequestException as e:
-                    st.error(f"Error connecting to the API: {str(e)}")
-                    st.info("Please ensure the API server is running")
+              

@@ -10,13 +10,13 @@ def HomeNav():
     st.sidebar.page_link("Home.py", label="Home", icon="🧭"
     )
 
-
 def AboutPageNav():
     st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠"
     )
 
 def CSuite():
-    st.sidebar.page_link("pages/31_Contact_Info.py", label="C Suite", icon="📞")
+    st.sidebar.page_link("pages/31_Contact_Info.py", label="C Suite", icon="📞"
+    )
 
 #### ------------------------ Examples for Role of Resident ------------------------
 def ResidentHomeNav():

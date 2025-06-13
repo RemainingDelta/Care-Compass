@@ -252,7 +252,7 @@ def favorite_articles():
         data = request.get_json()
 
         # Validate required fields
-        required_fields = ["articleID"]
+        required_fields = ["userID", "articleID"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -261,14 +261,15 @@ def favorite_articles():
 
         # Insert new article 
         query = """
-        INSERT INTO Favorites (articleID)
-        VALUES (%s)
+            INSERT INTO Favorites (userID, articleID)
+            VALUES (%s,%s)
         """
         cursor.execute(
             query,
             (
+                data["userID"],
                 data["articleID"]
-            ),
+            )
         )
 
         db.get_db().commit()
@@ -282,9 +283,10 @@ def favorite_articles():
     except Error as e:
         return jsonify({"error": str(e)}), 500
     
+    
 # gets all favorite articles and information about them
 @countries.route('/articles/favorite', methods=['GET'])
-def fav_articles():
+def get_fav_articles():
     try:
         cursor = db.get_db().cursor()
 
