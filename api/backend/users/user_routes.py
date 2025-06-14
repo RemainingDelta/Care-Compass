@@ -101,6 +101,7 @@ def update_user_preferences(user_id):
             cursor.execute(insert_query, (user_id, prevention, detect, rapid, health, intl, risk))
 
         db.get_db().commit()
+        current_app.logger.info(f"Preferences updated for user {user_id}")
         cursor.close()
         return jsonify({"message": "Preferences saved successfully."}), 200
 
