@@ -58,6 +58,7 @@ factor_descriptions = {}
 try:
     response = requests.get("http://host.docker.internal:4000/country/factor_descriptions", headers=headers, timeout=10)
     if response.status_code == 200:
+        
         data = response.json()
         for item in data:
             # Normalize key for matching
@@ -232,13 +233,36 @@ sorted_df_similar['the_country_cosine'] = []
 sorted_df_similar['the_country_dot_product'] = []
 if submit:
     #GET THE WEIGHTS IN HERE 
-    weights_dict = json.dumps(weights_dict)
+    # Save the weights in both dict and JSON formats
+    weights_dict_obj = weights_dict  # this is still a Python dict for saving to DB
+    weights_dict = json.dumps(weights_dict)  # JSON string for similarity endpoint
     #Calculating Similarity 
     api_url = f"http://host.docker.internal:4000/ml/ml/cosine/{chosen_country}/{weights_dict}"
     response = requests.get(api_url, headers=headers, timeout=10)
     #print(response)
 
     if response.status_code == 200:
+        # Save preferences to backend (if user is signed in)
+        if 'user_id' in st.session_state:
+            preferences_payload = {
+                "preventionWeight": weights_dict_obj.get("Prevention", 1.0) * 100,
+                "detectReportWeight": weights_dict_obj.get("Detection & Reporting", 1.0) * 100,
+                "rapidRespWeight": weights_dict_obj.get("Rapid Response", 1.0) * 100,
+                "healthSysWeight": weights_dict_obj.get("Health System", 1.0) * 100,
+                "intlNormsWeight": weights_dict_obj.get("International Norms Compliance", 1.0) * 100,
+                "riskEnvWeight": weights_dict_obj.get("Risk Environment", 1.0) * 100
+            }
+
+            try:
+                save_url = f"http://host.docker.internal:4000/users/users/{st.session_state['user_id']}/preferences"
+                save_response = requests.put(save_url, json=preferences_payload, headers=headers, timeout=10)
+                if save_response.status_code == 200:
+                    # st.success("Your preferences have been saved.")
+                    pass
+                else:
+                    st.warning(f"Could not save preferences: {save_response.status_code}")
+            except Exception as e:
+                st.warning(f"Error saving preferences: {e}")
         data = response.text  
         #st.success("It worked!")
         data_dict = json.loads(data)

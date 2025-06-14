@@ -258,8 +258,10 @@ with col2 :
     email_API = st.session_state['email']
 
     userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
-    userID = userID_response.json()
-    st.session_state['id'] = userID
+    user_data = userID_response.json()
+    user_id = user_data["id"]  # unpack the actual ID
+    st.session_state['user_id'] = user_id  # now it matches what the cosine page expects
+
 
     logger.info("Logging in as Resident Persona")
     st.switch_page('pages/00_Resident_Home.py')
@@ -276,8 +278,10 @@ with col4:
     email_API = st.session_state['email']
 
     userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
-    userID = userID_response.json()
-    st.session_state['id'] = userID
+    user_data = userID_response.json()
+    user_id = user_data["id"]  # unpack the actual ID
+    st.session_state['user_id'] = user_id  # now it matches what the cosine page expects
+
     
     logger.info("Logging in as Student Persona")
     st.switch_page('pages/10_Student_Home.py')
@@ -294,8 +298,10 @@ with col6:
     email_API = st.session_state['email']
 
     userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
-    userID = userID_response.json()
-    st.session_state['id'] = userID
+    user_data = userID_response.json()
+    user_id = user_data["id"]  # unpack the actual ID
+    st.session_state['user_id'] = user_id  # now it matches what the cosine page expects
+
     
     logger.info("Logging in as Policymaker Persona")
     st.switch_page('pages/20_Policymaker_Home.py')

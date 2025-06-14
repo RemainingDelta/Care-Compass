@@ -16,8 +16,7 @@ style_sidebar()
 
 SideBarLinks()
 
-
-userID = st.session_state['id']
+userID = st.session_state.get('user_id')
 
 #getting all the countries 
 country_url = "http://host.docker.internal:4000/country/countries"  
