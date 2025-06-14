@@ -44,9 +44,11 @@ CREATE TABLE CountryArticles(
     article_title  VARCHAR(255) NOT NULL,
     article_link   VARCHAR(1371) NOT NULL,
     source         VARCHAR(100) NOT NULL,
-
+    image_name    VARCHAR(26) NOT NULL,
     FOREIGN KEY (country_code) REFERENCES Countries(code)
 );
+
+
 
 DROP TABLE IF EXISTS UserRoles;
 CREATE TABLE UserRoles

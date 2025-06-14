@@ -224,7 +224,7 @@ def articles_by_country(country_code):
         cursor = db.get_db().cursor()
 
         query = """
-            SELECT id, article_title, source, article_link
+            SELECT id, article_title, article_link, source, image_name
             FROM CountryArticles
             WHERE country_code = %s
         """
@@ -236,7 +236,8 @@ def articles_by_country(country_code):
                 "id": row["id"],
                 "title": row["article_title"],
                 "source": row["source"],
-                "link": row["article_link"]
+                "link": row["article_link"],
+                "image_name": row["image_name"]
             }
             for row in articles
         ]

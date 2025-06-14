@@ -153,7 +153,7 @@ if selected_country :
         col = cols[i % 3]
         with col:
             st.container(border=True)
-            st.image(get_random_thumbnail())
+            st.image(f"assets/{article['image_name']}")
             st.markdown(f"**{article['title']}**")
 
             col_a, col_b = st.columns([0.85,0.15],gap="small")
