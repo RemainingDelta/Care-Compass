@@ -41,6 +41,55 @@ st.write(f"### Hi, {st.session_state['name']}.")
 st.write("Choose a country, and rank the healthcare factors in order of YOUR priority -- 1 being the highest and 6 the lowest. Then, you may adjust the weights accordingly.")
 st.write("")
 
+st.markdown("""
+<style>
+/* This targets all expanders and gives them a light green background */
+div[data-testid="stExpander"] > details > summary {
+    background-color: #d8f3dc;
+    color: #1b4332;
+    font-weight: 600;
+    border: 1px solid #95d5b2;
+    border-radius: 6px;
+    padding: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+with st.expander("ℹ️ How this tool works"):
+    st.markdown("""
+    This tool helps you explore and compare healthcare systems across countries based on **six core factors** from the Global Health Security Index:
+
+    - **Prevention**: Measures to prevent the emergence and spread of infectious diseases.
+    - **Detection and Reporting**: Capacity for early detection, testing, and transparent reporting of health threats.
+    - **Rapid Response**: Readiness and speed of response to outbreaks and emergencies.
+    - **Health System**: Availability, accessibility, and strength of healthcare infrastructure and services.
+    - **Compliance with International Norms**: Degree of compliance with WHO and other global health regulations.
+    - **Risk Environment**: The country's social, political, and environmental vulnerability to health threats.
+
+
+    ### How to Use:
+    1. **Select your country of origin**, which is factored into your final recommendations.
+    1. **Drag to Rank** the six factors in order of importance to you (1 = highest priority, 6 = lowest).
+    2. Use the **sliders next to each factor** to fine-tune the score for each factor.
+
+    ### How Rankings Are Generated:
+    - When you set the sliders, each one represents a **priority ranking from 1 to 6**.
+    - These are **mapped to a target score range** for each factor which you can adjust further with the sliders:
+        - **1 → 90–100**
+        - **2 → 70-90**
+        - **3 → 50-70**
+        - **4 → 30–50**
+        - **5 → 10-30**
+        - **6 → 0-10**  
+    - This creates a **target vector** that reflects your ideal health system profile.
+
+    - We then compute the **cosine similarity** between your vector and every country's actual scores (from normalized GHSI data).
+    - Countries are ranked based on how closely their health system profile **aligns with your priorities**.
+
+    ### Outputs:
+    - A **ranked list** of top 5 matching countries.
+    - An **heat map** showing compatibility scores visually.
+    """)
+
 
 options = ["Prevention","Health System","Rapid Response","Detection & Reporting", 
            "International Norms Compliance","Risk Environment"]
@@ -88,7 +137,7 @@ except (KeyError, TypeError) as e:
     print("Unexpected response format:", e)
 
 # Select Country Dropdown
-chosen_country = st.selectbox("Select Country:", 
+chosen_country = st.selectbox("Select Current Country:", 
                                 country_list,
                                 index=None)
 #st.write("FRONTEND SELECTED COUNTRY", chosen_country)
