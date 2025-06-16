@@ -142,6 +142,43 @@ SideBarLinks()
 # Page Title and Description
 st.title('FEATURES OVER TIME')
 st.write("Choose a country and your target year to view how healthcare features change over time.")
+st.markdown("""
+<style>
+/* This targets all expanders and gives them a light green background */
+div[data-testid="stExpander"] > details > summary {
+    background-color: #d8f3dc;
+    color: #1b4332;
+    font-weight: 600;
+    border: 1px solid #95d5b2;
+    border-radius: 6px;
+    padding: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+with st.expander("ℹ️ How this tool works"):
+    st.markdown("""
+    This tool helps you explore how key healthcare indicators have changed over time — and how they're projected to evolve in the future.
+
+    ### What It Does:
+    - Tracks trends for key healthcare features like:
+        - **Live Births per 1,000 Population**
+        - **General Practitioners per 10,000 People**
+        - **Total Health Expenditure per Capita**
+    - Uses **historical data** from the WHO.
+    - Applies an **autoregressive model** to forecast each feature into future years (e.g., up to 2035).
+
+    ### How to Use:
+    1. **Select a country** from the dropdown.
+    2. **Set a target year** using the date input — this determines how far into the future the forecast will extend.
+    3. **Click on one or more features** you want to visualize over time.
+    4. The line chart will display the actual historical data and the projected trend beyond the present.
+
+    ### Why It Matters:
+    These trends help uncover:
+    - Whether a healthcare system is improving or declining.
+    - Which areas (staffing, spending, births) are changing fastest.
+    - What future resource or policy needs may arise.
+    """)
 st.write("")
 
 # Fetch Countries
