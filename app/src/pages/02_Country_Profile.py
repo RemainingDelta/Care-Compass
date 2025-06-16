@@ -55,7 +55,7 @@ if selected_country :
     country_code = selected_country[start_index:]
         
     # API endpoint
-    API_URL = f"http://host.docker.internal:4000/country/countries/{country_code}"  
+    API_URL = f"http://host.docker.internal:4000/country/{country_code}"  
 
     try:
         # Fetch Country details
@@ -98,7 +98,7 @@ if selected_country :
                 for i in range(6):
                     weights_dict[factors[i]] = float(weights[i]/100)
                 weights_dict = json.dumps(weights_dict)
-                API_URL_2 = f"http://host.docker.internal:4000/ml/ml/cosine//{country_code}/{weights_dict}" 
+                API_URL_2 = f"http://host.docker.internal:4000/ml/cosine//{country_code}/{weights_dict}" 
                 response = requests.get(API_URL_2) 
                 
                 if response.status_code == 200:
@@ -141,7 +141,7 @@ if selected_country :
 
     st.header(f"Healthcare Articles for {country_code}")
 
-    res = requests.get(f"http://host.docker.internal:4000/country/countries/{country_code}/articles")
+    res = requests.get(f"http://host.docker.internal:4000/country/{country_code}/articles")
 
     articles = res.json()
 

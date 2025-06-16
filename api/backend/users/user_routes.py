@@ -43,7 +43,7 @@ def all_users():
 
 
 # get user id from last name
-@users.route("/users/id/<input>", methods=["GET"])
+@users.route("/id/<input>", methods=["GET"])
 def user_id(input):
     try:
         cursor = db.get_db().cursor()
@@ -61,7 +61,7 @@ def user_id(input):
         return jsonify({"error": "User not found"}), 404
     
 
-@users.route("/users/<int:user_id>/preferences", methods=["PUT"])
+@users.route("/<int:user_id>/preferences", methods=["PUT"])
 def update_user_preferences(user_id):
     try:
         current_app.logger.info(f"Updating preferences for user ID {user_id}")
@@ -110,7 +110,7 @@ def update_user_preferences(user_id):
         return jsonify({"error": str(e)}), 500
 
     
-@users.route("/users/<int:user_id>/preferences", methods=["GET"])
+@users.route("/<int:user_id>/preferences", methods=["GET"])
 def get_user_preferences(user_id):
     try:
         cursor = db.get_db().cursor()

@@ -257,7 +257,7 @@ with col2 :
     st.session_state['email'] = selected_email
     email_API = st.session_state['email']
 
-    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/id/{email_API}")
     user_data = userID_response.json()
     user_id = user_data["id"]  # unpack the actual ID
     st.session_state['user_id'] = user_id  # now it matches what the cosine page expects
@@ -277,7 +277,7 @@ with col4:
     st.session_state['email'] = selected_email
     email_API = st.session_state['email']
 
-    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/id/{email_API}")
     user_data = userID_response.json()
     user_id = user_data["id"]  # unpack the actual ID
     st.session_state['user_id'] = user_id  # now it matches what the cosine page expects
@@ -297,7 +297,7 @@ with col6:
     st.session_state['email'] = selected_email
     email_API = st.session_state['email']
 
-    userID_response = requests.get(f"http://host.docker.internal:4000/users/users/id/{email_API}")
+    userID_response = requests.get(f"http://host.docker.internal:4000/users/id/{email_API}")
     user_data = userID_response.json()
     user_id = user_data["id"]  # unpack the actual ID
     st.session_state['user_id'] = user_id  # now it matches what the cosine page expects

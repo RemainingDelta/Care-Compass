@@ -187,8 +187,8 @@ def all_features(input):
 
 
 # Get detailed information about a specific country including its projects and donors
-# Example: /country/countries/ARG
-@countries.route("/countries/<country_code>", methods=["GET"])
+# Example: /country/ARG
+@countries.route("/<country_code>", methods=["GET"])
 def country_info(country_code):
     try:
         cursor = db.get_db().cursor()
@@ -217,7 +217,7 @@ def country_info(country_code):
         return jsonify({"error": str(e)}), 500
 
 
-@countries.route('/countries/<country_code>/articles', methods=['GET'])
+@countries.route('/<country_code>/articles', methods=['GET'])
 def articles_by_country(country_code):
     try:
 

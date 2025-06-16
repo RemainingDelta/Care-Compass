@@ -207,7 +207,7 @@ with cola:
             
             #data code for life expectancy and get request url which passes through country and data_code
             data_code = "H2020_17"
-            api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+            api_url = f"http://host.docker.internal:4000/ml/get_regression/{chosen_country},{data_code}"
             try:
                 headers = {
                 "User-Agent": "Python/requests",
@@ -245,7 +245,7 @@ with cola:
              mortality_bool = True
              mortality_value = mortality
              data_code = "H2020_19"
-             api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+             api_url = f"http://host.docker.internal:4000/ml/get_regression/{chosen_country},{data_code}"
              try:
                 headers = {
                 "User-Agent": "Python/requests",
@@ -279,7 +279,7 @@ with colb:
              births_bool = True
              live_births_value = live_births
              data_code = "HFA_16"
-             api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+             api_url = f"http://host.docker.internal:4000/ml/get_regression/{chosen_country},{data_code}"
              try:
                 headers = {
                 "User-Agent": "Python/requests",
@@ -312,7 +312,7 @@ with colb:
              practitioners_value = practitioners
              practitioners_bool = True
              data_code = "HLTHRES_67"
-             api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+             api_url = f"http://host.docker.internal:4000/ml/get_regression/{chosen_country},{data_code}"
              try:
                 headers = {
                 "User-Agent": "Python/requests",
@@ -351,7 +351,7 @@ with colc:
             expenditure_value = expenditure
             expenditure_bool = True
             data_code = "HFA_570"
-            api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+            api_url = f"http://host.docker.internal:4000/ml/get_regression/{chosen_country},{data_code}"
             try:
                 headers = {
                 "User-Agent": "Python/requests",
@@ -387,7 +387,7 @@ with colc:
             impoverished_value = impoverished
             impoverished_bool = True
             data_code = "UHCFP_2"
-            api_url = f"http://host.docker.internal:4000/ml/ml/get_regression/{chosen_country},{data_code}"
+            api_url = f"http://host.docker.internal:4000/ml/get_regression/{chosen_country},{data_code}"
             try:
                 headers = {
                 "User-Agent": "Python/requests",
