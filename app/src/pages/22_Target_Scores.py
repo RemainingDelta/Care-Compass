@@ -47,6 +47,44 @@ except (KeyError, TypeError) as e:
 
 st.title("SET AND MONITOR TARGET VALUES")
 st.write("")
+st.markdown("""
+<style>
+/* This targets all expanders and gives them a light green background */
+div[data-testid="stExpander"] > details > summary {
+    background-color: #d8f3dc;
+    color: #1b4332;
+    font-weight: 600;
+    border: 1px solid #95d5b2;
+    border-radius: 6px;
+    padding: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+with st.expander("ℹ️ How this tool works"):
+    st.markdown("""
+    This page helps you **set long-term healthcare goals** for a country and estimate how long it will take to reach them.
+
+    ### How to Use:
+    1. **Select a country** using the dropdown.
+    2. Enter your **target values** for key healthcare features such as:
+        - **Life Expectancy**
+        - **Infant Mortality Rate**
+        - **Live Births per 1,000 Population**
+        - **General Practitioners per 10,000 People**
+        - **Total Health Expenditure per Capita**
+        - **Impoverished Households (%)**
+    3. Click **"Calculate"** to see how long it would take to reach those targets based on historical trends.
+
+    ### How It Works:
+    - We use past data from WHO to analyze **each feature’s historical growth or decline**.
+    - For each metric, we fit a **trend line using linear  modeling**.
+    - We then **project future values year by year** and estimate when your target value will be reached.
+
+    ### What You Get:
+    - A **time estimate (in years)** until each target is met — if trends continue.
+    - A visual indication if the target is **realistic or unlikely** based on recent performance.
+    """)
+
 
 col1, col2 = st.columns([0.8,0.2], gap="Large",vertical_alignment="bottom")
 
