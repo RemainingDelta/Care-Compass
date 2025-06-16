@@ -21,96 +21,6 @@ import json
 
 ml = Blueprint("ml", __name__)
 
-
-"""
-Query Params:
-- feature: Name of the healthcare factor (e.g. 'Health System')
-- countries: Comma-separated country IDs (e.g. 1,2,3)
-
-Returns:
-- Regression-based predictions for each country
-- Format: { country_id: [ { year, value }, ... ] }
-"""
-# Generate regression prediction for a feature across countries
-# Example: /ml/predict?feature=Health System&countries=1,2,3
-@ml.route("/ml/predict/<expenditure>/<country>", methods=["GET"])
-def predict_feature_over_time(expenditure,country):
-    # get a database cursor 
-    cursor = db.get_db().cursor()
-    
-    current_app.logger.info(f'expenditure = {expenditure}')
-    current_app.logger.info(f'country = {country}')
-
-    # get the model params from the database
-    query = 'SELECT year, expenditure, country FROM regression_model_params WHERE country = %s'
-    cursor.execute(query, (country),)
-    rows = cursor.fetchall()
-
-    #used chat -- said to build list of column names
-    col_names = [desc[0] for desc in cursor.description]
-
-    df_expenditure = pd.DataFrame(rows, columns=col_names)
-    
-    result = predict(df_expenditure, country)
-
-    return_dict = {
-        "slope": result["slope"],
-        "intercept": result["intercept"],
-        "mse": result['"mse"'],
-        "r2": result["r2"]
-    }
-
-    the_response = make_response(jsonify(return_dict))
-    the_response.status_code = 200
-    the_response.mimetype = 'application/json'
-    return the_response
-    
-
-# model calls post to put weights in database
-# adds new regression weight from model to database
-@ml.route("/ml/store-weights", methods=["POST"])
-def store_weights():
-    try:
-        data = request.get_json()
-        result = predict(dataframe(), chosen_country)
-
-        # Validate required fields
-        required_fields = ["country", "feature", "slope", "intercept", "mse", "r2"]
-        for field in required_fields:
-            if field not in data:
-                return jsonify({"error": f"Missing required field: {field}"}), 400
-        
-        cursor = db.get_db().cursor()
-
-        # Insert new Weight
-        query = """
-        INSERT INTO regression_weights (country, feature, slope, intercept, mse, r2)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(
-            query,
-            (
-                data["country"],
-                data["feature"],
-                data["slope"],
-                data["intercept"],
-                data.get["mse", None],
-                data.get("r2", None)
-            )
-        )
-
-        db.get_db().commit()
-        new_weight_id = cursor.lastrowid
-        cursor.close()
-
-        return (
-            jsonify({"message": "Weight created successfully", "weight_id": new_weight_id}),
-            201,
-        )
-    except Error as e:
-        return jsonify({"error": str(e)}), 500
-
-
 #model calls post to put weights in database
 # adds new regression weight from model to database
 @ml.route("/ml/get_regression/<input>", methods=["GET"])
@@ -183,108 +93,6 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
     print(result_final)
     return jsonify(result_final)
 
-#model calls post to put weights in database
-# adds new regression weight from model to database
-@ml.route("/ml/get_autoregressive_all/<input>", methods=["GET"])
-def get_autoregressive_all(input):
-    inputs = [str(x.strip()) for x in input.split(',')]
-    xy = create_xy_full(dataframe(inputs[1]))
-    inputs = create_xy(dataframe(inputs[1]), inputs[0])
-    result = autoreg_predict_full(inputs[0], inputs[1], autoreg_train(xy[0], xy[1]), inputs[2])
-    print("Country received:", inputs[0])
-
-    return jsonify(result)
-
-#model calls post to put weights in database
-# adds new regression weight from model to database
-@ml.route("/ml/store_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["PUT"])
-def store_autoregressive(chosen_country, data_code, chosen_year):
-
-    cursor = db.get_db().cursor()
-    #print("the chosen year")
-    #print(chosen_year)
-    if data_code == 'HFA_16':
-        query = """SELECT * FROM LiveBirths"""
-    elif data_code == 'HFA_570':
-        query = """SELECT * FROM HealthExpend"""
-    elif data_code == 'HLTHRES_67':
-        query = "SELECT * FROM GenPractitioners"
-    #print(query)
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    #print(rows)
-
-    # Convert to DataFrame
-    columns = ["COUNTRY", "YEAR", "VALUE"]
-    df = pd.DataFrame(rows, columns=columns)
-    value_list = []
-    for value in df["VALUE"]:
-        value_list.append(float(value))
-    
-    df["VALUE"] = value_list
-    #print("the chosen country")
-    #print(chosen_country)
-    #print("df")
-    #print(df)
-    
-    inputs = [chosen_country, data_code, chosen_year]
-    #xy = create_xy_full(dataframe(inputs[1]))
-    #df = dataframe(inputs[1])
-    #df_country = df[(df['COUNTRY'] == inputs[0])]
-    df_country = df[df['COUNTRY'] == inputs[0]]
-    #print("df_country")
-    #print(df_country)
-    #print("df_country")
-    #print(df_country)
-    df_filtered = df_country.reset_index(drop=True)
-    print("filtered dataframe")
-    print(df_filtered)
-    #print("df_filtered")
-    #print(df_filtered)
-    year = int(df_filtered.iloc[len(df_filtered) - 1]['YEAR'])
-    years = int(inputs[2]) - year
-    #print("number of years")
-    #print(years)
-    input = create_xy_select(df, inputs[0])
-    train = create_xy_full(df)
-    result = autoreg_train(train[0], train[1])
-    print("Country received:", inputs[0])
-    result_final = result.to_json()
-    #result_final = result.to_dict()
-    #result_final = json.dumps(result_final)
-    print(result_final)
-    return jsonify(result_final)
-
-#model calls post to put weights in database
-# adds new regression weight from model to database
-@ml.route("/ml/get_graph_data/<input>", methods=["GET"])
-def get_graph_data(input):
-    result = dataframe(input)
-    table = result.to_dict()
-    return jsonify(table)
-
-#gets all the countries in the live births dataset
-@ml.route("/ml/get_countries", methods=["GET"])
-def get_countries():
-    # get a database cursor 
-    cursor = db.get_db().cursor()
-    
-    #cursor.execute('''
-    #CREATE TABLE IF NOT EXISTS births_table(
-       #COUNTRY     VARCHAR(3) NOT NULL PRIMARY KEY
-      #,COUNTRY_GRP VARCHAR(17)
-      #,SEX         VARCHAR(3) NOT NULL
-      #,YEAR        INTEGER  NOT NULL
-      #,VALUE       NUMERIC(5,2) NOT NULL
-    #)
-    #''')
-    
-    
-    # Query distinct countries
-    cursor.execute("SELECT DISTINCT COUNTRY FROM births_table WHERE COUNTRY IS NOT NULL ORDER BY COUNTRY")
-    countries = [row[0] for row in cursor.fetchall()]
-    return countries
-
 
 #Gets the cosine similarity numbers for the chosen country 
 @ml.route("/ml/cosine/<chosen_country>/<weights_dict>", methods=["GET"])
@@ -355,133 +163,133 @@ def cosine(chosen_country, weights_dict):
     result = df.to_dict()
     return jsonify(result)
 
+# Test routes 
+# @ml.route("/cosine/<int:user_id>", methods=["GET"])
+# def cosine_for_user(user_id):
+#     try:
+#         # Step 1: Fetch user weights from the DB
+#         cursor = db.get_db().cursor()
+#         cursor.execute("""
+#             SELECT 
+#                 preventionWeight,
+#                 detectReportWeight,
+#                 rapidRespWeight,
+#                 healthSysWeight,
+#                 intlNormsWeight,
+#                 riskEnvWeight
+#             FROM UserWeights WHERE userID = %s
+#         """, (user_id,))
+#         row = cursor.fetchone()
 
-@ml.route("/cosine/<int:user_id>", methods=["GET"])
-def cosine_for_user(user_id):
-    try:
-        # Step 1: Fetch user weights from the DB
-        cursor = db.get_db().cursor()
-        cursor.execute("""
-            SELECT 
-                preventionWeight,
-                detectReportWeight,
-                rapidRespWeight,
-                healthSysWeight,
-                intlNormsWeight,
-                riskEnvWeight
-            FROM UserWeights WHERE userID = %s
-        """, (user_id,))
-        row = cursor.fetchone()
+#         if not row:
+#             cursor.close()
+#             return jsonify({"error": "User preferences not found."}), 404
 
-        if not row:
-            cursor.close()
-            return jsonify({"error": "User preferences not found."}), 404
+#         weights_vect = [
+#             float(row["preventionWeight"]),
+#             float(row["detectReportWeight"]),
+#             float(row["rapidRespWeight"]),
+#             float(row["healthSysWeight"]),
+#             float(row["intlNormsWeight"]),
+#             float(row["riskEnvWeight"])
+#         ]
 
-        weights_vect = [
-            float(row["preventionWeight"]),
-            float(row["detectReportWeight"]),
-            float(row["rapidRespWeight"]),
-            float(row["healthSysWeight"]),
-            float(row["intlNormsWeight"]),
-            float(row["riskEnvWeight"])
-        ]
+#         cursor.close()
 
-        cursor.close()
+#         # Step 2: Fetch GHS scores for each country
+#         cursor = db.get_db().cursor()
+#         cursor.execute("""
+#             SELECT 
+#                 country,
+#                 prevention,
+#                 detectReport,
+#                 rapidResp,
+#                 healthSys,
+#                 intlNorms,
+#                 riskEnv
+#             FROM OverallScore
+#         """)
+#         rows = cursor.fetchall()
+#         columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
+#         df_unscaled = pd.DataFrame(rows, columns=columns)
 
-        # Step 2: Fetch GHS scores for each country
-        cursor = db.get_db().cursor()
-        cursor.execute("""
-            SELECT 
-                country,
-                prevention,
-                detectReport,
-                rapidResp,
-                healthSys,
-                intlNorms,
-                riskEnv
-            FROM OverallScore
-        """)
-        rows = cursor.fetchall()
-        columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
-        df_unscaled = pd.DataFrame(rows, columns=columns)
+#         # Step 3: Normalize the scores
+#         df_scaled = df_unscaled[["prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]].copy()
+#         for feat in df_scaled.columns:
+#             df_scaled[feat] = (df_scaled[feat] - df_scaled[feat].mean()) / df_scaled[feat].std()
 
-        # Step 3: Normalize the scores
-        df_scaled = df_unscaled[["prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]].copy()
-        for feat in df_scaled.columns:
-            df_scaled[feat] = (df_scaled[feat] - df_scaled[feat].mean()) / df_scaled[feat].std()
+#         # Step 4: Get recommendations
+#         chosen_country = df_unscaled["country"].iloc[23]  # optional: override if needed
+#         result_df = get_similar(chosen_country, weights_vect, df_unscaled, df_scaled)
+#         # Sort by cosine similarity descending
+#         sorted_df = result_df.sort_values(by="the_country_cosine", ascending=False)
 
-        # Step 4: Get recommendations
-        chosen_country = df_unscaled["country"].iloc[23]  # optional: override if needed
-        result_df = get_similar(chosen_country, weights_vect, df_unscaled, df_scaled)
-        # Sort by cosine similarity descending
-        sorted_df = result_df.sort_values(by="the_country_cosine", ascending=False)
-
-        # Return only top N if desired
-        top_n = 5
-        result_json = sorted_df.head(top_n).to_dict(orient="records")
-        return jsonify(result_json), 200
+#         # Return only top N if desired
+#         top_n = 5
+#         result_json = sorted_df.head(top_n).to_dict(orient="records")
+#         return jsonify(result_json), 200
 
 
-    except Error as e:
-        return jsonify({"error": str(e)}), 500
+#     except Error as e:
+#         return jsonify({"error": str(e)}), 500
     
 
-@ml.route("/cosine/custom", methods=["POST"])
-def custom_cosine():
-    try:
-        data = request.get_json()
-        origin_country = data.get("origin_country")
-        use_origin_toggle = data.get("use_origin_toggle", False)
-        weights = data.get("weights")
+# @ml.route("/cosine/custom", methods=["POST"])
+# def custom_cosine():
+#     try:
+#         data = request.get_json()
+#         origin_country = data.get("origin_country")
+#         use_origin_toggle = data.get("use_origin_toggle", False)
+#         weights = data.get("weights")
 
-        if not origin_country or not weights:
-            return jsonify({"error": "Missing data"}), 400
+#         if not origin_country or not weights:
+#             return jsonify({"error": "Missing data"}), 400
 
-        weights_vect = [
-            float(weights["preventionWeight"]),
-            float(weights["detectReportWeight"]),
-            float(weights["rapidRespWeight"]),
-            float(weights["healthSysWeight"]),
-            float(weights["intlNormsWeight"]),
-            float(weights["riskEnvWeight"])
-        ]
+#         weights_vect = [
+#             float(weights["preventionWeight"]),
+#             float(weights["detectReportWeight"]),
+#             float(weights["rapidRespWeight"]),
+#             float(weights["healthSysWeight"]),
+#             float(weights["intlNormsWeight"]),
+#             float(weights["riskEnvWeight"])
+#         ]
 
-        # Fetch scores
-        cursor = db.get_db().cursor()
-        cursor.execute("""
-            SELECT 
-                country,
-                prevention,
-                detectReport,
-                rapidResp,
-                healthSys,
-                intlNorms,
-                riskEnv
-            FROM OverallScore
-        """)
-        rows = cursor.fetchall()
-        columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
-        df_unscaled = pd.DataFrame(rows, columns=columns)
+#         # Fetch scores
+#         cursor = db.get_db().cursor()
+#         cursor.execute("""
+#             SELECT 
+#                 country,
+#                 prevention,
+#                 detectReport,
+#                 rapidResp,
+#                 healthSys,
+#                 intlNorms,
+#                 riskEnv
+#             FROM OverallScore
+#         """)
+#         rows = cursor.fetchall()
+#         columns = ["country", "prevention", "detectReport", "rapidResp", "healthSys", "intlNorms", "riskEnv"]
+#         df_unscaled = pd.DataFrame(rows, columns=columns)
 
-        df_scaled = df_unscaled[columns[1:]].copy()  # Keep raw, unnormalized
+#         df_scaled = df_unscaled[columns[1:]].copy()  # Keep raw, unnormalized
 
 
-        df_weightsim = get_similar(origin_country, weights_vect, df_unscaled, df_scaled)
-        df_weightsim.columns = ["country", "dot_weight", "cosine_weight"]
+#         df_weightsim = get_similar(origin_country, weights_vect, df_unscaled, df_scaled)
+#         df_weightsim.columns = ["country", "dot_weight", "cosine_weight"]
 
-        if use_origin_toggle:
-            df_originsim = get_similar(origin_country, [1,1,1,1,1,1], df_unscaled, df_scaled)
-            df_originsim.columns = ["country", "dot_origin", "cosine_origin"]
+#         if use_origin_toggle:
+#             df_originsim = get_similar(origin_country, [1,1,1,1,1,1], df_unscaled, df_scaled)
+#             df_originsim.columns = ["country", "dot_origin", "cosine_origin"]
 
-            merged = pd.merge(df_weightsim, df_originsim, on="country")
-            merged["final_score"] = 0.75 * merged["cosine_weight"] + 0.25 * merged["cosine_origin"]
-            result_df = merged[merged["country"] != origin_country].sort_values(by="final_score", ascending=False)
-        else:
-            df_weightsim["final_score"] = df_weightsim["cosine_weight"]
-            result_df = df_weightsim[df_weightsim["country"] != origin_country].sort_values(by="final_score", ascending=False)
+#             merged = pd.merge(df_weightsim, df_originsim, on="country")
+#             merged["final_score"] = 0.75 * merged["cosine_weight"] + 0.25 * merged["cosine_origin"]
+#             result_df = merged[merged["country"] != origin_country].sort_values(by="final_score", ascending=False)
+#         else:
+#             df_weightsim["final_score"] = df_weightsim["cosine_weight"]
+#             result_df = df_weightsim[df_weightsim["country"] != origin_country].sort_values(by="final_score", ascending=False)
 
-        return jsonify(result_df.head(5).to_dict(orient="records")), 200
+#         return jsonify(result_df.head(5).to_dict(orient="records")), 200
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
