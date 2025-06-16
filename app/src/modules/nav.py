@@ -35,6 +35,11 @@ def CountryProfNav():
     st.sidebar.page_link("pages/02_Country_Profile.py", label="Country Profile", icon="🗺️"
     )
 
+def FavoriteArticlesNav():
+    st.sidebar.page_link(
+        "pages/12_Favorite_Articles.py", label="Favorite Articles", icon="⭐️"
+    )
+
 
 ## ------------------------ Examples for Role of Student ------------------------
 def StudentHomeNav():
@@ -50,7 +55,7 @@ def CountryComparatorNav():
 
 def FavoriteArticlesNav():
     st.sidebar.page_link(
-        "pages/12_Favorite_Articles.py", label="Favorite Articles", icon="➕"
+        "pages/12_Favorite_Articles.py", label="Favorite Articles", icon="⭐️"
     )
 
 

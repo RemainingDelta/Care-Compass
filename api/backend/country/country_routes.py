@@ -286,63 +286,114 @@ def favorite_articles():
 @countries.route('/articles/favorite', methods=['GET'])
 def get_fav_articles():
     try:
-        cursor = db.get_db().cursor(dictionary=True)
-
-
-        userID = request.args.get("userID")
-
-        if not userID:
-            return jsonify({"error": "Missing userID"}), 400
+        current_app.logger.info('Starting get_fav_articles request')
         
-        # Get country details
-        cursor.execute("SELECT * FROM Favorites WHERE userID = %s", (userID,))
-
+        userID = request.args.get("userID")
+        
+        if not userID:
+            current_app.logger.error("Missing userID parameter")
+            return jsonify({"error": "Missing userID parameter"}), 400
+        
+        current_app.logger.info(f'Fetching favorites for userID: {userID}')
+        
+        # Get cursor - it returns dictionaries
+        cursor = db.get_db().cursor()
+        
+        # Get favorite articles for the user
+        cursor.execute("SELECT articleID FROM Favorites WHERE userID = %s", (userID,))
         favorites = cursor.fetchall()
-
+        
+        current_app.logger.info(f'Found {len(favorites)} favorites for user {userID}')
+        
         if not favorites:
-            return jsonify({"error": "Articles not found"}), 404
-
+            cursor.close()
+            return jsonify([]), 200
+        
         articles = []
-        # Get associated article info
-        print("Fetched favorites:", favorites)
-        for article in favorites :
-            articleID = article["articleID"]
-            print("Trying to fetch article with ID:", articleID)
-            cursor.execute("SELECT * FROM CountryArticles WHERE id = %s", (articleID,))
-            info = cursor.fetchone()
-            if info:
-                articles.append(dict(info))
-
+        
+        # Handle favorites as dictionaries
+        for fav in favorites:
+            # If it's a dictionary, access by key
+            if isinstance(fav, dict):
+                articleID = fav['articleID']
+            else:
+                # If it's a tuple, access by index
+                articleID = fav[0]
+            
+            current_app.logger.debug(f'Fetching article details for ID: {articleID}')
+            
+            cursor.execute("""
+                SELECT id, article_title, article_link, source, image_name, country_code
+                FROM CountryArticles 
+                WHERE id = %s
+            """, (articleID,))
+            
+            article_data = cursor.fetchone()
+            
+            if article_data:
+                # If cursor returns dicts, article_data is already a dict
+                if isinstance(article_data, dict):
+                    articles.append(article_data)
+                else:
+                    # If it's a tuple, convert to dict
+                    columns = [desc[0] for desc in cursor.description]
+                    article_dict = dict(zip(columns, article_data))
+                    articles.append(article_dict)
+                
+                current_app.logger.debug(f'Added article: {articles[-1].get("article_title", "Unknown")}')
+            else:
+                current_app.logger.warning(f'Article ID {articleID} not found in CountryArticles')
+        
         cursor.close()
+        
+        current_app.logger.info(f'Returning {len(articles)} articles')
         return jsonify(articles), 200
+        
     except Error as e:
+        current_app.logger.error(f'Database error in get_fav_articles: {str(e)}')
         return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        current_app.logger.error(f'Unexpected error in get_fav_articles: {str(e)}')
+        return jsonify({"error": "Internal server error"}), 500
     
-
-# unfavorite an article, deleting it from Favorites table
+    
+# Fixed version of the unfavorite_article route
 @countries.route('/articles/favorite/<articleID>', methods=['DELETE'])
 def unfavorite_article(articleID):
     try:
         current_app.logger.info("Attempting to Unfavorite an Article %s", articleID)
+        
+        # Get userID from query parameter (NOT from Streamlit session!)
+        userID = request.args.get('userID')
+        
+        if not userID:
+            current_app.logger.error("Missing userID parameter")
+            return jsonify({"error": "Missing userID parameter"}), 400
 
         cursor = db.get_db().cursor()
         
-        userID = st.session_state['id']
-
-        # First, check if the article exists
-        cursor.execute("SELECT articleID FROM Favorites WHERE articleID = %s AND userID = %s", (articleID,userID,))
+        # First, check if the favorite exists
+        cursor.execute(
+            "SELECT articleID FROM Favorites WHERE articleID = %s AND userID = %s", 
+            (articleID, userID)
+        )
+        
         if not cursor.fetchone():
-            current_app.logger.warning("Article ID %s not found", articleID)
+            current_app.logger.warning("Favorite not found for Article ID %s and User ID %s", articleID, userID)
             cursor.close()
-            return jsonify({"error": "Article not found"}), 404
+            return jsonify({"error": "Favorite not found"}), 404
 
-        # Delete the country
-        cursor.execute("DELETE FROM Favorites WHERE articleID = %s AND userID = %s", (articleID,userID,))
+        # Delete the favorite
+        cursor.execute(
+            "DELETE FROM Favorites WHERE articleID = %s AND userID = %s", 
+            (articleID, userID)
+        )
+        
         db.get_db().commit()
         cursor.close()
 
-        current_app.logger.info("Successfully deleted articleID %s", articleID)
-        return jsonify({"message": f"Article {articleID} deleted successfully"}), 200
+        current_app.logger.info("Successfully unfavorited articleID %s for userID %s", articleID, userID)
+        return jsonify({"message": f"Article {articleID} unfavorited successfully"}), 200
 
     except Error as e:
         current_app.logger.error("Database error in unfavorite_article: %s", str(e))
@@ -382,3 +433,4 @@ def factor_descriptions():
         return jsonify(factors), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+  

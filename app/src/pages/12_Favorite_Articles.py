@@ -2,94 +2,94 @@ import logging
 logger = logging.getLogger(__name__)
 import streamlit as st
 import requests
-from urllib.error import URLError
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
-import random
-import json
-
 from modules.style import style_sidebar, set_background
+
 style_sidebar()
-
 SideBarLinks()
-
 
 st.title("FAVORITE HEALTHCARE ARTICLES")
 
- # Healthcare Articles 
-def get_random_thumbnail():
-    names = [
-        "Book-Blue.png", "Book-Green.png", "Book-Orange.png", "Book-Purple.png", "Book-Red.png",
-        "ClipBoard-Blue.png", "ClipBoard-Green.png", "ClipBoard-Orange.png", "ClipBoard-Purple.png", "ClipBoard-Red.png",
-        "MagnifyingGlass-Blue.png", "MagnifyingGlass-Green.png", "MagnifyingGlass-Orange.png", "MagnifyingGlass-Purple.png", "MagnifyingGlass-Red.png"
-    ]
-    # Assuming you are running streamlit from the `app/` root and images are in `app/src/assets/`
-    return f"assets/{random.choice(names)}"
-
-st.write("Session keys:", list(st.session_state.keys()))
-st.write("Session values:", dict(st.session_state))
-
+# Authentication check
 if not st.session_state.get("authenticated"):
     st.warning("You must be logged in to access this page.")
     st.stop()
 
-# Try multiple fallback keys to get the user ID
-userID = (
-    st.session_state.get("user_id")
-    or st.session_state.get("id")
-    or st.session_state.get("user", {}).get("id")
-)
+# Get user ID
+userID = st.session_state.get("user_id")
 
 if not userID:
-    st.warning("You must be logged in to view your favorite articles.")
+    st.error("Could not find user ID in session. Please log in again.")
     st.stop()
 
-# fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite"
+# API endpoint
 fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite?userID={userID}"
-
-# Confirm the structure
-userID = st.session_state.get("user_id")
-st.write("userID from session:", userID)
-
-
 
 try:
     # Fetch Articles details
-    response = requests.get(fav_articles_URL)
+    response = requests.get(fav_articles_URL, timeout=10)
     
     if response.status_code == 200:
-        st.write("Raw response text:", response.text)
-        try:
-            favorites = response.json()
-        except Exception as e:
-            st.error("Could not parse JSON. Here's the raw response:")
-            st.code(response.text)
-            st.stop()
-
-
-        cols = st.columns(3)
-
-        for i, article in enumerate(favorites):
-            col = cols[i % 3]
-            with col:
-                st.container(border=True)
-                st.image(get_random_thumbnail())
-                st.markdown(f"**{article['article_title']}**")
-                col_a, col_b = st.columns([0.85,0.15],gap="small")
-                with col_a:
-                    st.markdown(f"*{article['source']}*")
-                    st.markdown(f"[Read more]({article['article_link']})", unsafe_allow_html=True)
-
+        favorites = response.json()
         
-
-    elif response.status_code == 404:
-        st.error("Favorite Articles not found")
+        if not favorites:
+            st.info("You haven't favorited any articles yet.")
+            st.write("Browse the country pages to find and favorite articles!")
+        else:
+            st.success(f"You have {len(favorites)} favorite articles:")
+            
+            # Display articles in a 3-column grid
+            for idx in range(0, len(favorites), 3):
+                cols = st.columns(3)
+                
+                for col_idx in range(3):
+                    if idx + col_idx < len(favorites):
+                        article = favorites[idx + col_idx]
+                        
+                        with cols[col_idx]:
+                            # Create a container for each article
+                            with st.container(border=True):
+                                # Display thumbnail from database
+                                image_name = article.get('image_name', 'Book-Blue.png')  # Default image if none specified
+                                st.image(f"assets/{image_name}", use_container_width=True)
+                                
+                                # Article title
+                                st.markdown(f"**{article.get('article_title', 'No Title')}**")
+                                
+                                # Source
+                                st.markdown(f"*{article.get('source', 'Unknown Source')}*")
+                                
+                                # Country code (if you want to show it)
+                                if article.get('country_code'):
+                                    st.caption(f"Country: {article['country_code']}")
+                                
+                                # Read more link
+                                if article.get('article_link'):
+                                    st.markdown(f"[Read article →]({article['article_link']})")
+                                
+                                # Unfavorite button - use index to make key unique
+                                if st.button(
+                                    "Remove from Favorites", 
+                                    key=f"remove_{article['id']}_{idx + col_idx}",
+                                    type="secondary",
+                                    use_container_width=True
+                                ):
+                                    # Call unfavorite API
+                                    unfav_url = f"http://host.docker.internal:4000/country/articles/favorite/{article['id']}?userID={userID}"
+                                    unfav_response = requests.delete(unfav_url)
+                                    
+                                    if unfav_response.status_code == 200:
+                                        st.success("Article removed from favorites!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to remove article from favorites")
+                                
+                                # Add spacing between articles
+                                st.divider()
+                                
     else:
-        st.error(
-            f"Error fetching Favorite Article data: {response.json().get('error', 'Unknown error')}"
-        )
-
-except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching favorites: Status {response.status_code}")
+        
+except Exception as e:
     st.error(f"Error connecting to the API: {str(e)}")
-    st.info("Please ensure the API server is running")
-
