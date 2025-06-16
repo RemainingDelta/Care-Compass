@@ -1,14 +1,8 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
 from backend.db_connection import db
-from mysql.connector import Error
-from flask import current_app
-from flask import make_response
-import numpy as np
 from backend.ml_models.cosine_similarity import get_similar
 from backend.ml_models.regression import dataframe
 from backend.ml_models.regression import predict
-from backend.ml_models.regression import autoreg_predict
-from backend.ml_models.regression import create_xy
 from backend.ml_models.regression import create_xy_full
 from backend.ml_models.regression import create_xy_select
 from backend.ml_models.regression import autoreg_train
@@ -163,7 +157,7 @@ def cosine(chosen_country, weights_dict):
     result = df.to_dict()
     return jsonify(result)
 
-# Test routes 
+# Future routes 
 # @ml.route("/cosine/<int:user_id>", methods=["GET"])
 # def cosine_for_user(user_id):
 #     try:

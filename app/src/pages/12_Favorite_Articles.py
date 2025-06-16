@@ -26,19 +26,46 @@ def get_random_thumbnail():
     # Assuming you are running streamlit from the `app/` root and images are in `app/src/assets/`
     return f"assets/{random.choice(names)}"
 
-userID = st.session_state["id"]
+st.write("Session keys:", list(st.session_state.keys()))
+st.write("Session values:", dict(st.session_state))
+
+if not st.session_state.get("authenticated"):
+    st.warning("You must be logged in to access this page.")
+    st.stop()
+
+# Try multiple fallback keys to get the user ID
+userID = (
+    st.session_state.get("user_id")
+    or st.session_state.get("id")
+    or st.session_state.get("user", {}).get("id")
+)
+
+if not userID:
+    st.warning("You must be logged in to view your favorite articles.")
+    st.stop()
+
 # fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite"
 fav_articles_URL = f"http://host.docker.internal:4000/country/articles/favorite?userID={userID}"
 
 # Confirm the structure
-st.write("userID from session:", st.session_state["id"])
+userID = st.session_state.get("user_id")
+st.write("userID from session:", userID)
+
+
 
 try:
     # Fetch Articles details
     response = requests.get(fav_articles_URL)
-
+    
     if response.status_code == 200:
-        favorites = response.json()
+        st.write("Raw response text:", response.text)
+        try:
+            favorites = response.json()
+        except Exception as e:
+            st.error("Could not parse JSON. Here's the raw response:")
+            st.code(response.text)
+            st.stop()
+
 
         cols = st.columns(3)
 
