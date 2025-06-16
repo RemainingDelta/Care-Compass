@@ -105,7 +105,7 @@ headers = {
 
 def fetch_user_preferences(user_id):
     try:
-        url = f"http://host.docker.internal:4000/users/users/{user_id}/preferences"
+        url = f"http://host.docker.internal:4000/users/{user_id}/preferences"
         response = requests.get(url, headers=headers, timeout=10)
         if response.status_code == 200:
             return response.json()
@@ -321,7 +321,7 @@ if submit:
     weights_dict_obj = weights_dict  # this is still a Python dict for saving to DB
     weights_dict = json.dumps(weights_dict)  # JSON string for similarity endpoint
     #Calculating Similarity 
-    api_url = f"http://host.docker.internal:4000/ml/ml/cosine/{chosen_country}/{weights_dict}"
+    api_url = f"http://host.docker.internal:4000/ml/cosine/{chosen_country}/{weights_dict}"
     response = requests.get(api_url, headers=headers, timeout=10)
     #print(response)
 
@@ -338,7 +338,7 @@ if submit:
             }
 
             try:
-                save_url = f"http://host.docker.internal:4000/users/users/{st.session_state['user_id']}/preferences"
+                save_url = f"http://host.docker.internal:4000/users/{st.session_state['user_id']}/preferences"
                 save_response = requests.put(save_url, json=preferences_payload, headers=headers, timeout=10)
                 if save_response.status_code == 200:
                     # st.success("Your preferences have been saved.")

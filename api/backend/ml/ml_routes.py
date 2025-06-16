@@ -23,7 +23,7 @@ ml = Blueprint("ml", __name__)
 
 #model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/ml/get_regression/<input>", methods=["GET"])
+@ml.route("/get_regression/<input>", methods=["GET"])
 def get_regression(input):
     inputs = [str(x.strip()) for x in input.split(',')]
     result = predict(dataframe(inputs[1]), inputs[0])
@@ -33,7 +33,7 @@ def get_regression(input):
 
 #model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/ml/get_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["GET"])
+@ml.route("/get_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["GET"])
 def get_autoregressive(chosen_country, data_code, chosen_year):
 
     cursor = db.get_db().cursor()
@@ -95,7 +95,7 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
 
 
 #Gets the cosine similarity numbers for the chosen country 
-@ml.route("/ml/cosine/<chosen_country>/<weights_dict>", methods=["GET"])
+@ml.route("/cosine/<chosen_country>/<weights_dict>", methods=["GET"])
 def cosine(chosen_country, weights_dict):
 # Get DB cursor
     cursor = db.get_db().cursor()

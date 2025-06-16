@@ -110,7 +110,7 @@ def process_and_plot_data(df_country, title, y_value):
 
 def display_data(data_code, y_value, title, chosen_country, chosen_year):
     """Fetch and display feature data"""
-    api_url = f"http://web-api:4000/ml/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
+    api_url = f"http://web-api:4000/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
     logger.info(f"Attempting to fetch data from: {api_url}")
     
     try:
