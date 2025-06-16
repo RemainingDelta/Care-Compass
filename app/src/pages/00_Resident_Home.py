@@ -26,3 +26,8 @@ if st.button('View Country Profiles',
              type='primary',
              use_container_width=True):
   st.switch_page('pages/02_Country_Profile.py')
+
+if st.button('View Favorited Articles', 
+             type='primary',
+             use_container_width=True):
+  st.switch_page('pages/12_Favorite_Articles.py')
