@@ -106,7 +106,43 @@ SideBarLinks()
 
 st.title("COUNTRY COMPARATOR")
 st.write("")
-st.write("")
+st.markdown("""
+<style>
+/* This targets all expanders and gives them a light green background */
+div[data-testid="stExpander"] > details > summary {
+    background-color: #d8f3dc;
+    color: #1b4332;
+    font-weight: 600;
+    border: 1px solid #95d5b2;
+    border-radius: 6px;
+    padding: 8px;
+}
+</style>
+""", unsafe_allow_html=True)
+with st.expander("ℹ️ How this page works"):
+    st.markdown("""
+    The Country Comparator lets you view and compare the health systems of up to **three countries** side by side.
+
+    ### Step-by-Step Guide:
+    1. **Select up to 3 countries** from the dropdowns.
+    2. Click **"Submit"** to generate a table of core healthcare features for each country.
+    3. Use the **feature tracking section** below to visualize how certain indicators change over time.
+
+    ### Data Sources:
+    All data comes from the **Global Health Security Index (GHSI)** and **WHO APIs**.
+
+    ### Features Included:
+    - **Life Expectancy (years)**
+    - **Infant Mortality Rate (%)**
+    - **Live Births per 1,000 population**
+    - **General Practitioners per 10,000 people**
+    - **Total Health Expenditure per Capita**
+    - **Impoverished Households due to Out-of-Pocket Payments**
+
+    ### How Forecasts Work:
+    Time-based visualizations are powered by **autoregressive forecasting models**.
+    These models use historical trends to predict values (like health expenditure or practitioner counts) up to the year **2035**.
+    """)
 
 
 
