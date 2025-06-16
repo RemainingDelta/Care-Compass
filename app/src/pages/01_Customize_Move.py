@@ -21,6 +21,8 @@ style_sidebar()
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
 
+
+
 # set the header of the page
 st.title('CUSTOMIZE YOUR MOVE!')
 
@@ -101,6 +103,34 @@ headers = {
     "Content-Type": "application/json"
 }
 
+def fetch_user_preferences(user_id):
+    try:
+        url = f"http://host.docker.internal:4000/users/users/{user_id}/preferences"
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Failed to fetch preferences: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"Exception while fetching preferences: {e}")
+        return None
+
+
+# Load saved preferences if user is signed in
+if 'user_id' in st.session_state:
+    prefs = fetch_user_preferences(st.session_state['user_id'])
+    if prefs:
+        weights_from_backend = {
+            "Prevention": prefs["preventionWeight"] / 100,
+            "Detection & Reporting": prefs["detectReportWeight"] / 100,
+            "Rapid Response": prefs["rapidRespWeight"] / 100,
+            "Health System": prefs["healthSysWeight"] / 100,
+            "International Norms Compliance": prefs["intlNormsWeight"] / 100,
+            "Risk Environment": prefs["riskEnvWeight"] / 100
+        }
+        st.session_state["initial_preferences"] = weights_from_backend
+
 # Fetch factor descriptions for tooltips
 factor_descriptions = {}
 
@@ -180,8 +210,13 @@ for i in range(6):
     
     # Set keys and defaults
     val_key = f"val_{i}"
+    factor = st.session_state.dragged_factors[i]
+    initial_weight = st.session_state.get("initial_preferences", {}).get(factor, None)
+
+    # If backend weight exists, set slider default based on it (scaled 0–10)
     if val_key not in st.session_state:
-        st.session_state[val_key] = 5  # Default slider/input value
+        st.session_state[val_key] = int(initial_weight * 10) if initial_weight is not None else 5
+
 
     slider_val = st.session_state[val_key]
 
