@@ -255,7 +255,7 @@ def favorite_articles():
         print("Type of data:", type(data))
 
         # Validate required fields
-        required_fields = ["articleID"]
+        required_fields = ["articleID", "userID"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -264,14 +264,11 @@ def favorite_articles():
 
         # Insert new article 
         query = """
-            INSERT INTO Favorites (articleID)
-            VALUES (%s)
-            """
+            INSERT INTO Favorites (articleID, userID)
+            VALUES (%s, %s)
+        """
+        cursor.execute(query, (data["articleID"], data["userID"]))
 
-        params = (data["articleID"],)
-        
-        cursor.execute(query,
-                       (data["articleID"],))
 
         db.get_db().commit()
         fav_article_id = cursor.lastrowid
@@ -289,7 +286,8 @@ def favorite_articles():
 @countries.route('/articles/favorite', methods=['GET'])
 def get_fav_articles():
     try:
-        cursor = db.get_db().cursor()
+        cursor = db.get_db().cursor(dictionary=True)
+
 
         userID = request.args.get("userID")
 
@@ -306,15 +304,17 @@ def get_fav_articles():
 
         articles = []
         # Get associated article info
+        print("Fetched favorites:", favorites)
         for article in favorites :
             articleID = article["articleID"]
-            cursor.execute("SELECT * FROM CountryArticles WHERE articleID = %s", (articleID,))
+            print("Trying to fetch article with ID:", articleID)
+            cursor.execute("SELECT * FROM CountryArticles WHERE id = %s", (articleID,))
             info = cursor.fetchone()
             if info:
-                articles.append(info)
+                articles.append(dict(info))
 
         cursor.close()
-        return jsonify(favorites), 200
+        return jsonify(articles), 200
     except Error as e:
         return jsonify({"error": str(e)}), 500
     

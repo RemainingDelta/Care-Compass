@@ -93,6 +93,7 @@ def SideBarLinks(show_home=False):
             ResidentHomeNav()
             CustomizeMoveNav()
             CountryProfNav()
+            FavoriteArticlesNav()
                 
 
         # If the user role is usaid worker, show the Api Testing page
@@ -100,7 +101,7 @@ def SideBarLinks(show_home=False):
             StudentHomeNav()
             CountryComparatorNav()
             CountryProfNav()
-            #FavoriteArticlesNav()
+            FavoriteArticlesNav()
 
 
 
