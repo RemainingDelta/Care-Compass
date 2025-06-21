@@ -83,10 +83,11 @@ CREATE TABLE Favorites(
 );
 
 DROP TABLE IF EXISTS Factors;
-CREATE TABLE Factors (
+CREATE TABLE Factors 
+(
     factorID INT AUTO_INCREMENT PRIMARY KEY,
     factor_code VARCHAR(50) UNIQUE NOT NULL,
-    factor_name VARCHAR(100)
+    factor_name VARCHAR(100),
     who_code VARCHAR(50),  
     table_name VARCHAR(50)
 );
@@ -106,6 +107,23 @@ CREATE TABLE regression_weights
     FOREIGN KEY (userID) REFERENCES Users(id),
     FOREIGN KEY (country) REFERENCES Countries(code),
     FOREIGN KEY (factorID) REFERENCES Factors(factorID)
+);
+
+DROP TABLE IF EXISTS autoreg_weights;
+CREATE TABLE autoreg_weights 
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    country VARCHAR(50),
+    factorID INT,
+    userID INT,
+    weight_vector JSON,
+    lag_years INT DEFAULT 10,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (country) REFERENCES Countries(code),
+    FOREIGN KEY (factorID) REFERENCES Factors(factorID),
+    FOREIGN KEY (userID) REFERENCES Users(id),
+    UNIQUE KEY unique_autoreg (country, factorID, userID)
 );
 
 DROP TABLE IF EXISTS cosine_weights;

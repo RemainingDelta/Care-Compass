@@ -423,4 +423,123 @@ def add_predict(df, preds, country):
    
 
  
-
+# Add this function to your regression.py
+def predict_using_stored_autoreg(country, factor_code, target_year, user_id):
+    """
+    Make predictions using stored autoregression weights
+    """
+    from backend.db_connection import db
+    import numpy as np
+    import json
+    
+    cursor = db.get_db().cursor()
+    
+    # Get stored weights
+    query = """
+        SELECT aw.weight_vector, f.table_name
+        FROM autoreg_weights aw
+        JOIN Factors f ON aw.factorID = f.factorID
+        WHERE aw.country = %s 
+        AND (f.factor_code = %s OR f.who_code = %s)
+        AND aw.userID = %s
+    """
+    cursor.execute(query, (country, factor_code, factor_code, user_id))
+    result = cursor.fetchone()
+    
+    if not result:
+        raise ValueError(f"No stored autoreg weights found for {country}, {factor_code}")
+    
+    # Convert JSON back to numpy array
+    weight_vector = np.array(json.loads(result['weight_vector']))
+    
+    # Handle potential shape issues - flatten if needed
+    if len(weight_vector.shape) > 1:
+        weight_vector = weight_vector.flatten()
+    
+    # Infer the number of countries from weight vector length
+    # weight_vector length = (country_num - 1) + 10
+    country_num = len(weight_vector) - 10 + 1
+    
+    table_name = result['table_name']
+    
+    # Get the country list to find the index
+    # We need to match the exact country ordering used in training
+    all_data_query = f"""
+        SELECT DISTINCT COUNTRY 
+        FROM {table_name}
+        WHERE COUNTRY IN (
+            SELECT DISTINCT COUNTRY 
+            FROM {table_name}
+            GROUP BY COUNTRY
+            HAVING COUNT(*) >= 11
+        )
+        ORDER BY COUNTRY
+    """
+    cursor.execute(all_data_query)
+    all_countries = cursor.fetchall()
+    country_list = [row['COUNTRY'] for row in all_countries]
+    
+    # Truncate to match the country_num used in training
+    country_list = country_list[:country_num]
+    
+    try:
+        country_index = country_list.index(country)
+    except ValueError:
+        raise ValueError(f"Country {country} not found in the trained model")
+    
+    # Get the last 10 values for this country/factor
+    data_query = f"""
+        SELECT YEAR, VALUE 
+        FROM {table_name}
+        WHERE COUNTRY = %s
+        ORDER BY YEAR DESC
+        LIMIT 10
+    """
+    cursor.execute(data_query, (country,))
+    recent_data = cursor.fetchall()
+    
+    if len(recent_data) < 10:
+        raise ValueError(f"Insufficient data for {country}. Need at least 10 historical values.")
+    
+    # Prepare data for prediction
+    recent_values = [float(row['VALUE']) for row in reversed(recent_data)]
+    last_year = int(recent_data[0]['YEAR'])
+    
+    # Calculate how many years to predict
+    years_to_predict = target_year - last_year
+    
+    if years_to_predict <= 0:
+        raise ValueError(f"Target year {target_year} must be after {last_year}")
+    
+    # Make predictions
+    predictions = []
+    test_vec_values = recent_values.copy()
+    
+    for i in range(years_to_predict):
+        # Create the full feature vector matching the training structure
+        # Structure: [country_dummy_1, ..., country_dummy_(n-1), lag_1, ..., lag_10]
+        test_vec = np.zeros(len(weight_vector))
+        
+        # Set the country dummy variable (countries 0 to n-2 get dummies)
+        if country_index < country_num - 1:
+            test_vec[country_index] = 1
+        
+        # Set the lag values (last 10 positions)
+        test_vec[-10:] = test_vec_values[-10:]
+        
+        # Make prediction
+        y_pred = np.dot(test_vec, weight_vector)
+        predictions.append(float(y_pred))
+        
+        # Update the lag values for next prediction
+        test_vec_values.append(y_pred)
+    
+    cursor.close()
+    
+    return {
+        'country': country,
+        'factor': factor_code,
+        'start_year': last_year + 1,
+        'target_year': target_year,
+        'predictions': predictions
+    }

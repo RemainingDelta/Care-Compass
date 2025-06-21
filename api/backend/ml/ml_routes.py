@@ -8,6 +8,7 @@ from backend.ml_models.regression import create_xy_select
 from backend.ml_models.regression import autoreg_train
 from backend.ml_models.regression import autoreg_predict_full
 from backend.ml_models.regression import add_predict
+from backend.ml_models.regression import predict_using_stored_autoreg
 import pandas as pd
 import json
 
@@ -15,34 +16,138 @@ import json
 
 ml = Blueprint("ml", __name__)
 
-#model calls post to put weights in database
-# adds new regression weight from model to database
+# Modified ml.py route for regression with storage
+
 @ml.route("/get_regression/<input>", methods=["GET"])
 def get_regression(input):
     inputs = [str(x.strip()) for x in input.split(',')]
     result = predict(dataframe(inputs[1]), inputs[0])
     print("Country received:", inputs[0])
+    
+    # NEW: Store regression weights in database
+    try:
+        cursor = db.get_db().cursor()
+        
+        # First, get the factorID for this data code
+        factor_query = """
+            SELECT factorID FROM Factors 
+            WHERE who_code = %s OR factor_code = %s
+        """
+        cursor.execute(factor_query, (inputs[1], inputs[1]))
+        factor_result = cursor.fetchone()
+        
+        if factor_result:
+            factor_id = factor_result['factorID']
+        else:
+            # If factor doesn't exist, create it
+            insert_factor = """
+                INSERT INTO Factors (factor_code, who_code, table_name) 
+                VALUES (%s, %s, %s)
+            """
+            # Map data codes to table names
+            table_mapping = {
+                'HFA_16': 'LiveBirths',
+                'HFA_570': 'HealthExpend',
+                'HLTHRES_67': 'GenPractitioners',
+                # Add other mappings as needed
+            }
+            table_name = table_mapping.get(inputs[1], 'Unknown')
+            cursor.execute(insert_factor, (inputs[1], inputs[1], table_name))
+            factor_id = cursor.lastrowid
+        
+        # Check if regression weights already exist for this country/factor/user
+        check_query = """
+            SELECT id FROM regression_weights 
+            WHERE country = %s AND factorID = %s AND userID = %s
+        """
+        # Assuming userID = 1 for now, modify as needed
+        user_id = 1
+        cursor.execute(check_query, (inputs[0], factor_id, user_id))
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Update existing weights
+            update_query = """
+                UPDATE regression_weights 
+                SET slope = %s, intercept = %s, mse = %s, r2 = %s
+                WHERE id = %s
+            """
+            cursor.execute(update_query, (
+                result['slope'], 
+                result['intercept'], 
+                result['mse'], 
+                result['r2'],
+                existing['id']
+            ))
+        else:
+            # Insert new weights
+            insert_query = """
+                INSERT INTO regression_weights 
+                (country, slope, intercept, mse, r2, factorID, userID)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, (
+                inputs[0],
+                result['slope'],
+                result['intercept'],
+                result['mse'],
+                result['r2'],
+                factor_id,
+                user_id
+            ))
+        
+        db.get_db().commit()
+        cursor.close()
+        
+    except Exception as e:
+        print(f"Error storing regression weights: {e}")
+        db.get_db().rollback()
 
     return jsonify(result)
+
+
+# NEW: Route to retrieve stored regression weights
+@ml.route("/get_stored_regression/<country>/<data_code>/<user_id>", methods=["GET"])
+def get_stored_regression(country, data_code, user_id):
+    try:
+        cursor = db.get_db().cursor()
+        
+        query = """
+            SELECT rw.slope, rw.intercept, rw.mse, rw.r2
+            FROM regression_weights rw
+            JOIN Factors f ON rw.factorID = f.factorID
+            WHERE rw.country = %s 
+            AND (f.factor_code = %s OR f.who_code = %s)
+            AND rw.userID = %s
+        """
+        cursor.execute(query, (country, data_code, data_code, user_id))
+        result = cursor.fetchone()
+        cursor.close()
+        
+        if result:
+            return jsonify(result)
+        else:
+            return jsonify({"error": "No stored weights found"}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 #model calls post to put weights in database
 # adds new regression weight from model to database
 @ml.route("/get_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["GET"])
 def get_autoregressive(chosen_country, data_code, chosen_year):
-
     cursor = db.get_db().cursor()
-    #print("the chosen year")
-    #print(chosen_year)
+    
+    # Get data based on data_code
     if data_code == 'HFA_16':
         query = """SELECT * FROM LiveBirths"""
     elif data_code == 'HFA_570':
         query = """SELECT * FROM HealthExpend"""
     elif data_code == 'HLTHRES_67':
         query = "SELECT * FROM GenPractitioners"
-    #print(query)
+    
     cursor.execute(query)
     rows = cursor.fetchall()
-    #print(rows)
 
     # Convert to DataFrame
     columns = ["COUNTRY", "YEAR", "VALUE"]
@@ -52,41 +157,153 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
         value_list.append(float(value))
     
     df["VALUE"] = value_list
-    #print("the chosen country")
-    #print(chosen_country)
-    #print("df")
-    #print(df)
     
     inputs = [chosen_country, data_code, chosen_year]
-    #xy = create_xy_full(dataframe(inputs[1]))
-    #df = dataframe(inputs[1])
-    #df_country = df[(df['COUNTRY'] == inputs[0])]
     df_country = df[df['COUNTRY'] == inputs[0]]
-    #print("df_country")
-    #print(df_country)
-    #print("df_country")
-    #print(df_country)
     df_filtered = df_country.reset_index(drop=True)
-    print("filtered dataframe")
-    print(df_filtered)
-    #print("df_filtered")
-    #print(df_filtered)
+    
     year = int(df_filtered.iloc[len(df_filtered) - 1]['YEAR'])
     years = int(inputs[2]) - year
-    #print("number of years")
-    #print(years)
+    
     input = create_xy_select(df, inputs[0])
     train = create_xy_full(df)
-    preds = autoreg_predict_full(input[0], input[1], autoreg_train(train[0], train[1]), years, train[2])
+    
+    # Get the weight vector from autoregression training
+    weight_vector = autoreg_train(train[0], train[1])
+    
+    # NEW: Store autoregression weights
+    try:
+        # Get factorID
+        factor_query = """
+            SELECT factorID FROM Factors 
+            WHERE who_code = %s OR factor_code = %s
+        """
+        cursor.execute(factor_query, (data_code, data_code))
+        factor_result = cursor.fetchone()
+        
+        if factor_result:
+            factor_id = factor_result['factorID']
+        else:
+            # Create factor if it doesn't exist
+            insert_factor = """
+                INSERT INTO Factors (factor_code, who_code, table_name) 
+                VALUES (%s, %s, %s)
+            """
+            table_mapping = {
+                'HFA_16': 'LiveBirths',
+                'HFA_570': 'HealthExpend',
+                'HLTHRES_67': 'GenPractitioners',
+            }
+            table_name = table_mapping.get(data_code, 'Unknown')
+            cursor.execute(insert_factor, (data_code, data_code, table_name))
+            factor_id = cursor.lastrowid
+        
+        user_id = 1  # Or get from session
+        
+        # Convert numpy array to list for JSON storage
+        weight_vector_list = weight_vector.flatten().tolist()
+        
+        # Check if autoreg weights exist
+        check_query = """
+            SELECT id FROM autoreg_weights 
+            WHERE country = %s AND factorID = %s AND userID = %s
+        """
+        cursor.execute(check_query, (chosen_country, factor_id, user_id))
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Update existing weights
+            update_query = """
+                UPDATE autoreg_weights 
+                SET weight_vector = %s
+                WHERE id = %s
+            """
+            cursor.execute(update_query, (
+                json.dumps(weight_vector_list),
+                existing['id']
+            ))
+        else:
+            # Insert new weights
+            insert_query = """
+                INSERT INTO autoreg_weights 
+                (country, factorID, userID, weight_vector)
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, (
+                chosen_country,
+                factor_id,
+                user_id,
+                json.dumps(weight_vector_list)
+            ))
+        
+        db.get_db().commit()
+        
+    except Exception as e:
+        print(f"Error storing autoregression weights: {e}")
+        db.get_db().rollback()
+    
+    # Continue with prediction
+    preds = autoreg_predict_full(input[0], input[1], weight_vector, years, train[2])
     result = add_predict(df_country, preds, input[0])
+    
+    cursor.close()
+    
     print("Country received:", inputs[0])
     result_final = result.to_json()
-    #result_final = result.to_dict()
-    #result_final = json.dumps(result_final)
     print("final data frame")
     print(result_final)
     return jsonify(result_final)
 
+
+# NEW: Route to retrieve stored autoregression weights
+@ml.route("/get_stored_autoreg/<country>/<data_code>/<user_id>", methods=["GET"])
+def get_stored_autoreg(country, data_code, user_id):
+    try:
+        cursor = db.get_db().cursor()
+        
+        query = """
+            SELECT aw.weight_vector
+            FROM autoreg_weights aw
+            JOIN Factors f ON aw.factorID = f.factorID
+            WHERE aw.country = %s 
+            AND (f.factor_code = %s OR f.who_code = %s)
+            AND aw.userID = %s
+        """
+        cursor.execute(query, (country, data_code, data_code, user_id))
+        result = cursor.fetchone()
+        cursor.close()
+        
+        if result:
+            weight_vector = json.loads(result['weight_vector'])
+            return jsonify({
+                'country': country,
+                'factor': data_code,
+                'weight_vector': weight_vector
+            })
+        else:
+            return jsonify({"error": "No stored weights found"}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@ml.route("/predict_autoreg_fast/<country>/<data_code>/<int:year>/<int:user_id>", methods=["GET"])
+def predict_autoreg_fast(country, data_code, year, user_id):
+    """
+    Fast prediction using stored autoregression weights
+    This actually USES the predict_using_stored_autoreg function you imported
+    """
+    try:
+        # This line actually uses the imported function!
+        result = predict_using_stored_autoreg(country, data_code, year, user_id)
+        return jsonify(result)
+    except ValueError as e:
+        # No stored weights found
+        return jsonify({
+            "error": str(e),
+            "message": "No stored weights found. Use /get_autoregressive/ to calculate and store weights first."
+        }), 404
+    except Exception as e:
+        return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
 
 #Gets the cosine similarity numbers for the chosen country 
 @ml.route("/cosine/<chosen_country>/<weights_dict>", methods=["GET"])

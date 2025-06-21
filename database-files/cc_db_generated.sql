@@ -202,12 +202,12 @@ INSERT INTO UserRoles(roleID,roleName) VALUES (1,"Student");
 INSERT INTO UserRoles(roleID,roleName) VALUES (2,"Policymaker");
 
 INSERT INTO Factors (factor_code, factor_name, who_code, table_name) VALUES
-('health_expend', 'Health Expenditure', 'HFA_570', 'HealthExpend'),
-('life_expect', 'Life Expectancy', 'HFA_67', 'LifeExpectancy'),
-('infant_mort', 'Infant Mortality', 'HFA_82', 'InfantMortality'),
-('gen_pract', 'General Practitioners', 'HLTHRES_67', 'GenPractitioners'),
-('live_births', 'Live Births', 'HFA_16', 'LiveBirths'),
-('impov_house', 'Impoverished Households', NULL, 'ImpoverishedHouse');
+('LIVE_BIRTHS', 'Live Births per 1000 Population', 'HFA_16', 'LiveBirths'),
+('LIFE_EXP', 'Life Expectancy at Birth', 'HFA_11', 'LifeExpectancy'),
+('GEN_PRACT', 'General Practitioners per 10,000', 'HLTHRES_67', 'GenPractitioners'),
+('HEALTH_EXP', 'Total Health Expenditure per Capita', 'HFA_570', 'HealthExpend'),
+('IMPOV_HOUSE', 'Impoverished Households (%)', 'WHO_IH', 'ImpoverishedHouse'),
+('INF_MORT', 'Infant Mortality Rate', 'HFA_15', 'InfantMortality');
 
 INSERT INTO Users(first_name,last_name,email,roleID,country) VALUES ('Vasili','Dennert','vdennert0@economist.com',1,'PRT');
 INSERT INTO Users(first_name,last_name,email,roleID,country) VALUES ('Charlena','Kliment','ckliment1@mtv.com',2,'JOR');
