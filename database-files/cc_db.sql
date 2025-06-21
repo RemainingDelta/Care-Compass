@@ -83,35 +83,12 @@ CREATE TABLE Favorites(
 );
 
 DROP TABLE IF EXISTS Factors;
-CREATE TABLE Factors
-(
-    factorID    INT PRIMARY KEY,
-    name        VARCHAR(50),
-    score       INT,
-    
-    FOREIGN KEY (score) REFERENCES OverallScore(scoreID)
-);
-
-DROP TABLE IF EXISTS score_project;
-CREATE TABLE score_project
-(
-    time    DATETIME,
-    targetScore     FLOAT primary key,
-    factorID        INT,
-    FOREIGN KEY (factorID) REFERENCES Factors(factorID)
-);
-
-
-DROP TABLE IF EXISTS comparator;
-CREATE TABLE comparator
-(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    country1  VARCHAR(50),
-    country2  VARCHAR(50),
-    country3 VARCHAR(50),
-    FOREIGN KEY (country1) REFERENCES Countries(code),
-    FOREIGN KEY (country2) REFERENCES Countries(code),
-    FOREIGN KEY (country3) REFERENCES Countries(code)
+CREATE TABLE Factors (
+    factorID INT AUTO_INCREMENT PRIMARY KEY,
+    factor_code VARCHAR(50) UNIQUE NOT NULL,
+    factor_name VARCHAR(100)
+    who_code VARCHAR(50),  
+    table_name VARCHAR(50)
 );
 
 DROP TABLE IF EXISTS regression_weights;
@@ -145,28 +122,6 @@ CREATE TABLE cosine_weights
     userID INT,
 
     FOREIGN KEY (userID) REFERENCES Users(id),
-    FOREIGN KEY (country) REFERENCES Countries(code)
-);
-
-DROP TABLE IF EXISTS regression_model_params;
-CREATE TABLE regression_model_params
-(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    year INT,
-    expenditure FLOAT,
-    country VARCHAR(50),
-    FOREIGN KEY (country) REFERENCES Countries(code)
-);
-
-DROP TABLE IF EXISTS train_test;
-CREATE TABLE train_test
-(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    train_x INT,
-    test_x INT,
-    train_y INT,
-    test_y INT,
-    country VARCHAR(50),
     FOREIGN KEY (country) REFERENCES Countries(code)
 );
 

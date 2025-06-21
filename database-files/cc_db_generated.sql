@@ -201,6 +201,14 @@ INSERT INTO UserRoles(roleID,roleName) VALUES (0,"Resident");
 INSERT INTO UserRoles(roleID,roleName) VALUES (1,"Student");
 INSERT INTO UserRoles(roleID,roleName) VALUES (2,"Policymaker");
 
+INSERT INTO Factors (factor_code, factor_name, who_code, table_name) VALUES
+('health_expend', 'Health Expenditure', 'HFA_570', 'HealthExpend'),
+('life_expect', 'Life Expectancy', 'HFA_67', 'LifeExpectancy'),
+('infant_mort', 'Infant Mortality', 'HFA_82', 'InfantMortality'),
+('gen_pract', 'General Practitioners', 'HLTHRES_67', 'GenPractitioners'),
+('live_births', 'Live Births', 'HFA_16', 'LiveBirths'),
+('impov_house', 'Impoverished Households', NULL, 'ImpoverishedHouse');
+
 INSERT INTO Users(first_name,last_name,email,roleID,country) VALUES ('Vasili','Dennert','vdennert0@economist.com',1,'PRT');
 INSERT INTO Users(first_name,last_name,email,roleID,country) VALUES ('Charlena','Kliment','ckliment1@mtv.com',2,'JOR');
 INSERT INTO Users(first_name,last_name,email,roleID,country) VALUES ('Jordanna','Foy','jfoy2@ca.gov',2,'RUS');
