@@ -4,9 +4,7 @@ import pandas as pd
 import streamlit as st
 from streamlit_extras.app_logo import add_logo
 import world_bank_data as wb
-#import matplotlib.pyplot as plt
 import numpy as np
-#import plotly.express as px
 from modules.nav import SideBarLinks
 import requests
 import json
@@ -14,111 +12,572 @@ from streamlit_sortables import sort_items
 import plotly.express as px 
 import plotly.graph_objects as go
 
-
 from modules.style import style_sidebar, set_background
 style_sidebar()
 
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
 
-
-
-# set the header of the page
-st.title('CUSTOMIZE YOUR MOVE!')
-
+# Custom CSS for modern styling
 st.markdown("""
     <style>
-    div[data-testid="sortable-item"] {
-        font-family: inherit;
-        font-weight: 500;
-        font-size: 1rem;
-        padding: 10px;
+    /* Main container styling */
+    .main {
+        background-color: #fafafa;
     }
+    
+    /* Header styling - clean and simple */
+    .page-header {
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        padding: 0;
+        line-height: 1.2;
+    }
+    
+    .page-subtitle {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.95;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Welcome section */
+    .welcome-box {
+        background: rgba(255, 255, 255, 0.6);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #097969;
+    }
+    
+    .welcome-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #097969;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Instructions card */
+    .instructions-card {
+        background: rgba(232, 245, 240, 0.8);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(9, 121, 105, 0.2);
+    }
+    
+    /* Expander styling */
+    div[data-testid="stExpander"] {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 12px;
+        border: 1px solid rgba(224, 224, 224, 0.5);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    div[data-testid="stExpander"] > details > summary {
+        background: linear-gradient(135deg, #f0fdf4 0%, #e8f5f0 100%);
+        color: #097969;
+        font-weight: 600;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    div[data-testid="stExpander"] > details > summary:hover {
+        background: linear-gradient(135deg, #e8f5f0 0%, #d8f3dc 100%);
+    }
+    
+    /* Section spacing */
+    .section-spacing {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Country selector styling */
+    .selector-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Drag and drop section */
+    .ranking-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .ranking-subtitle {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Sortable items styling */
+    div[data-testid="sortable-item"] {
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        cursor: move;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    div[data-testid="sortable-item"]:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.3);
+    }
+    
+    /* Weight adjustment section */
+    .weights-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+    }
+    
+    /* Individual weight item */
+    .weight-item {
+        background: rgba(255, 255, 255, 0.7);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(224, 224, 224, 0.7);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: visible !important;
+    }
+    
+    .weight-item:first-child {
+        margin-top: 0.5rem;
+        overflow: visible !important;
+    }
+    
+    .weight-item:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: #097969;
+        box-shadow: 0 2px 10px rgba(9, 121, 105, 0.1);
+    }
+    
+    /* Add stacking context to ensure tooltips appear above other elements */
+    .weight-label {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+        width: 100%;
+    }
+    
+    .factor-name {
+        position: relative;
+        cursor: help;
+        border-bottom: 1px dotted rgba(9, 121, 105, 0.5);
+        display: inline-block;
+        transition: all 0.2s ease;
+        padding-bottom: 1px;
+        font-weight: 600;
+    }
+    
+    .factor-name::after {
+        content: "ⓘ";
+        font-size: 0.75rem;
+        color: #097969;
+        margin-left: 3px;
+        opacity: 0.4;
+        transition: opacity 0.3s ease;
+        vertical-align: super;
+        font-weight: normal;
+    }
+    
+    .factor-name:hover {
+        color: #097969;
+        border-bottom-style: solid;
+    }
+    
+    .factor-name:hover::after {
+        opacity: 1;
+    }
+    
+    /* Tooltip styling */
+    .tooltip-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    /* Tooltip styling */
+    .tooltip-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .tooltip-text {
+        visibility: hidden;
+        background-color: #2c3e50;
+        color: white;
+        text-align: left;
+        padding: 12px 15px;
+        border-radius: 8px;
+        position: absolute;
+        z-index: 1000;
+        bottom: calc(100% + 10px);
+        left: 0;
+        min-width: 280px;
+        max-width: 350px;
+        font-size: 0.9rem;
+        font-weight: 400;
+        line-height: 1.5;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        opacity: 0;
+        transition: opacity 0.2s, transform 0.2s;
+        transform: translateY(5px);
+        white-space: normal;
+        pointer-events: none;
+    }
+    
+    .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 60px;
+        border-width: 6px;
+        border-style: solid;
+        border-color: #2c3e50 transparent transparent transparent;
+    }
+    
+    .tooltip-container:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+    
+    /* Adjust tooltip position for last 3 items to show below */
+    .weight-item:nth-last-child(-n+3) .tooltip-text {
+        bottom: auto;
+        top: calc(100% + 10px);
+    }
+    
+    .weight-item:nth-last-child(-n+3) .tooltip-text::after {
+        top: auto;
+        bottom: 100%;
+        border-color: transparent transparent #2c3e50 transparent;
+    }
+    
+    .rank-badge {
+        background: #097969;
+        color: white;
+        padding: 0.25rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        flex-shrink: 0;
+        min-width: 28px;
+        text-align: center;
+    }
+    
+    /* Slider styling */
+    .stSlider > div > div > div > div {
+        background: linear-gradient(90deg, #e8f5f0 0%, #097969 100%);
+    }
+    
+    .stSlider > div > div > div > div > div {
+        background: #097969;
+        border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* Results section */
+    .results-section {
+        padding: 2rem 0;
+        margin-top: 2rem;
+    }
+    
+    .results-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #097969;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    /* Submit button */
+    .stButton > button[type="primary"] {
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: 0.75rem 3rem;
+        border-radius: 30px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.3);
+        display: block;
+        margin: 2rem auto;
+    }
+    
+    .stButton > button[type="primary"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(9, 121, 105, 0.4);
+    }
+    
+    /* Toggle switch styling */
+    .stToggle > label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        font-size: 1.05rem;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #097969;
+    }
+    
+    /* Number input styling */
+    .stNumberInput > div > div > input {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    /* Success message */
+    .stSuccess {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    
+    /* Add visual indicators for priority levels */
+    .priority-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-left: auto;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    /* Ensure parent containers don't clip tooltips */
+    .element-container {
+        overflow: visible !important;
+    }
+    
+    [data-testid="column"] {
+        overflow: visible !important;
+    }
+    
+    .stHorizontalBlock {
+        overflow: visible !important;
+    }
+    
+    .priority-high { background: #28a745; }
+    .priority-medium { background: #ffc107; }
+    .priority-low { background: #dc3545; }
     </style>
 """, unsafe_allow_html=True)
 
-
-# You can access the session state to make a more customized/personalized app experience
-st.write(f"### Hi, {st.session_state['name']}.")
-st.write("Choose a country, and rank the healthcare factors in order of YOUR priority -- 1 being the highest and 6 the lowest. Then, you may adjust the weights accordingly.")
-st.write("")
-
+# Header
 st.markdown("""
-<style>
-/* This targets all expanders and gives them a light green background */
-div[data-testid="stExpander"] > details > summary {
-    background-color: #d8f3dc;
-    color: #1b4332;
-    font-weight: 600;
-    border: 1px solid #95d5b2;
-    border-radius: 6px;
-    padding: 8px;
-}
-</style>
+    <div class="page-header">
+        <h1 class="page-title">🏥 Customize Your Healthcare Journey</h1>
+        <div class="page-subtitle">Design your ideal healthcare system by prioritizing what matters most to you</div>
+    </div>
 """, unsafe_allow_html=True)
-with st.expander("ℹ️ How this tool works"):
+
+# Welcome message
+st.markdown(f"""
+    <div class="welcome-box">
+        <div class="welcome-name">Welcome back, {st.session_state.get('name', 'Guest')}! 👋</div>
+        <div>Let's find the perfect healthcare system that aligns with your priorities.</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Instructions
+st.markdown("""
+    <div class="instructions-card">
+        <strong>🎯 Quick Start Guide:</strong>
+        <ol style="margin: 0.5rem 0 0 1rem; padding-left: 1rem;">
+            <li>Select your current country from the dropdown</li>
+            <li>Drag and drop the healthcare factors to rank them (1 = most important)</li>
+            <li>Fine-tune the importance of each factor using the sliders</li>
+            <li>Click Submit to see your personalized recommendations!</li>
+        </ol>
+    </div>
+""", unsafe_allow_html=True)
+
+# How it works expander
+with st.expander("📚 Learn How This Tool Works"):
     st.markdown("""
-    This tool helps you explore and compare healthcare systems across countries based on **six core factors** from the Global Health Security Index:
-
-    - **Prevention**: Measures to prevent the emergence and spread of infectious diseases.
-    - **Detection and Reporting**: Capacity for early detection, testing, and transparent reporting of health threats.
-    - **Rapid Response**: Readiness and speed of response to outbreaks and emergencies.
-    - **Health System**: Availability, accessibility, and strength of healthcare infrastructure and services.
-    - **Compliance with International Norms**: Degree of compliance with WHO and other global health regulations.
-    - **Risk Environment**: The country's social, political, and environmental vulnerability to health threats.
-
-
-    ### How to Use:
-    1. **Select your country of origin**, which is factored into your final recommendations.
-    1. **Drag to Rank** the six factors in order of importance to you (1 = highest priority, 6 = lowest).
-    2. Use the **sliders next to each factor** to fine-tune the score for each factor.
-
-    ### How Rankings Are Generated:
-    - When you set the sliders, each one represents a **priority ranking from 1 to 6**.
-    - These are **mapped to a target score range** for each factor which you can adjust further with the sliders:
-        - **1 → 90–100**
-        - **2 → 70-90**
-        - **3 → 50-70**
-        - **4 → 30–50**
-        - **5 → 10-30**
-        - **6 → 0-10**  
-    - This creates a **target vector** that reflects your ideal health system profile.
-
-    - We then compute the **cosine similarity** between your vector and every country's actual scores (from normalized GHSI data).
-    - Countries are ranked based on how closely their health system profile **aligns with your priorities**.
-
-    ### Outputs:
-    - A **ranked list** of top 5 matching countries.
-    - An **heat map** showing compatibility scores visually.
+    ### 🔍 Understanding the Healthcare Factors
+    
+    This tool analyzes **six core dimensions** from the Global Health Security Index:
+    
+    **1. 🛡️ Prevention**  
+    Measures to prevent the emergence and spread of infectious diseases
+    
+    **2. 🔬 Detection & Reporting**  
+    Capacity for early detection, testing, and transparent reporting
+    
+    **3. ⚡ Rapid Response**  
+    Readiness and speed of response to health emergencies
+    
+    **4. 🏥 Health System**  
+    Quality and accessibility of healthcare infrastructure
+    
+    **5. 🌍 International Norms Compliance**  
+    Adherence to WHO and global health regulations
+    
+    **6. ⚠️ Risk Environment**  
+    Social, political, and environmental vulnerability factors
+    
+    ---
+    
+    ### 📊 How We Calculate Your Matches
+    
+    Your rankings are converted into a **priority score system**:
+    - **Rank 1** → 90-100 points (Highest priority)
+    - **Rank 2** → 70-90 points
+    - **Rank 3** → 50-70 points
+    - **Rank 4** → 30-50 points
+    - **Rank 5** → 10-30 points
+    - **Rank 6** → 0-10 points (Lowest priority)
+    
+    We use **cosine similarity** to find countries whose healthcare profiles best match your priorities!
     """)
 
+# Initialize session state
+if "factor_weights" not in st.session_state:
+    st.session_state.factor_weights = {}
+if "dragged_factors" not in st.session_state:
+    st.session_state.dragged_factors = [
+        "Prevention",
+        "Health System",
+        "Rapid Response",
+        "Detection & Reporting",
+        "International Norms Compliance",
+        "Risk Environment"
+    ]
+if "slot_weights" not in st.session_state:
+    st.session_state.slot_weights = [100 - i * 20 for i in range(6)]
 
-options = ["Prevention","Health System","Rapid Response","Detection & Reporting", 
-           "International Norms Compliance","Risk Environment"]
-
-
+# API setup
 headers = {
     "User-Agent": "Python/requests",
     "Accept": "application/json",
     "Content-Type": "application/json"
 }
 
-def fetch_user_preferences(user_id):
-    try:
-        url = f"http://host.docker.internal:4000/users/{user_id}/preferences"
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print(f"Failed to fetch preferences: {response.status_code}")
-            return None
-    except Exception as e:
-        print(f"Exception while fetching preferences: {e}")
-        return None
+# Fetch countries
+API_URL = "http://web-api:4000/country/countries"
+country_list = []
 
+try:
+    response = requests.get(API_URL, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    country_list = [item["name"] for item in data]
+except requests.exceptions.RequestException as e:
+    st.error("Failed to load countries. Please try again later.")
+    logger.error(f"API request failed: {e}")
 
-# Load saved preferences if user is signed in
+# Country selector section
+st.markdown('<div class="selector-title">🌍 Step 1: Select Your Current Country</div>', unsafe_allow_html=True)
+
+chosen_country = st.selectbox(
+    "Where are you currently located?",
+    country_list,
+    index=None,
+    placeholder="Choose a country...",
+    help="This helps us provide more relevant recommendations"
+)
+
+# Add spacing
+st.markdown('<div class="section-spacing"></div>', unsafe_allow_html=True)
+
+# Ranking section
+st.markdown('<div class="ranking-title">📊 Step 2: Rank Healthcare Factors by Importance</div>', unsafe_allow_html=True)
+st.markdown('<div class="ranking-subtitle">Drag to reorder - your top priority should be at the top!</div>', unsafe_allow_html=True)
+
+# Drag and drop interface
+st.session_state.dragged_factors = sort_items(
+    st.session_state.dragged_factors,
+    direction="vertical",
+    key="drag_order"
+)
+
+# Add spacing
+st.markdown('<div class="section-spacing"></div>', unsafe_allow_html=True)
+
+# Weight adjustment section
+st.markdown('<div class="weights-title">⚖️ Step 3: Fine-tune Your Priorities</div>', unsafe_allow_html=True)
+st.markdown('<p style="font-size: 0.9rem; color: #6c757d; margin-bottom: 0.5rem;">💡 Hover over factor names to see detailed descriptions</p>', unsafe_allow_html=True)
+
+# Fetch factor descriptions
+factor_descriptions = {}
+try:
+    response = requests.get("http://host.docker.internal:4000/country/factor_descriptions", headers=headers, timeout=10)
+    if response.status_code == 200:
+        data = response.json()
+        for item in data:
+            # Map factor names to their descriptions
+            key = item["name"].lower().replace(" ", "").replace("&", "and").strip()
+            factor_descriptions[key] = item["description"]
+            logger.info(f"Loaded description for: {key}")
+except Exception as e:
+    logger.error(f"Failed to fetch factor descriptions: {e}")
+
+# Load saved preferences if available
 if 'user_id' in st.session_state:
+    def fetch_user_preferences(user_id):
+        try:
+            url = f"http://host.docker.internal:4000/users/{user_id}/preferences"
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+            return None
+        except Exception as e:
+            logger.error(f"Exception while fetching preferences: {e}")
+            return None
+    
     prefs = fetch_user_preferences(st.session_state['user_id'])
     if prefs:
         weights_from_backend = {
@@ -131,96 +590,23 @@ if 'user_id' in st.session_state:
         }
         st.session_state["initial_preferences"] = weights_from_backend
 
-# Fetch factor descriptions for tooltips
-factor_descriptions = {}
-
-try:
-    response = requests.get("http://host.docker.internal:4000/country/factor_descriptions", headers=headers, timeout=10)
-    if response.status_code == 200:
-        
-        data = response.json()
-        for item in data:
-            # Normalize key for matching
-            key = item["name"].lower().replace(" ", "").replace("&", "and").strip()
-            print("Storing description for:", key)
-            factor_descriptions[key] = item["description"]
-except Exception as e:
-    print("Failed to fetch factor descriptions:", e)
-
-API_URL = "http://web-api:4000/country/countries"
-
-country_list = []
-
-try:
-    response = requests.get(API_URL, headers=headers)
-    response.raise_for_status()
-    data = response.json()
-
-    # Response is a list of country dicts
-    country_list = [item["name"] for item in data]
-
-    print("Countries:", country_list)
-
-except requests.exceptions.RequestException as e:
-    print("API request failed:", e)
-except (KeyError, TypeError) as e:
-    print("Unexpected response format:", e)
-
-# Select Country Dropdown
-chosen_country = st.selectbox("Select Current Country:", 
-                                country_list,
-                                index=None)
-#st.write("FRONTEND SELECTED COUNTRY", chosen_country)
-
-st.write("Drag to reorder factors (top = 1, bottom = 6)")
-
-factors = [
-    "Prevention",
-    "Health System",
-    "Rapid Response",
-    "Detection & Reporting",
-    "International Norms Compliance",
-    "Risk Environment"
-]
-
-# Persistent state
-if "factor_weights" not in st.session_state:
-    st.session_state.factor_weights = {factor: 100 - i * 20 for i, factor in enumerate(factors)}
-if "dragged_factors" not in st.session_state:
-    st.session_state.dragged_factors = factors.copy()
-
-# Show rank guidance
-st.session_state.dragged_factors = sort_items(
-    st.session_state.dragged_factors,
-    direction="vertical",
-    key="drag_order"
-)
-
-# Set default weights per slot, not per factor
-if "slot_weights" not in st.session_state:
-    st.session_state.slot_weights = [100 - i * 20 for i in range(6)]
-
-st.markdown("### Adjust the weight for each priority slot")
-
-slider_range = (1, 10)
-
-
+# Weight adjustment interface
 for i in range(6):
     factor = st.session_state.dragged_factors[i]
     
+    # Create weight item container
+    st.markdown(f'<div class="weight-item">', unsafe_allow_html=True)
+    
     # Set keys and defaults
     val_key = f"val_{i}"
-    factor = st.session_state.dragged_factors[i]
     initial_weight = st.session_state.get("initial_preferences", {}).get(factor, None)
-
-    # If backend weight exists, set slider default based on it (scaled 0–10)
+    
     if val_key not in st.session_state:
         st.session_state[val_key] = int(initial_weight * 10) if initial_weight is not None else 5
-
-
+    
     slider_val = st.session_state[val_key]
-
-    # Normalize tooltip key
+    
+    # Get tooltip
     tooltip_keys = {
         "prevention": "prevention",
         "healthsystem": "healthsystem",
@@ -231,44 +617,64 @@ for i in range(6):
     }
     lookup_key = tooltip_keys.get(factor.lower().replace(" ", "").strip(), "")
     desc = factor_descriptions.get(lookup_key, "")
-
-    # Layout: label + ℹ️ on left, slider + input on right
-    col_label, col_slider, col_input = st.columns([4, 5, 2])
+    
+    # Fallback descriptions if API doesn't provide them
+    if not desc:
+        fallback_descriptions = {
+            "Prevention": "Measures and policies to prevent the emergence and spread of infectious diseases",
+            "Health System": "The quality, accessibility, and robustness of healthcare infrastructure and services",
+            "Rapid Response": "The readiness and speed of response to health emergencies and outbreaks",
+            "Detection & Reporting": "Capacity for early detection, testing, and transparent reporting of health threats",
+            "International Norms Compliance": "Adherence to WHO regulations and global health standards",
+            "Risk Environment": "Social, political, and environmental factors that affect health vulnerability"
+        }
+        desc = fallback_descriptions.get(factor, f"Priority ranking for {factor}")
+    
+    # Layout - adjusted for better spacing
+    col_label, col_slider, col_input = st.columns([4.5, 5.5, 2])
     
     with col_label:
-        row = st.columns([5, 1])  # 5 parts label, 1 part icon
-        with row[0]:
-            st.markdown(f"**{i+1}. {factor}**")
-        with row[1]:
-            st.button("ℹ️", key=f"info_button_{i}", help=desc)
-
+        priority_class = "priority-high" if i < 2 else "priority-medium" if i < 4 else "priority-low"
+        # Create tooltip HTML - factor name stays visible, description in tooltip
+        tooltip_desc = desc if desc else f"Configure priority for {factor} in the healthcare system"
+        tooltip_html = f"""
+            <div class="weight-label">
+                <span class="rank-badge">{i+1}</span>
+                <div class="tooltip-container">
+                    <span class="factor-name">{factor}</span>
+                    <span class="tooltip-text">{tooltip_desc}</span>
+                </div>
+                <span class="priority-indicator {priority_class}"></span>
+            </div>
+        """
+        st.markdown(tooltip_html, unsafe_allow_html=True)
+    
     with col_slider:
         new_slider = st.slider(
-            label="",
+            label="Importance",
             min_value=0,
             max_value=10,
             value=slider_val,
             key=f"slider_{i}",
-            label_visibility="collapsed"
+            help=f"Adjust the importance of {factor}"
         )
-        
+    
     with col_input:
         new_input = st.number_input(
-            label="",
+            label="Value",
             min_value=0,
             max_value=10,
             value=slider_val,
             step=1,
-            key=f"input_{i}",
-            label_visibility="collapsed"
+            key=f"input_{i}"
         )
-
+    
     # Sync slider/input
     if new_input != st.session_state[val_key]:
         st.session_state[val_key] = new_input
     elif new_slider != st.session_state[val_key]:
         st.session_state[val_key] = new_slider
-
+    
     # Calculate weighted priority
     if i == 0:
         true_weight = 90 + st.session_state[val_key]
@@ -276,152 +682,183 @@ for i in range(6):
         true_weight = st.session_state[val_key]
     else:
         true_weight = 90 - 20 * i + 2 * st.session_state[val_key]
-
+    
     st.session_state.slot_weights[i] = true_weight
+    st.markdown('</div>', unsafe_allow_html=True)
 
-
-
-
-if i == 0:
-    true_weight = 90 + slider_val
-elif i == 5:
-    true_weight = slider_val
-else:
-    base = 90 - 20 * i
-    true_weight = base + 2 * slider_val
-
-st.session_state.slot_weights[i] = true_weight
-
+# Build weights dictionary
 weights_dict = {}
-# Output
-st.markdown("---")
-st.markdown("### Final Rankings & Slot Weights")
 for i in range(6):
     factor = st.session_state.dragged_factors[i]
     weight = st.session_state.slot_weights[i]
-    st.write(f"{i+1}. {factor}: {weight}")
     weights_dict[factor] = float(weight/100)
 
-#Put the weights in a table 
+# Add spacing before submit button
+st.markdown('<div class="section-spacing"></div>', unsafe_allow_html=True)
 
+# Submit button and visualization toggle
+col1, col2 = st.columns([1, 2])
+with col1:
+    submit = st.button("🚀 Find My Matches", type="primary", use_container_width=True)
+with col2:
+    on = st.toggle("Switch View: Bar Chart / World Map", help="Toggle between different visualization styles")
 
-submit = st.button("Submit", type="primary")
-on = st.toggle("Bar Chart / Gradient Map")
-bar_chart_display = pd.DataFrame()
-bar_chart_display['Country'] = []
-bar_chart_display['the_country_cosine'] = []
-bar_chart_display['the_country_dot_product'] = []
-sorted_df_similar = pd.DataFrame()
-sorted_df_similar['Country'] = []
-sorted_df_similar['the_country_cosine'] = []
-sorted_df_similar['the_country_dot_product'] = []
-if submit:
-    #GET THE WEIGHTS IN HERE 
-    # Save the weights in both dict and JSON formats
-    weights_dict_obj = weights_dict  # this is still a Python dict for saving to DB
-    weights_dict = json.dumps(weights_dict)  # JSON string for similarity endpoint
-    #Calculating Similarity 
-    api_url = f"http://host.docker.internal:4000/ml/cosine/{chosen_country}/{weights_dict}"
-    response = requests.get(api_url, headers=headers, timeout=10)
-    #print(response)
-
-    if response.status_code == 200:
-        # Save preferences to backend (if user is signed in)
-        if 'user_id' in st.session_state:
-            preferences_payload = {
-                "preventionWeight": weights_dict_obj.get("Prevention", 1.0) * 100,
-                "detectReportWeight": weights_dict_obj.get("Detection & Reporting", 1.0) * 100,
-                "rapidRespWeight": weights_dict_obj.get("Rapid Response", 1.0) * 100,
-                "healthSysWeight": weights_dict_obj.get("Health System", 1.0) * 100,
-                "intlNormsWeight": weights_dict_obj.get("International Norms Compliance", 1.0) * 100,
-                "riskEnvWeight": weights_dict_obj.get("Risk Environment", 1.0) * 100
-            }
-
-            try:
-                save_url = f"http://host.docker.internal:4000/users/{st.session_state['user_id']}/preferences"
-                save_response = requests.put(save_url, json=preferences_payload, headers=headers, timeout=10)
-                if save_response.status_code == 200:
-                    # st.success("Your preferences have been saved.")
-                    pass
+# Results processing
+if submit and chosen_country:
+    with st.spinner('🔍 Analyzing healthcare systems worldwide...'):
+        # Prepare weights
+        weights_dict_obj = weights_dict
+        weights_dict_json = json.dumps(weights_dict)
+        
+        # Call similarity API
+        api_url = f"http://host.docker.internal:4000/ml/cosine/{chosen_country}/{weights_dict_json}"
+        
+        try:
+            response = requests.get(api_url, headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                # Save preferences if user is logged in
+                if 'user_id' in st.session_state:
+                    preferences_payload = {
+                        "preventionWeight": weights_dict_obj.get("Prevention", 1.0) * 100,
+                        "detectReportWeight": weights_dict_obj.get("Detection & Reporting", 1.0) * 100,
+                        "rapidRespWeight": weights_dict_obj.get("Rapid Response", 1.0) * 100,
+                        "healthSysWeight": weights_dict_obj.get("Health System", 1.0) * 100,
+                        "intlNormsWeight": weights_dict_obj.get("International Norms Compliance", 1.0) * 100,
+                        "riskEnvWeight": weights_dict_obj.get("Risk Environment", 1.0) * 100
+                    }
+                    
+                    try:
+                        save_url = f"http://host.docker.internal:4000/users/{st.session_state['user_id']}/preferences"
+                        save_response = requests.put(save_url, json=preferences_payload, headers=headers, timeout=10)
+                        if save_response.status_code == 200:
+                            st.success("✅ Your preferences have been saved!")
+                    except Exception as e:
+                        logger.warning(f"Error saving preferences: {e}")
+                
+                # Process results
+                data = response.text
+                data_dict = json.loads(data)
+                df_similar = pd.DataFrame(data_dict)
+                sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
+                st.session_state['similar_df'] = sorted_df_similar
+                
+                # Display results
+                st.markdown('<div class="results-section">', unsafe_allow_html=True)
+                st.markdown('<div class="results-title">🎯 Your Top Healthcare Matches</div>', unsafe_allow_html=True)
+                
+                # Show top 5 matches
+                top_matches = sorted_df_similar[1:6]  # Exclude the selected country itself
+                
+                for idx, (_, row) in enumerate(top_matches.iterrows(), 1):
+                    match_score = row['the_country_cosine']
+                    match_percentage = f"{match_score * 100:.1f}%"
+                    
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.markdown(f"**{idx}. {row['Country']}**")
+                    with col2:
+                        st.metric("Match", match_percentage, delta=None)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+                # Visualization
+                if on and 'similar_df' in st.session_state:
+                    # World map visualization
+                    country_url = "http://host.docker.internal:4000/country/countries"
+                    try:
+                        response = requests.get(country_url, headers=headers, timeout=10)
+                        response.raise_for_status()
+                        data = response.json()
+                        df_country_and_code = pd.DataFrame(data)
+                        
+                        # Add country names
+                        add_names = []
+                        for _, row in df_country_and_code.iterrows():
+                            for _, row2 in sorted_df_similar.iterrows():
+                                if row['code'] == row2['Country']:
+                                    add_names.append(row['name'])
+                        
+                        sorted_df_similar['name'] = add_names
+                        
+                        # Create choropleth map
+                        fig1 = px.choropleth(
+                            sorted_df_similar,
+                            locations='Country',
+                            locationmode='ISO-3',
+                            color='the_country_cosine',
+                            color_continuous_scale="Viridis",
+                            range_color=(0.7, 1),
+                            scope='world',
+                            labels={'the_country_cosine': 'Similarity Score'},
+                            title='Healthcare System Compatibility Map'
+                        )
+                        
+                        fig1.update_geos(
+                            showcountries=True,
+                            showcoastlines=True,
+                            showland=True,
+                            fitbounds="locations"
+                        )
+                        
+                        fig1.update_layout(
+                            margin={"r":0,"t":50,"l":0,"b":0},
+                            height=600,
+                            title_font_size=20,
+                            title_font_color="#097969"
+                        )
+                        
+                        st.plotly_chart(fig1, use_container_width=True)
+                        
+                    except Exception as e:
+                        logger.error(f"Map visualization error: {e}")
+                
                 else:
-                    st.warning(f"Could not save preferences: {save_response.status_code}")
-            except Exception as e:
-                st.warning(f"Error saving preferences: {e}")
-        data = response.text  
-        #st.success("It worked!")
-        data_dict = json.loads(data)
-        df_similar = pd.DataFrame(data_dict)
-        sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
-        #st.write(f"Here are the countries most similar to: {chosen_country}")
-        #st.dataframe(sorted_df_similar.head(10)) 
-        #st.write(f"Here are the countries least similar to: {chosen_country}")
-        #st.dataframe(sorted_df_similar.tail(10)) 
-        bar_chart_display = sorted_df_similar[1:6]
-        st.session_state['similar_df'] = sorted_df_similar
-    else:
-        st.error(response.status_code)
-        st.error("No data for the country available")
-if on and chosen_country is not None:
-    country_url = "http://host.docker.internal:4000/country/countries"  
-    try:
-        headers = {
-        "User-Agent": "Python/requests",
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-        }
-        response = requests.get(country_url, headers=headers, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        df_country_and_code = pd.DataFrame(data)
-        #print(df_country_and_code)
-        if 'similar_df' in st.session_state:
-            sorted_df_similar = st.session_state['similar_df']
+                    # Bar chart visualization
+                    bar_chart_display = sorted_df_similar[1:6]
+                    
+                    fig = px.bar(
+                        bar_chart_display,
+                        x='Country',
+                        y='the_country_cosine',
+                        color='the_country_cosine',
+                        color_continuous_scale="Viridis",
+                        labels={'the_country_cosine': 'Similarity Score'},
+                        title="Top 5 Healthcare System Matches"
+                    )
+                    
+                    fig.update_yaxes(range=[0.85, 1])
+                    fig.update_layout(
+                        xaxis_title="Country",
+                        yaxis_title="Similarity Score",
+                        showlegend=False,
+                        height=500,
+                        title_font_size=20,
+                        title_font_color="#097969"
+                    )
+                    
+                    # Add value labels on bars
+                    fig.update_traces(
+                        texttemplate='%{y:.3f}',
+                        textposition='outside'
+                    )
+                    
+                    st.plotly_chart(fig, use_container_width=True)
+                
+            else:
+                st.error("😔 Unable to process your request. Please try again.")
+                
+        except Exception as e:
+            st.error("🚫 Connection error. Please check your internet and try again.")
+            logger.error(f"API error: {e}")
 
-        add_names = []
-        for index, row in df_country_and_code.iterrows():
-            for index2, row2 in sorted_df_similar.iterrows():
-                if row['code'] == row2['Country']:
-                    add_names.append(row['name'])
-        sorted_df_similar['name'] = add_names
-        #print("THIS IS MY DATAFRAME INSIDE: ", sorted_df_similar)
-        print("THIS IS MY DATAFRAME:", sorted_df_similar)
-        fig1 = px.choropleth(
-            sorted_df_similar,
-            locations='Country',  # Column with country names/codes
-            locationmode='ISO-3',  
-            color='the_country_cosine',  # Column with similarity scores
-            color_continuous_scale="Viridis",
-            range_color=(-1, 1),  # Adjusted range to better show differences (since most scores are >0.95)
-            scope='world',
-            labels={'the_country_cosine': 'Similarity Score'},
-            title='Country Similarity Scores (World)'
-        )
+elif submit and not chosen_country:
+    st.warning("⚠️ Please select your current country before submitting!")
 
-        # Update layout for better display
-        fig1.update_geos(showcountries=True, showcoastlines=True, showland=True)
-        fig1.update_layout(margin={"r":0,"t":30,"l":0,"b":0})
-
-        st.plotly_chart(fig1, use_container_width=True)
-    except requests.exceptions.RequestException as e:
-        print("API request failed:", e)
-
-elif not on and chosen_country is not None: 
-    # Create the bar chart with individual bar colors
-    fig = px.bar(bar_chart_display,
-                    x='Country',
-                    y='the_country_cosine',
-                    color='Country',  
-                    color_discrete_sequence=px.colors.qualitative.Set2 
-                )
-
-    fig.update_yaxes(range=[0.90, 1])
-    # Customize axes labels and layout
-    fig.update_layout(
-        xaxis_title="Country",
-        yaxis_title="Similarity Score"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-
-
+# Footer
+st.markdown("---")
+st.markdown("""
+    <div style="text-align: center; color: #6c757d; padding: 1rem;">
+        <small>💡 Tip: Your preferences are automatically saved when you submit!</small>
+    </div>
+""", unsafe_allow_html=True)
