@@ -201,7 +201,7 @@ INSERT INTO UserRoles(roleID,roleName) VALUES (0,"Resident");
 INSERT INTO UserRoles(roleID,roleName) VALUES (1,"Student");
 INSERT INTO UserRoles(roleID,roleName) VALUES (2,"Policymaker");
 
-INSERT INTO Factors (factor_code, factor_name, who_code, table_name) VALUES
+INSERT INTO RegressionFactors (factor_code, factor_name, who_code, table_name) VALUES
 ('LIVE_BIRTHS', 'Live Births per 1000 Population', 'HFA_16', 'LiveBirths'),
 ('LIFE_EXP', 'Life Expectancy at Birth', 'HFA_11', 'LifeExpectancy'),
 ('GEN_PRACT', 'General Practitioners per 10,000', 'HLTHRES_67', 'GenPractitioners'),

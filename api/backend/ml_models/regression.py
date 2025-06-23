@@ -437,8 +437,8 @@ def predict_using_stored_autoreg(country, factor_code, target_year, user_id):
     # Get stored weights
     query = """
         SELECT aw.weight_vector, f.table_name
-        FROM autoreg_weights aw
-        JOIN Factors f ON aw.factorID = f.factorID
+        FROM AutoregWeights aw
+        JOIN RegressionFactors f ON aw.factorID = f.factorID
         WHERE aw.country = %s 
         AND (f.factor_code = %s OR f.who_code = %s)
         AND aw.userID = %s

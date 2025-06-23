@@ -82,8 +82,8 @@ CREATE TABLE Favorites(
     FOREIGN KEY (userID) REFERENCES Users(id)
 );
 
-DROP TABLE IF EXISTS Factors;
-CREATE TABLE Factors 
+DROP TABLE IF EXISTS RegressionFactors;
+CREATE TABLE RegressionFactors 
 (
     factorID INT AUTO_INCREMENT PRIMARY KEY,
     factor_code VARCHAR(50) UNIQUE NOT NULL,
@@ -92,8 +92,8 @@ CREATE TABLE Factors
     table_name VARCHAR(50)
 );
 
-DROP TABLE IF EXISTS regression_weights;
-CREATE TABLE regression_weights
+DROP TABLE IF EXISTS RegressionWeights;
+CREATE TABLE RegressionWeights
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
     country VARCHAR(50),
@@ -106,11 +106,11 @@ CREATE TABLE regression_weights
 
     FOREIGN KEY (userID) REFERENCES Users(id),
     FOREIGN KEY (country) REFERENCES Countries(code),
-    FOREIGN KEY (factorID) REFERENCES Factors(factorID)
+    FOREIGN KEY (factorID) REFERENCES RegressionFactors(factorID)
 );
 
-DROP TABLE IF EXISTS autoreg_weights;
-CREATE TABLE autoreg_weights 
+DROP TABLE IF EXISTS AutoregWeights;
+CREATE TABLE AutoregWeights 
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
     country VARCHAR(50),
@@ -121,7 +121,7 @@ CREATE TABLE autoreg_weights
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (country) REFERENCES Countries(code),
-    FOREIGN KEY (factorID) REFERENCES Factors(factorID),
+    FOREIGN KEY (factorID) REFERENCES RegressionFactors(factorID),
     FOREIGN KEY (userID) REFERENCES Users(id),
     UNIQUE KEY unique_autoreg (country, factorID, userID)
 );
@@ -187,8 +187,8 @@ CREATE TABLE InfantMortality(
     FOREIGN KEY (COUNTRY) REFERENCES Countries(code)
 );
 
-DROP TABLE IF EXISTS cosine_weights;
-CREATE TABLE cosine_weights(
+DROP TABLE IF EXISTS CosineWeights;
+CREATE TABLE CosineWeights(
     id INT AUTO_INCREMENT PRIMARY KEY,
     userID INT,
     preventionWeight FLOAT DEFAULT 0.0,
