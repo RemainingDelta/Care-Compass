@@ -288,12 +288,6 @@ st.markdown("""
         align-items: center;
     }
     
-    /* Center all content within columns */
-    .element-container {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-    }
     [data-testid="column"] {
         display: flex;
         flex-direction: column;
@@ -301,7 +295,8 @@ st.markdown("""
     }
     
     [data-testid="column"] > div {
-        width: 100%;
+        width: 100% !important;
+        max-width: none !important;
     }
     </style>
 """, unsafe_allow_html=True)
