@@ -210,7 +210,7 @@ st.markdown("""
 # Hero Section
 st.markdown(f"""
     <div class="hero-container">
-        <h1 class="hero-title" style="color: white !important;">Welcome back, {st.session_state.get('name', 'Resident')}! 🌿</h1>
+        <h1 class="hero-title" style="color: white !important;">Welcome back, {st.session_state.get('name', 'Resident')}! 🏠</h1>
         <p class="hero-subtitle" style="color: white !important;">Your personalized healthcare relocation assistant is ready to help you today</p>
     </div>
 """, unsafe_allow_html=True)
