@@ -30,7 +30,7 @@ def get_regression(input):
         
         # First, get the factorID for this data code
         factor_query = """
-            SELECT factorID FROM Factors 
+            SELECT factorID FROM RegressionFactors 
             WHERE who_code = %s OR factor_code = %s
         """
         cursor.execute(factor_query, (inputs[1], inputs[1]))
@@ -41,7 +41,7 @@ def get_regression(input):
         else:
             # If factor doesn't exist, create it
             insert_factor = """
-                INSERT INTO Factors (factor_code, who_code, table_name) 
+                INSERT INTO RegressionFactors (factor_code, who_code, table_name) 
                 VALUES (%s, %s, %s)
             """
             # Map data codes to table names
@@ -57,7 +57,7 @@ def get_regression(input):
         
         # Check if regression weights already exist for this country/factor/user
         check_query = """
-            SELECT id FROM regression_weights 
+            SELECT id FROM RegressionWeights 
             WHERE country = %s AND factorID = %s AND userID = %s
         """
         # Assuming userID = 1 for now, modify as needed
@@ -68,7 +68,7 @@ def get_regression(input):
         if existing:
             # Update existing weights
             update_query = """
-                UPDATE regression_weights 
+                UPDATE RegressionWeights 
                 SET slope = %s, intercept = %s, mse = %s, r2 = %s
                 WHERE id = %s
             """
@@ -82,7 +82,7 @@ def get_regression(input):
         else:
             # Insert new weights
             insert_query = """
-                INSERT INTO regression_weights 
+                INSERT INTO RegressionWeights 
                 (country, slope, intercept, mse, r2, factorID, userID)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
@@ -114,8 +114,8 @@ def get_stored_regression(country, data_code, user_id):
         
         query = """
             SELECT rw.slope, rw.intercept, rw.mse, rw.r2
-            FROM regression_weights rw
-            JOIN Factors f ON rw.factorID = f.factorID
+            FROM RegressionWeights rw
+            JOIN RegressionFactors f ON rw.factorID = f.factorID
             WHERE rw.country = %s 
             AND (f.factor_code = %s OR f.who_code = %s)
             AND rw.userID = %s
@@ -175,7 +175,7 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
     try:
         # Get factorID
         factor_query = """
-            SELECT factorID FROM Factors 
+            SELECT factorID FROM RegressionFactors 
             WHERE who_code = %s OR factor_code = %s
         """
         cursor.execute(factor_query, (data_code, data_code))
@@ -186,7 +186,7 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
         else:
             # Create factor if it doesn't exist
             insert_factor = """
-                INSERT INTO Factors (factor_code, who_code, table_name) 
+                INSERT INTO RegressionFactors (factor_code, who_code, table_name) 
                 VALUES (%s, %s, %s)
             """
             table_mapping = {
@@ -205,7 +205,7 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
         
         # Check if autoreg weights exist
         check_query = """
-            SELECT id FROM autoreg_weights 
+            SELECT id FROM AutoregWeights 
             WHERE country = %s AND factorID = %s AND userID = %s
         """
         cursor.execute(check_query, (chosen_country, factor_id, user_id))
@@ -214,7 +214,7 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
         if existing:
             # Update existing weights
             update_query = """
-                UPDATE autoreg_weights 
+                UPDATE AutoregWeights 
                 SET weight_vector = %s
                 WHERE id = %s
             """
@@ -225,7 +225,7 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
         else:
             # Insert new weights
             insert_query = """
-                INSERT INTO autoreg_weights 
+                INSERT INTO AutoregWeights 
                 (country, factorID, userID, weight_vector)
                 VALUES (%s, %s, %s, %s)
             """
@@ -263,8 +263,8 @@ def get_stored_autoreg(country, data_code, user_id):
         
         query = """
             SELECT aw.weight_vector
-            FROM autoreg_weights aw
-            JOIN Factors f ON aw.factorID = f.factorID
+            FROM AutoregWeights aw
+            JOIN RegressionFactors f ON aw.factorID = f.factorID
             WHERE aw.country = %s 
             AND (f.factor_code = %s OR f.who_code = %s)
             AND aw.userID = %s
@@ -388,7 +388,7 @@ def cosine(chosen_country, weights_dict):
 #                 healthSysWeight,
 #                 intlNormsWeight,
 #                 riskEnvWeight
-#             FROM cosine_weights WHERE userID = %s
+#             FROM CosineWeights WHERE userID = %s
 #         """, (user_id,))
 #         row = cursor.fetchone()
 
