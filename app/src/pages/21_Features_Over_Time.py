@@ -15,9 +15,6 @@ from modules.style import style_sidebar
 import time
 from datetime import datetime, date
 
-
-
-
 # Constants for feature configurations
 FEATURES = {
     "live_births": {
@@ -310,24 +307,94 @@ def display_data_with_loading(data_code, y_value, title, chosen_country, chosen_
 st.set_page_config(
     layout='wide', 
     page_title="Healthcare Features Over Time",
-    page_icon="🏥"
+    page_icon="📈"
 )
 style_sidebar()
 SideBarLinks()
 
-# Use full width for main content
-main_container = st.container()
-
-with main_container:
-    # Page Title and Description
-    st.title('🏥 FEATURES OVER TIME')
-    st.write("Explore historical trends and future projections for key healthcare indicators.")
-
-    # Custom CSS for better styling and full width
-    # Replace your CSS section with this more aggressive version:
-
-    st.markdown("""
+# Custom CSS for modern styling - combining existing styles with new header styles
+st.markdown("""
     <style>
+    /* Main container styling */
+    .main {
+        background-color: #fafafa;
+    }
+    
+    /* Header styling - clean and simple */
+    .page-header {
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        padding: 0;
+        line-height: 1.2;
+    }
+    
+    .page-subtitle {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.95;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Welcome section */
+    .welcome-box {
+        background: rgba(255, 255, 255, 0.6);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #097969;
+    }
+    
+    .welcome-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #097969;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Instructions card */
+    .instructions-card {
+        background: rgba(232, 245, 240, 0.8);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(9, 121, 105, 0.2);
+    }
+    
+    /* Expander styling */
+    div[data-testid="stExpander"] {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 12px;
+        border: 1px solid rgba(224, 224, 224, 0.5);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    div[data-testid="stExpander"] > details > summary {
+        background: linear-gradient(135deg, #f0fdf4 0%, #e8f5f0 100%);
+        color: #097969;
+        font-weight: 600;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    div[data-testid="stExpander"] > details > summary:hover {
+        background: linear-gradient(135deg, #e8f5f0 0%, #d8f3dc 100%);
+    }
+    
     /* Force main container to use almost full width */
     .main .block-container {
         max-width: 98% !important;
@@ -356,22 +423,23 @@ with main_container:
         flex: 1 1 100% !important;
     }
 
-    /* Style expander */
-    div[data-testid="stExpander"] > details > summary {
-        background-color: #d8f3dc;
-        color: #1b4332;
-        font-weight: 600;
-        border: 1px solid #95d5b2;
-        border-radius: 6px;
-        padding: 8px;
-    }
-
     /* Button styling */
     .stButton > button {
         width: 100%;
         height: 60px;
         font-size: 16px;
         font-weight: 500;
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        border-radius: 30px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(9, 121, 105, 0.4);
     }
 
     /* Metrics in row */
@@ -382,34 +450,129 @@ with main_container:
         padding: 0.5rem 1rem;
         margin: 0.25rem;
     }
+    
+    /* Section headers */
+    .section-header {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #097969;
+    }
+    
+    /* Date input styling */
+    .stDateInput > div > div > input {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stDateInput > div > div > input:hover {
+        border-color: #097969;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    with st.expander("ℹ️ How this tool works"):
-        st.markdown("""
-        ### 🎯 What It Does:
-        This tool uses **autoregressive modeling** to predict future healthcare trends based on historical patterns.
-        
-        ### 📊 Available Indicators:
-        - **Live Births per 1,000 Population** - Population growth trends
-        - **General Practitioners per 10,000 People** - Healthcare workforce availability
-        - **Total Health Expenditure per Capita** - Healthcare spending patterns
-        
-        ### 🚀 Performance Features:
-        - **Smart Caching**: Predictions are cached for 1 hour to improve speed
-        - **Fast Predictions**: Uses pre-calculated models when available
-        - **Fallback Mode**: Automatically recalculates if no stored model exists
-        
-        ### 📈 How to Use:
-        1. Select a country and target year
-        2. Click on an indicator to view its trend
-        3. Blue line = historical data, Red dashed line = predictions
-        4. Download the data as CSV for further analysis
-        """)
+# Header
+st.markdown("""
+    <div class="page-header">
+        <h1 class="page-title">📈 Healthcare Trends Over Time</h1>
+        <div class="page-subtitle">Visualize historical data and future projections for key healthcare indicators</div>
+    </div>
+""", unsafe_allow_html=True)
 
-    # Spacer
-    st.write("")
+# Welcome message
+st.markdown(f"""
+    <div class="welcome-box">
+        <div class="welcome-name">Welcome back, {st.session_state.get('name', 'Guest')}! 👋</div>
+        <div>Explore how healthcare metrics have evolved and where they're heading in the future.</div>
+    </div>
+""", unsafe_allow_html=True)
 
+# Quick Start Guide
+st.markdown("""
+    <div class="instructions-card">
+        <strong>🎯 Quick Start Guide:</strong>
+        <ol style="margin: 0.5rem 0 0 1rem; padding-left: 1rem;">
+            <li>Select a country from the dropdown menu</li>
+            <li>Choose your target year for projections (up to 2100)</li>
+            <li>Click on any healthcare indicator button to see its trend</li>
+            <li>Download the data as CSV for further analysis</li>
+        </ol>
+    </div>
+""", unsafe_allow_html=True)
+
+# How it works expander
+with st.expander("📚 Learn How This Tool Works"):
+    st.markdown("""
+    ### 🔍 Understanding Healthcare Trend Analysis
+    
+    This tool uses advanced statistical modeling to analyze and predict healthcare trends.
+    
+    ---
+    
+    ### 📊 Available Healthcare Indicators
+    
+    **Live Births per 1,000 Population** 👶  
+    Track population growth trends and birth rate changes over time
+    
+    **General Practitioners per 10,000 People** 👨‍⚕️  
+    Monitor the availability of primary healthcare providers
+    
+    **Total Health Expenditure per Capita** 💰  
+    Analyze healthcare spending patterns and future budget needs
+    
+    ---
+    
+    ### 🤖 Our Forecasting Technology
+    
+    **Autoregressive Models**  
+    - Uses historical patterns to predict future values
+    - Accounts for trends, seasonality, and country-specific factors
+    - Provides reliable estimates based on WHO and GHSI data
+    
+    **Smart Performance Features**  
+    - **Intelligent Caching**: Predictions stored for 1 hour
+    - **Fast Mode**: Pre-calculated models when available
+    - **Automatic Fallback**: Recalculates if needed
+    
+    ---
+    
+    ### 📈 How to Read the Charts
+    
+    - **Blue Line with Markers**: Historical data (actual measurements)
+    - **Red Dashed Line**: Predicted future values
+    - **Vertical Gray Line**: Shows where predictions begin
+    - **Trend Indicator**: Shows if values are increasing (↑) or decreasing (↓)
+    
+    ---
+    
+    ### 💡 Pro Tips
+    - Hover over data points to see exact values
+    - Look for the R² value to assess prediction reliability
+    - Download data for custom analysis in Excel or other tools
+    """)
+
+# Use full width for main content
+main_container = st.container()
+
+with main_container:
     # Fetch Countries
     try:
         country_list, code_list, country_code_list = fetch_countries("http://web-api:4000/country/countries")
@@ -418,7 +581,9 @@ with main_container:
         st.error("Failed to load country data. Please try again later.")
         country_list, code_list, country_code_list = [], [], []
 
-    # User Input Section - Keep in columns but ensure they don't constrain the chart
+    # User Input Section
+    st.markdown('<div class="section-header">🌐 Step 1: Select Country and Target Year</div>', unsafe_allow_html=True)
+    
     input_container = st.container()
     with input_container:
         col1, col2 = st.columns(2)
@@ -427,27 +592,27 @@ with main_container:
                 "🌍 Select Country:",
                 country_code_list,
                 index=None,
-                placeholder="Select Country ..."
+                placeholder="Choose a country...",
+                help="Select the country you want to analyze"
             )
 
         with col2:
             end_date = st.date_input(
-                "📅 Target Year:", 
+                "📅 Target Year for Projections:", 
                 value=date.today(),
                 min_value=pd.to_datetime("2024-01-01"),
-                max_value=pd.to_datetime("2100-01-01")
+                max_value=pd.to_datetime("2100-01-01"),
+                help="How far into the future do you want to project?"
             )
 
     # Process Inputs
     chosen_year = end_date.year if end_date else None
     
-    # Replace your current button handling and display section with this:
-
     if chosen_country2:
         chosen_country = chosen_country2[chosen_country2.index('-')+1:]
         
         st.write("")
-        st.subheader("📊 Select Healthcare Indicator to Analyze")
+        st.markdown('<div class="section-header">📊 Step 2: Select Healthcare Indicator to Analyze</div>', unsafe_allow_html=True)
         
         # Feature Selection buttons - these stay in columns
         col3, col4, col5 = st.columns(3)
@@ -455,15 +620,15 @@ with main_container:
         selected_feature = None
         
         with col3:
-            if st.button("👶 Live Births", help="Track population growth trends"):
+            if st.button("👶 Live Births", help="Track population growth trends", use_container_width=True):
                 selected_feature = "live_births"
         
         with col4:
-            if st.button("👨‍⚕️ General Practitioners", help="Monitor healthcare workforce"):
+            if st.button("👨‍⚕️ General Practitioners", help="Monitor healthcare workforce", use_container_width=True):
                 selected_feature = "general_practitioners"
         
         with col5:
-            if st.button("💰 Health Expenditure", help="Analyze healthcare spending"):
+            if st.button("💰 Health Expenditure", help="Analyze healthcare spending", use_container_width=True):
                 selected_feature = "health_expenditure"
         
         # IMPORTANT: Display the chart OUTSIDE of any columns
@@ -471,7 +636,7 @@ with main_container:
             feature = FEATURES[selected_feature]
             
             # Use the FULL WIDTH of the page - no columns here!
-            st.success(f"Loading {feature['title'].replace(' Over Time', '')} data...")
+            st.success(f"✅ Loading {feature['title'].replace(' Over Time', '')} data for analysis...")
             
             # Call the display function directly, not inside any column
             display_data_with_loading(
@@ -483,3 +648,11 @@ with main_container:
             )    
     else:
         st.info("👆 Please select a country to begin exploring healthcare trends")
+
+# Footer
+st.markdown("---")
+st.markdown("""
+    <div style="text-align: center; color: #6c757d; padding: 1rem;">
+        <small>💡 Tip: Use the download button to export data for custom analysis in Excel or other tools</small>
+    </div>
+""", unsafe_allow_html=True)
