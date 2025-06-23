@@ -78,12 +78,12 @@ def update_user_preferences(user_id):
         if not all(isinstance(val, (int, float)) for val in [prevention, detect, rapid, health, intl, risk]):
             return jsonify({"error": "All weights must be numbers."}), 400
 
-        cursor.execute("SELECT id FROM UserWeights WHERE userID = %s", (user_id,))
+        cursor.execute("SELECT id FROM cosine_weights WHERE userID = %s", (user_id,))
         existing = cursor.fetchone()
 
         if existing:
             update_query = """
-                UPDATE UserWeights
+                UPDATE cosine_weights
                 SET preventionWeight = %s,
                     detectReportWeight = %s,
                     rapidRespWeight = %s,
@@ -95,7 +95,7 @@ def update_user_preferences(user_id):
             cursor.execute(update_query, (prevention, detect, rapid, health, intl, risk, user_id))
         else:
             insert_query = """
-                INSERT INTO UserWeights (userID, preventionWeight, detectReportWeight, rapidRespWeight, healthSysWeight, intlNormsWeight, riskEnvWeight)
+                INSERT INTO cosine_weights (userID, preventionWeight, detectReportWeight, rapidRespWeight, healthSysWeight, intlNormsWeight, riskEnvWeight)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
             cursor.execute(insert_query, (user_id, prevention, detect, rapid, health, intl, risk))
@@ -122,7 +122,7 @@ def get_user_preferences(user_id):
                 healthSysWeight,
                 intlNormsWeight,
                 riskEnvWeight
-            FROM UserWeights WHERE userID = %s
+            FROM cosine_weights WHERE userID = %s
         """, (user_id,))
         row = cursor.fetchone()
 

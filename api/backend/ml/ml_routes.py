@@ -388,7 +388,7 @@ def cosine(chosen_country, weights_dict):
 #                 healthSysWeight,
 #                 intlNormsWeight,
 #                 riskEnvWeight
-#             FROM UserWeights WHERE userID = %s
+#             FROM cosine_weights WHERE userID = %s
 #         """, (user_id,))
 #         row = cursor.fetchone()
 

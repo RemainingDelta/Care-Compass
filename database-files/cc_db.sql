@@ -126,23 +126,6 @@ CREATE TABLE autoreg_weights
     UNIQUE KEY unique_autoreg (country, factorID, userID)
 );
 
-DROP TABLE IF EXISTS cosine_weights;
-CREATE TABLE cosine_weights
-(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    preventionWeight FLOAT,
-    healthSysWeight FLOAT,
-    rapidRespWeight FLOAT,
-    intlNormsWeight FLOAT,
-    riskEnvWeight FLOAT,
-    detectReportWeight FLOAT,
-    country VARCHAR(50),
-    userID INT,
-
-    FOREIGN KEY (userID) REFERENCES Users(id),
-    FOREIGN KEY (country) REFERENCES Countries(code)
-);
-
 
 DROP TABLE IF EXISTS LiveBirths;
 CREATE TABLE LiveBirths(
@@ -204,8 +187,8 @@ CREATE TABLE InfantMortality(
     FOREIGN KEY (COUNTRY) REFERENCES Countries(code)
 );
 
-DROP TABLE IF EXISTS UserWeights;
-CREATE TABLE UserWeights (
+DROP TABLE IF EXISTS cosine_weights;
+CREATE TABLE cosine_weights(
     id INT AUTO_INCREMENT PRIMARY KEY,
     userID INT,
     preventionWeight FLOAT DEFAULT 0.0,
