@@ -30,7 +30,6 @@ def get_best_matching_key(target_key, data_dict):
             return actual_key
     return None
 
-
 # Apply styling AFTER page config
 style_sidebar()
 SideBarLinks()
@@ -238,14 +237,101 @@ def create_projection_chart(feature_name, current_value, target_value, regressio
     
     return fig
 
-# Title and Description
-st.title("🎯 SET AND MONITOR TARGET VALUES")
-st.write("Set healthcare goals and see when they might be achieved based on historical trends.")
-
-# Custom CSS
-# CSS to make this section wider and bigger
+# Custom CSS for modern styling
 st.markdown("""
     <style>
+    /* Main container styling */
+    .main {
+        background-color: #fafafa;
+    }
+    
+    /* Header styling - clean and simple */
+    .page-header {
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        padding: 0;
+        line-height: 1.2;
+    }
+    
+    .page-subtitle {
+        font-size: 1.2rem;
+        font-weight: 400;
+        opacity: 0.95;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Welcome section */
+    .welcome-box {
+        background: rgba(255, 255, 255, 0.6);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #097969;
+    }
+    
+    .welcome-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #097969;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Instructions card */
+    .instructions-card {
+        background: rgba(232, 245, 240, 0.8);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(9, 121, 105, 0.2);
+    }
+    
+    /* Expander styling */
+    div[data-testid="stExpander"] {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 12px;
+        border: 1px solid rgba(224, 224, 224, 0.5);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    div[data-testid="stExpander"] > details > summary {
+        background: linear-gradient(135deg, #f0fdf4 0%, #e8f5f0 100%);
+        color: #097969;
+        font-weight: 600;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    div[data-testid="stExpander"] > details > summary:hover {
+        background: linear-gradient(135deg, #e8f5f0 0%, #d8f3dc 100%);
+    }
+    
+    /* Section headers */
+    .section-header {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
     /* Force main container to use almost full width */
     .main .block-container {
         max-width: 98% !important;
@@ -274,22 +360,22 @@ st.markdown("""
         flex: 1 1 100% !important;
     }
 
-    /* Style expander */
-    div[data-testid="stExpander"] > details > summary {
-        background-color: #d8f3dc;
-        color: #1b4332;
-        font-weight: 600;
-        border: 1px solid #95d5b2;
-        border-radius: 6px;
-        padding: 8px;
-    }
-
     /* Button styling */
     .stButton > button {
-        width: 100%;
-        height: 60px;
-        font-size: 16px;
-        font-weight: 500;
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 30px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(9, 121, 105, 0.4);
     }
 
     /* Metrics in row */
@@ -300,47 +386,177 @@ st.markdown("""
         padding: 0.5rem 1rem;
         margin: 0.25rem;
     }
+    
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #097969;
+    }
+    
+    /* Number input styling */
+    .stNumberInput > div > div > input {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .stNumberInput > div > div > input:hover {
+        border-color: #097969;
+    }
+    
+    /* Current values card */
+    .current-values-card {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(224, 224, 224, 0.5);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Target input card */
+    .target-input-card {
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(224, 224, 224, 0.5);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Results section styling */
+    .results-header {
+        font-size: 3.5rem;
+        font-weight: 900;
+        text-align: center;
+        margin: 2rem auto;
+        color: #1f2937;
+    }
+    
+    /* Download button styling */
+    .stDownloadButton {
+        display: flex;
+        justify-content: center;
+        margin: 3rem auto;
+    }
+    
+    .stDownloadButton button {
+        font-size: 1.2rem !important;
+        padding: 0.75rem 2rem !important;
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.3);
+    }
+    
+    .stDownloadButton button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(9, 121, 105, 0.4);
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Header
+st.markdown("""
+    <div class="page-header">
+        <h1 class="page-title">🎯 Healthcare Target Calculator</h1>
+        <div class="page-subtitle">Set ambitious healthcare goals and track when they'll be achieved</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Welcome message
+st.markdown(f"""
+    <div class="welcome-box">
+        <div class="welcome-name">Welcome back, {st.session_state.get('name', 'Guest')}! 👋</div>
+        <div>Let's set healthcare targets and see when your country might achieve them based on current trends.</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# Quick Start Guide
+st.markdown("""
+    <div class="instructions-card">
+        <strong>🎯 Quick Start Guide:</strong>
+        <ol style="margin: 0.5rem 0 0 1rem; padding-left: 1rem;">
+            <li>Select a country to analyze</li>
+            <li>Review current healthcare indicators</li>
+            <li>Set your target values for each metric</li>
+            <li>Click "Calculate Projections" to see when targets will be reached</li>
+        </ol>
+    </div>
+""", unsafe_allow_html=True)
+
 # How it works expander
-with st.expander("ℹ️ How this tool works"):
+with st.expander("📚 Learn How This Tool Works"):
     st.markdown("""
-    ### 🎯 Purpose
-    This tool helps you set long-term healthcare goals for a country and estimates when they might be achieved based on historical trends.
-
-    ### 📊 How It Works
-    1. **Linear Regression Analysis**: We analyze historical data for each healthcare indicator
-    2. **Trend Projection**: We project future values based on the historical trend
-    3. **Target Achievement**: We calculate when your target value will be reached if trends continue
-
-    ### 🔍 Indicators Available
-    - **Life Expectancy**: Average years of life expected at birth
-    - **Infant Mortality**: Deaths under age 1 per 1,000 live births
-    - **Live Births**: Birth rate per 1,000 population
-    - **General Practitioners**: Healthcare workforce per 10,000 people
-    - **Health Expenditure**: Total spending per capita
-    - **Impoverished Households**: Percentage affected by healthcare costs
-
-    ### ⚠️ Important Notes
-    - Projections assume historical trends continue unchanged
-    - Major policy changes or events can alter these trajectories
-    - Use these as planning estimates, not guarantees
+    ### 🔍 Understanding Target Projections
+    
+    This tool helps you set long-term healthcare goals and estimates achievement timelines based on data-driven analysis.
+    
+    ---
+    
+    ### 📊 How Our Projections Work
+    
+    **Linear Regression Analysis** 📈  
+    We analyze historical trends for each healthcare indicator using statistical modeling
+    
+    **Trend Projection** 📉  
+    Future values are projected based on the historical rate of change
+    
+    **Target Achievement** 🎯  
+    We calculate when your target value will be reached if current trends continue
+    
+    ---
+    
+    ### 🏥 Available Healthcare Indicators
+    
+    **Life Expectancy** - Average years of life expected at birth  
+    **Infant Mortality** - Deaths under age 1 per 1,000 live births  
+    **Live Births** - Birth rate per 1,000 population  
+    **General Practitioners** - Healthcare workforce per 10,000 people  
+    **Health Expenditure** - Total spending per capita in USD  
+    **Impoverished Households** - Percentage affected by healthcare costs  
+    
+    ---
+    
+    ### ⚠️ Important Considerations
+    
+    - **Projections assume historical trends continue** unchanged
+    - **Major policy changes** or events can alter these trajectories
+    - **Use as planning estimates**, not guaranteed outcomes
+    - **R² scores indicate** the reliability of historical trends
+    
+    ---
+    
+    ### 💡 Pro Tips
+    
+    - Set **ambitious but realistic** targets
+    - Consider **regional benchmarks** when setting goals
+    - Review projections **regularly** as new data becomes available
+    - Use the **detailed analysis** tab for deeper insights
     """)
 
 # Fetch countries
 country_list = fetch_countries()
 
 # Country selection
-st.write("")
-col1, col2 = st.columns([3, 1])
+st.markdown('<div class="section-header">🌍 Step 1: Select Country to Analyze</div>', unsafe_allow_html=True)
 
-with col1:
-    chosen_country = st.selectbox(
-        "🌍 Select Country:",
-        country_list,
-        index=None,
-        placeholder="Choose a country..."
-    )
+chosen_country = st.selectbox(
+    "Choose a country:",
+    country_list,
+    index=None,
+    placeholder="Select a country...",
+    help="Choose the country you want to set healthcare targets for"
+)
 
 # Extract country code
 country_code = None
@@ -349,21 +565,16 @@ if chosen_country:
     country_code = chosen_country.split('-')[-1]
     
     # Fetch current values
-    with st.spinner("Loading current values..."):
+    with st.spinner("Loading current healthcare indicators..."):
         current_values = fetch_current_values(country_code)
 
 # Show current values if available
 if current_values:
-    st.write("")
-    st.subheader(f"📊 Current Healthcare Indicators for {chosen_country.split('-')[0]}")
-    
+    st.markdown('<div class="section-header">📊 Step 2: Review Current Healthcare Status</div>', unsafe_allow_html=True)
+    st.markdown('<div class="current-values-card">', unsafe_allow_html=True)
     
     # Create metrics display
-    st.write("### Displaying Metrics:")
     metric_cols = st.columns(3)
-    
-    # Add debugging for each metric
-    debug_info = []
     
     for idx, (key, config) in enumerate(FEATURES_CONFIG.items()):
         col_idx = idx % 3
@@ -372,45 +583,31 @@ if current_values:
         display_key = config['display_key']
         actual_key = get_best_matching_key(display_key, current_values)
         display_value = current_values.get(actual_key)
-
-        
-        # Debug info
-        debug_info.append({
-            'Feature': config['name'],
-            'Key': key,
-            'Display Key': display_key,
-            'Value Found': display_value,
-            'Type': type(display_value).__name__ if display_value is not None else 'None'
-        })
         
         with metric_cols[col_idx]:
-            # Add individual debug for this metric
-            with st.container():
-                
-                if display_value is not None and display_value != 'N/A':
-                    st.metric(
-                        label=f"{config['icon']} {config['name']}",
-                        value=f"{display_value:.2f}" if isinstance(display_value, (int, float)) else str(display_value),
-                        help=f"Measured in {config['unit']}"
-                    )
-                else:
-                    st.metric(
-                        label=f"{config['icon']} {config['name']}",
-                        value="No data",
-                        help="Data not available for this country"
-                    )
-    
+            if display_value is not None and display_value != 'N/A':
+                st.metric(
+                    label=f"{config['icon']} {config['name']}",
+                    value=f"{display_value:.2f}" if isinstance(display_value, (int, float)) else str(display_value),
+                    help=f"Measured in {config['unit']}"
+                )
+            else:
+                st.metric(
+                    label=f"{config['icon']} {config['name']}",
+                    value="No data",
+                    help="Data not available for this country"
+                )
     
     # Add footnotes
     st.caption("*General Practitioners per 10,000 Population")
-    st.caption("**Total Health Expenditure per Capita")
-    st.caption("***Impoverished Households due to out-of-pocket healthcare payments")
+    st.caption("**Total Health Expenditure per Capita (USD)")
+    st.caption("++Live births per 1,000 population")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Target value inputs
 if country_code:
-    st.write("")
-    st.write("")
-    st.subheader("🎯 Set Your Target Values")
+    st.markdown('<div class="section-header">🎯 Step 3: Set Your Target Values</div>', unsafe_allow_html=True)
+    st.markdown('<div class="target-input-card">', unsafe_allow_html=True)
     
     # Create input columns
     input_cols = st.columns(3)
@@ -420,7 +617,9 @@ if country_code:
         col_idx = idx % 3
         with input_cols[col_idx]:
             # Get current value for reference
-            current_val = current_values.get(config['display_key']) if current_values else None
+            display_key = config['display_key']
+            actual_key = get_best_matching_key(display_key, current_values) if current_values else None
+            current_val = current_values.get(actual_key) if current_values and actual_key else None
             
             # Create number input with helpful placeholder
             if current_val is not None and isinstance(current_val, (int, float)):
@@ -436,12 +635,14 @@ if country_code:
                 key=f"target_{key}"
             )
     
+    st.markdown('</div>', unsafe_allow_html=True)
+    
     # Calculate button
     st.write("")
-    col_calc, col_empty = st.columns([1, 4])
+    col_calc, col_empty = st.columns([1, 3])
     
     with col_calc:
-        if st.button("🔮 Calculate Projections", type="primary"):
+        if st.button("🔮 Calculate Projections", type="primary", use_container_width=True):
             if any(target_values.values()):
                 # Progress bar
                 progress_bar = st.progress(0, text="Calculating projections...")
@@ -494,177 +695,48 @@ if country_code:
                         st.warning(error)
                 
                 # Display results if we have any
-# Display results if we have any
                 if results:
                     st.write("")
                     st.write("---")
                     
-                    # CSS to fix table width issues
-                    st.markdown("""
-                    <style>
-                    /* Remove ALL width constraints for dataframe */
-                    [data-testid="stDataFrame"] {
-                        transform: none !important;
-                        width: 100% !important;
-                        max-width: none !important;  /* Remove max-width constraint */
-                        margin: 0 !important;
-                    }
-                    
-                    [data-testid="stDataFrame"] > div {
-                        width: 100% !important;
-                        max-width: none !important;
-                    }
-                    
-                    /* Make table use full available width */
-                    [data-testid="stDataFrame"] table {
-                        font-size: 1.1rem !important;
-                        width: 100% !important;
-                        table-layout: fixed !important;  /* Force equal column widths */
-                    }
-                    
-                    [data-testid="stDataFrame"] th {
-                        padding: 10px 5px !important;
-                        font-size: 1.1rem !important;
-                        background-color: #e9ecef !important;
-                        text-align: center !important;
-                    }
-                    
-                    [data-testid="stDataFrame"] td {
-                        padding: 10px 5px !important;
-                        font-size: 1.1rem !important;
-                        text-align: center !important;
-                        white-space: normal !important;  /* Allow text wrapping */
-                        word-wrap: break-word !important;
-                    }
-                    
-                    /* Center tabs */
-                    .stTabs [data-baseweb="tab-list"] {
-                        justify-content: center !important;
-                        gap: 3rem !important;
-                    }
-                    
-                    .stTabs [data-baseweb="tab-list"] button {
-                        font-size: 1.6rem !important;
-                        padding: 15px 50px !important;
-                        font-weight: bold !important;
-                    }
-                    
-                    /* Center expanders in detailed view */
-                    .stExpander {
-                        max-width: 900px;
-                        margin: 1rem auto !important;
-                    }
-                    
-                    /* Center download button */
-                    .stDownloadButton {
-                        display: flex;
-                        justify-content: center;
-                        margin: 3rem auto;
-                    }
-                    
-                    .stDownloadButton button {
-                        font-size: 1.4rem !important;
-                        padding: 15px 40px !important;
-                    }
-                    
-                    /* Metrics row styling */
-                    .metrics-row {
-                        text-align: center;
-                        margin: 2rem 0;
-                    }
-                    </style>
-                    """, unsafe_allow_html=True)
-                    
                     # Big centered title
-                    st.markdown("""
-                    <h1 style="font-size: 3.5rem; font-weight: 900; text-align: center; margin: 2rem auto; color: #1f2937;">
-                        📈 Projection Results
-                    </h1>
-                    """, unsafe_allow_html=True)
+                    st.markdown('<h1 class="results-header">📈 Projection Results</h1>', unsafe_allow_html=True)
                     
                     # Create tabs for different views
                     tab1, tab2 = st.tabs(["📊 Summary", "📈 Detailed Analysis"])
                     
                     with tab1:
-                        # Add some padding with columns
-                        col1, col2, col3 = st.columns([0.5, 10, 0.5])
+                        # Summary table
+                        summary_data = []
                         
-                        with col2:
-                            # Summary table with clear but concise column names
-                            summary_data = []
+                        for key, result in results.items():
+                            config = FEATURES_CONFIG[key]
                             
-                            for key, result in results.items():
-                                config = FEATURES_CONFIG[key]
-                                
-                                # Clear status text
-                                if isinstance(result['projection'], str):
-                                    if "Already achieved" in result['projection']:
-                                        status = "✅ Achieved"
-                                    elif "Beyond" in result['projection']:
-                                        status = "⚠️ Long Term"
-                                    elif "No trend" in result['projection']:
-                                        status = "➖ No Trend"
-                                    else:
-                                        status = "📊 On Track"
+                            # Clear status text
+                            if isinstance(result['projection'], str):
+                                if "Already achieved" in result['projection']:
+                                    status = "✅ Achieved"
+                                elif "Beyond" in result['projection']:
+                                    status = "⚠️ Long Term"
+                                elif "No trend" in result['projection']:
+                                    status = "➖ No Trend"
                                 else:
-                                    status = "📊 Calculating"
-                                
-                                summary_data.append({
-                                    'Indicator': f"{config['icon']} {config['name']}",
-                                    'Current': f"{result['current']:.1f}",
-                                    'Target': f"{result['target']:.1f}",
-                                    'Trend': '📈' if result['trend'] == 'increasing' else '📉',
-                                    'Projection': result['projection'],
-                                    'Status': status
-                                })
+                                    status = "📊 On Track"
+                            else:
+                                status = "📊 Calculating"
                             
-                            df_summary = pd.DataFrame(summary_data)
-                            
-                            # Add custom styling for this specific dataframe
-                            st.markdown("""
-                            <style>
-                            /* Make sure the table fits */
-                            [data-testid="stDataFrame"]:has(table) {
-                                width: 100% !important;
-                            }
-                            
-                            /* Adjust column widths */
-                            [data-testid="stDataFrame"] table {
-                                width: 100% !important;
-                            }
-                            
-                            /* Make specific columns narrower */
-                            [data-testid="stDataFrame"] th:nth-child(2),
-                            [data-testid="stDataFrame"] td:nth-child(2),
-                            [data-testid="stDataFrame"] th:nth-child(3),
-                            [data-testid="stDataFrame"] td:nth-child(3) {
-                                width: 80px !important;  /* Current and Target columns */
-                            }
-                            
-                            [data-testid="stDataFrame"] th:nth-child(4),
-                            [data-testid="stDataFrame"] td:nth-child(4) {
-                                width: 60px !important;  /* Trend column */
-                            }
-                            
-                            /* Give more space to Indicator and Projection columns */
-                            [data-testid="stDataFrame"] th:nth-child(1),
-                            [data-testid="stDataFrame"] td:nth-child(1) {
-                                width: 25% !important;  /* Indicator column */
-                            }
-                            
-                            [data-testid="stDataFrame"] th:nth-child(5),
-                            [data-testid="stDataFrame"] td:nth-child(5) {
-                                width: 20% !important;  /* Projection column */
-                            }
-                            
-                            [data-testid="stDataFrame"] th:nth-child(6),
-                            [data-testid="stDataFrame"] td:nth-child(6) {
-                                width: 15% !important;  /* Status column */
-                            }
-                            </style>
-                            """, unsafe_allow_html=True)
-                            
-                            st.dataframe(df_summary, hide_index=True, use_container_width=True)
+                            summary_data.append({
+                                'Indicator': f"{config['icon']} {config['name']}",
+                                'Current': f"{result['current']:.1f}",
+                                'Target': f"{result['target']:.1f}",
+                                'Trend': '📈' if result['trend'] == 'increasing' else '📉',
+                                'Projection': result['projection'],
+                                'Status': status
+                            })
+                        
+                        df_summary = pd.DataFrame(summary_data)
+                        st.dataframe(df_summary, hide_index=True, use_container_width=True)
+                        
                     with tab2:
                         # Detailed charts for each indicator
                         for key, result in results.items():
@@ -686,36 +758,28 @@ if country_code:
                                 )
                                 st.plotly_chart(fig, use_container_width=True)
                                 
-                                # Add metrics without using columns
-                                st.markdown("### 📊 Regression Statistics")
+                                # Add metrics
+                                col1, col2, col3 = st.columns(3)
                                 
-                                # Use HTML for side-by-side metrics instead of columns
-                                st.markdown(f"""
-                                <div class="metrics-row">
-                                    <div style="display: inline-block; width: 30%; margin: 0 1.5%; text-align: center;">
-                                        <h4>Slope</h4>
-                                        <h2>{result['regression']['slope']:.4f}</h2>
-                                    </div>
-                                    <div style="display: inline-block; width: 30%; margin: 0 1.5%; text-align: center;">
-                                        <h4>R² Score</h4>
-                                        <h2>{result['regression']['r2']:.3f}</h2>
-                                    </div>
-                                    <div style="display: inline-block; width: 30%; margin: 0 1.5%; text-align: center;">
-                                        <h4>Trend</h4>
-                                        <h2>{'📈 Increasing' if result['trend'] == 'increasing' else '📉 Decreasing'}</h2>
-                                    </div>
-                                </div>
-                                """, unsafe_allow_html=True)
+                                with col1:
+                                    st.metric("Slope", f"{result['regression']['slope']:.4f}")
+                                
+                                with col2:
+                                    st.metric("R² Score", f"{result['regression']['r2']:.3f}")
+                                
+                                with col3:
+                                    trend_emoji = '📈' if result['trend'] == 'increasing' else '📉'
+                                    st.metric("Trend", f"{trend_emoji} {result['trend'].capitalize()}")
                                 
                                 # Add interpretation
                                 if result['regression']['r2'] > 0.7:
-                                    st.success("Strong historical trend")
+                                    st.success("✅ Strong historical trend - High confidence in projection")
                                 elif result['regression']['r2'] > 0.4:
-                                    st.warning("Moderate historical trend")
+                                    st.warning("⚠️ Moderate historical trend - Medium confidence in projection")
                                 else:
-                                    st.error("Weak historical trend")
+                                    st.error("❌ Weak historical trend - Low confidence in projection")
                     
-                    # Download results - also centered
+                    # Download results
                     st.write("")
                     csv = pd.DataFrame(summary_data).to_csv(index=False)
                     st.download_button(
@@ -727,7 +791,15 @@ if country_code:
                 else:
                     st.error("No results could be calculated. Please check the data availability for this country.")
             else:
-                st.warning("Please enter at least one target value.")
+                st.warning("⚠️ Please enter at least one target value.")
 else:
-    if country_code:
+    if chosen_country:
         st.info("👆 Enter target values and click 'Calculate Projections' to see when they might be achieved.")
+
+# Footer
+st.markdown("---")
+st.markdown("""
+    <div style="text-align: center; color: #6c757d; padding: 1rem;">
+        <small>💡 Tip: Set ambitious but achievable targets based on regional benchmarks</small>
+    </div>
+""", unsafe_allow_html=True)
