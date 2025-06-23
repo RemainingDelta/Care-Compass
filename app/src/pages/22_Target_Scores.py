@@ -362,11 +362,12 @@ st.markdown("""
 
     /* Button styling */
     .stButton > button {
+        width: 100%;
+        height: 60px;
+        font-size: 16px;
+        font-weight: 500;
         background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
         color: white;
-        font-size: 1.1rem;
-        font-weight: 600;
-        padding: 0.75rem 2rem;
         border-radius: 30px;
         border: none;
         transition: all 0.3s ease;
@@ -571,7 +572,6 @@ if chosen_country:
 # Show current values if available
 if current_values:
     st.markdown('<div class="section-header">📊 Step 2: Review Current Healthcare Status</div>', unsafe_allow_html=True)
-    st.markdown('<div class="current-values-card">', unsafe_allow_html=True)
     
     # Create metrics display
     metric_cols = st.columns(3)
@@ -607,7 +607,6 @@ if current_values:
 # Target value inputs
 if country_code:
     st.markdown('<div class="section-header">🎯 Step 3: Set Your Target Values</div>', unsafe_allow_html=True)
-    st.markdown('<div class="target-input-card">', unsafe_allow_html=True)
     
     # Create input columns
     input_cols = st.columns(3)
