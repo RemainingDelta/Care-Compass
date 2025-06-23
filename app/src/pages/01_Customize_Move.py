@@ -324,9 +324,136 @@ st.markdown("""
     }
     
     .results-title {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #097969;
+        margin-bottom: 2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .results-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 400;
+    }
+    
+    /* Match cards styling */
+    .match-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid rgba(224, 224, 224, 0.7);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .match-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-color: #097969;
+    }
+    
+    .match-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .match-rank {
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .match-country {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .match-score-container {
+        text-align: right;
+    }
+    
+    .match-score {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #097969;
+    }
+    
+    .match-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Top match special styling */
+    .match-card:first-child {
+        background: linear-gradient(135deg, rgba(9, 121, 105, 0.05) 0%, rgba(10, 157, 122, 0.05) 100%);
+        border: 2px solid #097969;
+    }
+    
+    .match-card:first-child .match-rank {
+        background: gold;
+        color: #2c3e50;
+        font-size: 1.3rem;
+    }
+    
+    /* Results summary box */
+    .results-summary {
+        background: linear-gradient(135deg, rgba(9, 121, 105, 0.05) 0%, rgba(10, 157, 122, 0.05) 100%);
+        border: 1px solid rgba(9, 121, 105, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .summary-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #097969;
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-text {
+        color: #2c3e50;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    /* Visualization section */
+    .viz-section {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(224, 224, 224, 0.5);
+    }
+    
+    .viz-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
         margin-bottom: 1.5rem;
         text-align: center;
     }
@@ -394,6 +521,36 @@ st.markdown("""
         margin-left: auto;
         margin-right: 0.5rem;
         flex-shrink: 0;
+    }
+    
+    /* Add country flag placeholder */
+    .country-flag {
+        width: 32px;
+        height: 24px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+    
+    /* Progress bar for match score */
+    .match-progress {
+        width: 100%;
+        height: 6px;
+        background: rgba(9, 121, 105, 0.1);
+        border-radius: 3px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .match-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #097969 0%, #0a9d7a 100%);
+        border-radius: 3px;
+        transition: width 0.5s ease;
     }
     
     /* Ensure parent containers don't clip tooltips */
@@ -743,47 +900,125 @@ if submit and chosen_country:
                 sorted_df_similar = df_similar.sort_values(by='the_country_cosine', ascending=False)
                 st.session_state['similar_df'] = sorted_df_similar
                 
+                # Get country names mapping
+                country_names = {}
+                try:
+                    country_response = requests.get("http://host.docker.internal:4000/country/countries", headers=headers, timeout=10)
+                    if country_response.status_code == 200:
+                        countries_data = country_response.json()
+                        country_names = {item['code']: item['name'] for item in countries_data}
+                except Exception as e:
+                    logger.error(f"Failed to fetch country names: {e}")
+                
+                # Country flag emoji mapping (common countries)
+                country_flags = {
+                    'USA': '🇺🇸', 'GBR': '🇬🇧', 'CAN': '🇨🇦', 'AUS': '🇦🇺', 'DEU': '🇩🇪',
+                    'FRA': '🇫🇷', 'JPN': '🇯🇵', 'KOR': '🇰🇷', 'CHN': '🇨🇳', 'IND': '🇮🇳',
+                    'BRA': '🇧🇷', 'MEX': '🇲🇽', 'ITA': '🇮🇹', 'ESP': '🇪🇸', 'NLD': '🇳🇱',
+                    'BEL': '🇧🇪', 'CHE': '🇨🇭', 'SWE': '🇸🇪', 'NOR': '🇳🇴', 'DNK': '🇩🇰',
+                    'FIN': '🇫🇮', 'AUT': '🇦🇹', 'POL': '🇵🇱', 'PRT': '🇵🇹', 'GRC': '🇬🇷',
+                    'TUR': '🇹🇷', 'ISR': '🇮🇱', 'SGP': '🇸🇬', 'NZL': '🇳🇿', 'IRL': '🇮🇪',
+                    'LUX': '🇱🇺', 'ISL': '🇮🇸', 'CZE': '🇨🇿', 'SVK': '🇸🇰', 'HUN': '🇭🇺',
+                    'ROU': '🇷🇴', 'BGR': '🇧🇬', 'HRV': '🇭🇷', 'SVN': '🇸🇮', 'LTU': '🇱🇹',
+                    'LVA': '🇱🇻', 'EST': '🇪🇪', 'CYP': '🇨🇾', 'MLT': '🇲🇹', 'ZAF': '🇿🇦',
+                    'ARG': '🇦🇷', 'CHL': '🇨🇱', 'COL': '🇨🇴', 'PER': '🇵🇪', 'VEN': '🇻🇪',
+                    'EGY': '🇪🇬', 'MAR': '🇲🇦', 'NGA': '🇳🇬', 'KEN': '🇰🇪', 'GHA': '🇬🇭',
+                    'ETH': '🇪🇹', 'TZA': '🇹🇿', 'UGA': '🇺🇬', 'DZA': '🇩🇿', 'SDN': '🇸🇩',
+                    'AGO': '🇦🇴', 'MOZ': '🇲🇿', 'MDG': '🇲🇬', 'CMR': '🇨🇲', 'CIV': '🇨🇮',
+                    'NER': '🇳🇪', 'BFA': '🇧🇫', 'MLI': '🇲🇱', 'MWI': '🇲🇼', 'ZMB': '🇿🇲',
+                    'SEN': '🇸🇳', 'ZWE': '🇿🇼', 'RWA': '🇷🇼', 'TUN': '🇹🇳', 'LBY': '🇱🇾',
+                    'MUS': '🇲🇺', 'BWA': '🇧🇼', 'NAM': '🇳🇦', 'GAB': '🇬🇦', 'TGO': '🇹🇬',
+                    'BEN': '🇧🇯', 'GNB': '🇬🇼', 'SLE': '🇸🇱', 'LBR': '🇱🇷', 'MRT': '🇲🇷',
+                    'GMB': '🇬🇲', 'GNQ': '🇬🇶', 'SWZ': '🇸🇿', 'DJI': '🇩🇯', 'COM': '🇰🇲',
+                    'CPV': '🇨🇻', 'STP': '🇸🇹', 'SYC': '🇸🇨', 'ARE': '🇦🇪', 'SAU': '🇸🇦',
+                    'QAT': '🇶🇦', 'KWT': '🇰🇼', 'BHR': '🇧🇭', 'OMN': '🇴🇲', 'JOR': '🇯🇴',
+                    'LBN': '🇱🇧', 'YEM': '🇾🇪', 'IRQ': '🇮🇶', 'SYR': '🇸🇾', 'IRN': '🇮🇷',
+                    'PAK': '🇵🇰', 'AFG': '🇦🇫', 'BGD': '🇧🇩', 'LKA': '🇱🇰', 'MMR': '🇲🇲',
+                    'THA': '🇹🇭', 'VNM': '🇻🇳', 'KHM': '🇰🇭', 'LAO': '🇱🇦', 'MYS': '🇲🇾',
+                    'IDN': '🇮🇩', 'PHL': '🇵🇭', 'BRN': '🇧🇳', 'TLS': '🇹🇱', 'MNG': '🇲🇳',
+                    'KAZ': '🇰🇿', 'UZB': '🇺🇿', 'TKM': '🇹🇲', 'KGZ': '🇰🇬', 'TJK': '🇹🇯',
+                    'RUS': '🇷🇺', 'UKR': '🇺🇦', 'BLR': '🇧🇾', 'MDA': '🇲🇩', 'ARM': '🇦🇲',
+                    'GEO': '🇬🇪', 'AZE': '🇦🇿', 'ALB': '🇦🇱', 'MKD': '🇲🇰', 'SRB': '🇷🇸',
+                    'MNE': '🇲🇪', 'BIH': '🇧🇦', 'AND': '🇦🇩', 'MCO': '🇲🇨', 'LIE': '🇱🇮',
+                    'SMR': '🇸🇲', 'VAT': '🇻🇦', 'PNG': '🇵🇬', 'FJI': '🇫🇯', 'SLB': '🇸🇧',
+                    'VUT': '🇻🇺', 'NCL': '🇳🇨', 'PYF': '🇵🇫', 'WSM': '🇼🇸', 'KIR': '🇰🇮',
+                    'TON': '🇹🇴', 'FSM': '🇫🇲', 'PLW': '🇵🇼', 'MHL': '🇲🇭', 'NRU': '🇳🇷',
+                    'TUV': '🇹🇻', 'COK': '🇨🇰', 'NIU': '🇳🇺', 'TKL': '🇹🇰', 'GUM': '🇬🇺',
+                    'ASM': '🇦🇸', 'MNP': '🇲🇵', 'PRY': '🇵🇾', 'URY': '🇺🇾', 'ECU': '🇪🇨',
+                    'BOL': '🇧🇴', 'GUY': '🇬🇾', 'SUR': '🇸🇷', 'GUF': '🇬🇫', 'HTI': '🇭🇹',
+                    'DOM': '🇩🇴', 'CUB': '🇨🇺', 'JAM': '🇯🇲', 'TTO': '🇹🇹', 'BRB': '🇧🇧',
+                    'DMA': '🇩🇲', 'GRD': '🇬🇩', 'VCT': '🇻🇨', 'LCA': '🇱🇨', 'ATG': '🇦🇬',
+                    'KNA': '🇰🇳', 'BHS': '🇧🇸', 'BLZ': '🇧🇿', 'CRI': '🇨🇷', 'SLV': '🇸🇻',
+                    'GTM': '🇬🇹', 'HND': '🇭🇳', 'NIC': '🇳🇮', 'PAN': '🇵🇦'
+                }
+                
                 # Display results
                 st.markdown('<div class="results-section">', unsafe_allow_html=True)
-                st.markdown('<div class="results-title">🎯 Your Top Healthcare Matches</div>', unsafe_allow_html=True)
+                st.markdown("""
+                    <div class="results-title">
+                        <span>🎯</span>
+                        <span>Your Top Healthcare Matches</span>
+                    </div>
+                    <div class="results-subtitle">
+                        Based on your priorities, these countries offer healthcare systems that best align with your preferences
+                    </div>
+                """, unsafe_allow_html=True)
                 
                 # Show top 5 matches
                 top_matches = sorted_df_similar[1:6]  # Exclude the selected country itself
                 
                 for idx, (_, row) in enumerate(top_matches.iterrows(), 1):
                     match_score = row['the_country_cosine']
-                    match_percentage = f"{match_score * 100:.1f}%"
+                    match_percentage = f"{match_score * 100:.1f}"
+                    country_code = row['Country']
+                    country_name = country_names.get(country_code, country_code)
                     
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.markdown(f"**{idx}. {row['Country']}**")
-                    with col2:
-                        st.metric("Match", match_percentage, delta=None)
+                    # Create match card
+                    rank_emoji = "🥇" if idx == 1 else "🥈" if idx == 2 else "🥉" if idx == 3 else str(idx)
+                    
+                    card_html = f"""
+                        <div class="match-card">
+                            <div class="match-info">
+                                <div class="match-rank">{rank_emoji if idx <= 3 else idx}</div>
+                                <div class="match-country">{country_name}</div>
+                            </div>
+                            <div class="match-score-container">
+                                <div class="match-score">{match_percentage}%</div>
+                                <div class="match-label">Match Score</div>
+                            </div>
+                        </div>
+                    """
+                    st.markdown(card_html, unsafe_allow_html=True)
                 
                 st.markdown('</div>', unsafe_allow_html=True)
                 
                 # Visualization
                 if on and 'similar_df' in st.session_state:
                     # World map visualization
+                    st.markdown('<div class="viz-section">', unsafe_allow_html=True)
+                    st.markdown('<div class="viz-title">🗺️ Healthcare System Compatibility Map</div>', unsafe_allow_html=True)
+                    
                     country_url = "http://host.docker.internal:4000/country/countries"
                     try:
                         response = requests.get(country_url, headers=headers, timeout=10)
                         response.raise_for_status()
                         data = response.json()
-                        df_country_and_code = pd.DataFrame(data)
                         
-                        # Add country names
-                        add_names = []
-                        for _, row in df_country_and_code.iterrows():
-                            for _, row2 in sorted_df_similar.iterrows():
-                                if row['code'] == row2['Country']:
-                                    add_names.append(row['name'])
+                        # Create a dictionary for efficient lookup
+                        code_to_name = {item['code']: item['name'] for item in data}
                         
-                        sorted_df_similar['name'] = add_names
+                        # Create a copy to avoid modifying the original
+                        map_df = sorted_df_similar.copy()
+                        
+                        # Add country names using dictionary lookup
+                        map_df['name'] = map_df['Country'].map(code_to_name)
+                        
+                        # Handle any missing country names
+                        map_df['name'] = map_df['name'].fillna(map_df['Country'])
                         
                         # Create choropleth map
                         fig1 = px.choropleth(
-                            sorted_df_similar,
+                            map_df,
                             locations='Country',
                             locationmode='ISO-3',
                             color='the_country_cosine',
@@ -791,59 +1026,104 @@ if submit and chosen_country:
                             range_color=(0.7, 1),
                             scope='world',
                             labels={'the_country_cosine': 'Similarity Score'},
-                            title='Healthcare System Compatibility Map'
+                            hover_name='name',
+                            hover_data={'the_country_cosine': ':.3f', 'Country': False}
                         )
                         
                         fig1.update_geos(
                             showcountries=True,
                             showcoastlines=True,
                             showland=True,
-                            fitbounds="locations"
+                            landcolor='lightgray',
+                            coastlinecolor='white',
+                            projection_type='natural earth'
                         )
                         
                         fig1.update_layout(
-                            margin={"r":0,"t":50,"l":0,"b":0},
+                            margin={"r":0,"t":0,"l":0,"b":0},
                             height=600,
-                            title_font_size=20,
-                            title_font_color="#097969"
+                            geo=dict(
+                                showframe=False,
+                                showcoastlines=True,
+                                bgcolor='rgba(0,0,0,0)'
+                            ),
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)'
+                        )
+                        
+                        # Fixed colorbar configuration - removed titleside
+                        fig1.update_coloraxes(
+                            colorbar=dict(
+                                title="Match Score",
+                                tickmode="linear",
+                                tick0=0.7,
+                                dtick=0.05,
+                                tickformat=".0%"
+                            )
                         )
                         
                         st.plotly_chart(fig1, use_container_width=True)
+                        st.markdown('</div>', unsafe_allow_html=True)
                         
                     except Exception as e:
                         logger.error(f"Map visualization error: {e}")
-                
+                        st.error(f"Unable to load the world map visualization. Error: {str(e)}")
+                        # Show debug info if needed
+                        if st.checkbox("Show debug info"):
+                            st.write("Similar countries data shape:", sorted_df_similar.shape)
+                            st.write("Sample data:", sorted_df_similar.head())
+                            st.write("Columns:", sorted_df_similar.columns.tolist())
                 else:
                     # Bar chart visualization
-                    bar_chart_display = sorted_df_similar[1:6]
+                    st.markdown('<div class="viz-section">', unsafe_allow_html=True)
+                    st.markdown('<div class="viz-title">📊 Top Healthcare Matches Comparison</div>', unsafe_allow_html=True)
+                    
+                    bar_chart_display = sorted_df_similar[1:6].copy()
+                    
+                    # Add country names to bar chart
+                    bar_chart_countries = []
+                    for _, row in bar_chart_display.iterrows():
+                        country_code = row['Country']
+                        country_name = country_names.get(country_code, country_code)
+                        bar_chart_countries.append(country_name)
+                    
+                    bar_chart_display['Country_Name'] = bar_chart_countries
                     
                     fig = px.bar(
                         bar_chart_display,
-                        x='Country',
+                        x='Country_Name',
                         y='the_country_cosine',
                         color='the_country_cosine',
                         color_continuous_scale="Viridis",
-                        labels={'the_country_cosine': 'Similarity Score'},
-                        title="Top 5 Healthcare System Matches"
+                        labels={'the_country_cosine': 'Similarity Score', 'Country_Name': 'Country'},
+                        hover_data={'the_country_cosine': ':.3f'}
                     )
                     
-                    fig.update_yaxes(range=[0.85, 1])
+                    fig.update_yaxes(range=[0.85, 1], tickformat=".0%")
                     fig.update_layout(
                         xaxis_title="Country",
-                        yaxis_title="Similarity Score",
+                        yaxis_title="Match Score",
                         showlegend=False,
-                        height=500,
-                        title_font_size=20,
-                        title_font_color="#097969"
+                        height=400,
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        yaxis=dict(
+                            gridcolor='rgba(128,128,128,0.2)',
+                            zerolinecolor='rgba(128,128,128,0.2)'
+                        )
                     )
                     
                     # Add value labels on bars
                     fig.update_traces(
-                        texttemplate='%{y:.3f}',
-                        textposition='outside'
+                        texttemplate='%{y:.1%}',
+                        textposition='outside',
+                        textfont_size=12
                     )
                     
+                    fig.update_coloraxes(showscale=False)
+                    
                     st.plotly_chart(fig, use_container_width=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
                 
             else:
                 st.error("😔 Unable to process your request. Please try again.")
