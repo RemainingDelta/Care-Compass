@@ -472,6 +472,20 @@ st.markdown("""
         display: block;
         margin: 2rem auto;
     }
+            
+    /* Button styling */
+    .stButton > button {
+        width: 100%;
+        height: 60px;
+        font-size: 16px;
+        font-weight: 500;
+        background: linear-gradient(135deg, #097969 0%, #0a9d7a 100%);
+        color: white;
+        border-radius: 30px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.3);
+    }
     
     .stButton > button[type="primary"]:hover {
         transform: translateY(-2px);
