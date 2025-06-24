@@ -627,7 +627,7 @@ with feat_col3:
             <div class="feature-icon">🌍</div>
             <div class="feature-title">Global Coverage</div>
             <div class="feature-text">
-                Compare healthcare systems across countries
+                Compare healthcare systems across many different countries
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -638,7 +638,7 @@ with feat_col4:
             <div class="feature-icon">🎯</div>
             <div class="feature-title">Personalized</div>
             <div class="feature-text">
-                Get recommendations based on your priorities
+                Get personalized recommendations based on your top priorities
             </div>
         </div>
     """, unsafe_allow_html=True)
