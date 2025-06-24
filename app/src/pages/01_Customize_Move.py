@@ -12,9 +12,10 @@ from streamlit_sortables import sort_items
 import plotly.express as px 
 import plotly.graph_objects as go
 
-from modules.style import style_sidebar, set_background
-style_sidebar()
+from modules.style import style_sidebar, set_background_color
 
+style_sidebar()
+set_background_color() 
 # Call the SideBarLinks from the nav module in the modules directory
 SideBarLinks()
 
@@ -56,7 +57,7 @@ st.markdown("""
     
     /* Welcome section */
     .welcome-box {
-        background: rgba(255, 255, 255, 0.6);
+        background: white;
         padding: 1.5rem;
         border-radius: 15px;
         margin-bottom: 1.5rem;
@@ -87,18 +88,23 @@ st.markdown("""
         margin-bottom: 1.5rem;
         overflow: hidden;
     }
-    
+        
     div[data-testid="stExpander"] > details > summary {
-        background: linear-gradient(135deg, #f0fdf4 0%, #e8f5f0 100%);
+        background: #f1f8e9;
         color: #097969;
         font-weight: 600;
-        border: none;
+        border: 2px solid #097969;
         padding: 1rem 1.5rem;
         font-size: 1.1rem;
+        border-radius: 12px 12px 0 0;
     }
-    
+
+    div[data-testid="stExpander"] > details:not([open]) > summary {
+        border-radius: 12px;  /* ADD THIS - rounds all corners when closed */
+    }
+
     div[data-testid="stExpander"] > details > summary:hover {
-        background: linear-gradient(135deg, #e8f5f0 0%, #d8f3dc 100%);
+        background: linear-gradient(135deg, #c8e6c9 0%, #b2dfdb 100%);
     }
     
     /* Section spacing */
@@ -583,6 +589,33 @@ st.markdown("""
     .priority-high { background: #28a745; }
     .priority-medium { background: #ffc107; }
     .priority-low { background: #dc3545; }
+            
+    /* Instructions card - make it really stand out */
+    .instructions-card {
+        background: #f1f8e9;
+        color: #2c3e50 !important;
+        padding: 1.8rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        border: 2px solid #097969;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Text colors */
+    .instructions-card * {
+        color: #2c3e50 !important;
+    }
+
+    .instructions-card strong {
+        color: #097969 !important;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -764,9 +797,6 @@ if 'user_id' in st.session_state:
 # Weight adjustment interface
 for i in range(6):
     factor = st.session_state.dragged_factors[i]
-    
-    # Create weight item container
-    st.markdown(f'<div class="weight-item">', unsafe_allow_html=True)
     
     # Set keys and defaults
     val_key = f"val_{i}"

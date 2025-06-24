@@ -28,8 +28,9 @@ st.session_state['authenticated'] = False
 # the links displayed on the left-side panel. 
 SideBarLinks(show_home=True)
 
-from modules.style import style_sidebar, set_background
+from modules.style import style_sidebar, set_background_color
 style_sidebar()
+set_background_color() 
 
 # ***************************************************
 #    Custom CSS for modern styling
@@ -38,7 +39,7 @@ st.markdown("""
     <style>
     /* Main container styling */
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: linear-gradient(135deg, #dddddd 50%, #dddddd 100%);
         min-height: 100vh;
     /* Form container for centering selectbox and button */
     .login-card-content {
@@ -162,12 +163,32 @@ st.markdown("""
         align-items: center;
         justify-content: flex-start;
         position: relative;
+        overflow: hidden; /* needed for top border animation */
     }
+
     
     .login-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        background: rgba(232, 245, 240, 0.3); /* light green tint */
         border-color: rgba(9, 121, 105, 0.3);
+    }
+
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #097969 0%, #0a9d7a 100%);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+
+    .login-card:hover::before {
+        transform: scaleX(1);
     }
     
     .role-icon {
@@ -261,24 +282,44 @@ st.markdown("""
     }
     
     .feature-item {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
         text-align: center;
-        padding: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(9, 121, 105, 0.15);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 180px;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(9, 121, 105, 0.2);
+        border-color: rgba(9, 121, 105, 0.3);
     }
     
     .feature-icon {
         font-size: 2.5rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
+        display: block;
     }
-    
+
     .feature-title {
-        font-weight: 600;
+        font-weight: 700;
         color: #097969;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
     }
-    
+
     .feature-text {
-        color: #6c757d;
+        color: #5a6c7d;
         font-size: 0.9rem;
+        line-height: 1.5;
     }
     
     /* Ensure Streamlit widgets are centered */

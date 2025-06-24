@@ -3,11 +3,13 @@ from modules.nav import SideBarLinks
 import requests
 import pandas as pd
 import json
-from modules.style import style_sidebar
+from modules.style import style_sidebar, set_background_color
+
 
 # Page config
 st.set_page_config(layout='wide', page_title="Team - Care Compass", page_icon="🧭")
 style_sidebar()
+set_background_color() 
 SideBarLinks()
 
 # Custom CSS for modern styling (matching About page)

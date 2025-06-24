@@ -4,9 +4,11 @@ import streamlit as st
 import requests
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
-from modules.style import style_sidebar, set_background
+from modules.style import style_sidebar, set_background_color
+
 
 style_sidebar()
+set_background_color() 
 SideBarLinks()
 
 # Custom CSS matching Country Healthcare Profiles page exactly
@@ -47,13 +49,13 @@ st.markdown("""
     
     /* Welcome section */
     .welcome-box {
-        background: rgba(255, 255, 255, 0.6);
+        background: white;
         padding: 1.5rem;
         border-radius: 15px;
         margin-bottom: 1.5rem;
         border-left: 4px solid #097969;
     }
-    
+
     .welcome-name {
         font-size: 1.5rem;
         font-weight: 600;
@@ -77,11 +79,28 @@ st.markdown("""
     
     /* Instructions card */
     .instructions-card {
-        background: rgba(232, 245, 240, 0.8);
-        padding: 1.5rem;
-        border-radius: 15px;
+        background: #f1f8e9;
+        color: #2c3e50 !important;
+        padding: 1.8rem;
+        border-radius: 16px;
         margin-bottom: 2rem;
-        border: 1px solid rgba(9, 121, 105, 0.2);
+        border: 2px solid #097969;
+        box-shadow: 0 4px 15px rgba(9, 121, 105, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Text colors for instructions card */
+    .instructions-card * {
+        color: #2c3e50 !important;
+    }
+
+    .instructions-card strong {
+        color: #097969 !important;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        display: block;
     }
     
     /* Style the expander */
@@ -92,18 +111,23 @@ st.markdown("""
         margin-bottom: 1.5rem;
         overflow: hidden;
     }
-    
+
     div[data-testid="stExpander"] > details > summary {
-        background: linear-gradient(135deg, #f0fdf4 0%, #e8f5f0 100%);
+        background: #f1f8e9;
         color: #097969;
         font-weight: 600;
-        border: none;
+        border: 2px solid #097969;
         padding: 1rem 1.5rem;
         font-size: 1.1rem;
+        border-radius: 12px 12px 0 0;
     }
-    
+
+    div[data-testid="stExpander"] > details:not([open]) > summary {
+        border-radius: 12px;  /* Rounds all corners when closed */
+    }
+
     div[data-testid="stExpander"] > details > summary:hover {
-        background: linear-gradient(135deg, #e8f5f0 0%, #d8f3dc 100%);
+        background: linear-gradient(135deg, #c8e6c9 0%, #b2dfdb 100%);
     }
     
     /* Articles count message */
