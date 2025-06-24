@@ -1,11 +1,13 @@
 import streamlit as st
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
-from modules.style import style_sidebar, set_background
+from modules.style import style_sidebar, set_background_color
+
 
 # Page config
 st.set_page_config(layout='wide', page_title="About - Care Compass", page_icon="🧭")
 style_sidebar()
+set_background_color() 
 SideBarLinks()
 
 # Custom CSS for modern styling

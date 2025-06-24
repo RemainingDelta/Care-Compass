@@ -2,12 +2,15 @@ import logging
 logger = logging.getLogger(__name__)
 import streamlit as st
 from modules.nav import SideBarLinks
-from modules.style import style_sidebar, set_background
+from modules.style import style_sidebar, set_background_color
 
 # Page config
 st.set_page_config(layout='wide', page_title="Welcome - Healthcare Journey", page_icon="🏥")
 style_sidebar()
 SideBarLinks()
+set_background_color() 
+
+
 
 # Custom CSS for modern styling
 st.markdown("""
