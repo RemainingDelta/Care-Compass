@@ -1039,7 +1039,6 @@ if submit and chosen_country:
                 # Visualization
                 if on and 'similar_df' in st.session_state:
                     # World map visualization
-                    st.markdown('<div class="viz-section">', unsafe_allow_html=True)
                     st.markdown('<div class="viz-title">🗺️ Healthcare System Compatibility Map</div>', unsafe_allow_html=True)
                     
                     country_url = "http://host.docker.internal:4000/country/countries"
@@ -1119,7 +1118,6 @@ if submit and chosen_country:
                             st.write("Columns:", sorted_df_similar.columns.tolist())
                 else:
                     # Bar chart visualization
-                    st.markdown('<div class="viz-section">', unsafe_allow_html=True)
                     st.markdown('<div class="viz-title">📊 Top Healthcare Matches Comparison</div>', unsafe_allow_html=True)
                     
                     bar_chart_display = sorted_df_similar[1:6].copy()

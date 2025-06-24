@@ -137,7 +137,7 @@ st.markdown("""
     
     /* About section */
     .about-section {
-        background: linear-gradient(135deg, rgba(9, 121, 105, 0.05) 0%, rgba(10, 157, 122, 0.05) 100%);
+        background: white;
         border-radius: 16px;
         padding: 2.5rem;
         margin: 2rem 0;
