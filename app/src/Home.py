@@ -404,7 +404,7 @@ with col1:
     st.markdown("""
         <div class="login-card">
             <div class="role-icon">🏠</div>
-            <h3 class="role-title">Resident</h3>
+            <h3 class="role-title">Relocating Resident</h3>
             <p class="role-description">
                 Access personalized healthcare recommendations and country comparisons
             </p>

@@ -382,7 +382,7 @@ def fetch_countries(url):
 def display_data(data_code, y_value, title, countries_exist, chosen_year):
     dataframe_list = []
     for chosen_country in countries_exist:
-        api_url = f"http://web-api:4000/ml/get_autoregressive/{chosen_country}/{data_code}/{chosen_year}"
+        api_url = f"http://web-api:4000/ml/autoregressive/{chosen_country}/{data_code}/{chosen_year}"
         logger.info(f"Attempting to fetch data from: {api_url}")
         
         try:

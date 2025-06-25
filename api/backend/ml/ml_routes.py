@@ -18,8 +18,8 @@ ml = Blueprint("ml", __name__)
 
 # Modified ml.py route for regression with storage
 
-@ml.route("/get_regression/<input>", methods=["GET"])
-def get_regression(input):
+@ml.route("/regression/<input>", methods=["GET"])
+def regression(input):
     inputs = [str(x.strip()) for x in input.split(',')]
     result = predict(dataframe(inputs[1]), inputs[0])
     print("Country received:", inputs[0])
@@ -106,36 +106,10 @@ def get_regression(input):
     return jsonify(result)
 
 
-# NEW: Route to retrieve stored regression weights
-@ml.route("/get_stored_regression/<country>/<data_code>/<user_id>", methods=["GET"])
-def get_stored_regression(country, data_code, user_id):
-    try:
-        cursor = db.get_db().cursor()
-        
-        query = """
-            SELECT rw.slope, rw.intercept, rw.mse, rw.r2
-            FROM RegressionWeights rw
-            JOIN RegressionFactors f ON rw.factorID = f.factorID
-            WHERE rw.country = %s 
-            AND (f.factor_code = %s OR f.who_code = %s)
-            AND rw.userID = %s
-        """
-        cursor.execute(query, (country, data_code, data_code, user_id))
-        result = cursor.fetchone()
-        cursor.close()
-        
-        if result:
-            return jsonify(result)
-        else:
-            return jsonify({"error": "No stored weights found"}), 404
-            
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 #model calls post to put weights in database
 # adds new regression weight from model to database
-@ml.route("/get_autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["GET"])
-def get_autoregressive(chosen_country, data_code, chosen_year):
+@ml.route("/autoregressive/<chosen_country>/<data_code>/<chosen_year>", methods=["GET"])
+def autoregressive(chosen_country, data_code, chosen_year):
     cursor = db.get_db().cursor()
     
     # Get data based on data_code
@@ -255,37 +229,6 @@ def get_autoregressive(chosen_country, data_code, chosen_year):
     return jsonify(result_final)
 
 
-# NEW: Route to retrieve stored autoregression weights
-@ml.route("/get_stored_autoreg/<country>/<data_code>/<user_id>", methods=["GET"])
-def get_stored_autoreg(country, data_code, user_id):
-    try:
-        cursor = db.get_db().cursor()
-        
-        query = """
-            SELECT aw.weight_vector
-            FROM AutoregWeights aw
-            JOIN RegressionFactors f ON aw.factorID = f.factorID
-            WHERE aw.country = %s 
-            AND (f.factor_code = %s OR f.who_code = %s)
-            AND aw.userID = %s
-        """
-        cursor.execute(query, (country, data_code, data_code, user_id))
-        result = cursor.fetchone()
-        cursor.close()
-        
-        if result:
-            weight_vector = json.loads(result['weight_vector'])
-            return jsonify({
-                'country': country,
-                'factor': data_code,
-                'weight_vector': weight_vector
-            })
-        else:
-            return jsonify({"error": "No stored weights found"}), 404
-            
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 @ml.route("/predict_autoreg_fast/<country>/<data_code>/<int:year>/<int:user_id>", methods=["GET"])
 def predict_autoreg_fast(country, data_code, year, user_id):
     """
@@ -300,7 +243,7 @@ def predict_autoreg_fast(country, data_code, year, user_id):
         # No stored weights found
         return jsonify({
             "error": str(e),
-            "message": "No stored weights found. Use /get_autoregressive/ to calculate and store weights first."
+            "message": "No stored weights found. Use /autoregressive/ to calculate and store weights first."
         }), 404
     except Exception as e:
         return jsonify({"error": f"Prediction failed: {str(e)}"}), 500

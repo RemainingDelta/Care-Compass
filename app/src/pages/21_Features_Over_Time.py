@@ -96,7 +96,7 @@ def fetch_prediction_data(country, data_code, year, user_id=1):
         logger.info(f"Fast prediction failed: {str(e)}, falling back to full calculation")
     
     # Fallback to full autoregression calculation
-    full_url = f"http://web-api:4000/ml/get_autoregressive/{country}/{data_code}/{year}"
+    full_url = f"http://web-api:4000/ml/autoregressive/{country}/{data_code}/{year}"
     
     try:
         with get_session() as session:
