@@ -140,10 +140,10 @@ def fetch_current_values(country_code):
         st.error(f"Error fetching current values: {str(e)}")
         return None
 
-def get_regression_params(country_code, data_code):
+def regression_params(country_code, data_code):
     """Get regression parameters for a country and indicator"""
     try:
-        api_url = f"{API_BASE_URL}/ml/get_regression/{country_code},{data_code}"
+        api_url = f"{API_BASE_URL}/ml/regression/{country_code},{data_code}"
         response = requests.get(api_url, timeout=10)
         
         if response.status_code == 200:
@@ -682,7 +682,7 @@ if country_code:
                         progress_bar.progress(current_idx / total_targets, text=f"Analyzing {FEATURES_CONFIG[key]['name']}...")
                         
                         # Get regression parameters
-                        regression_data = get_regression_params(country_code, FEATURES_CONFIG[key]['code'])
+                        regression_data = regression_params(country_code, FEATURES_CONFIG[key]['code'])
                         
                         if regression_data:
                             # Get current value from flattened data
