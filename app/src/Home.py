@@ -396,6 +396,7 @@ if not residents_list and not students_list and not policymakers_list:
 
 # Login Cards Section
 st.markdown("### Choose Your Role")
+st.markdown("")
 
 col1, col2, col3 = st.columns(3, gap="large")
 
@@ -464,6 +465,7 @@ with col1:
 
 # Student Card
 with col2:
+    st.markdown("")
     st.markdown("""
         <div class="login-card">
             <div class="role-icon">🎓</div>
@@ -527,6 +529,7 @@ with col2:
 
 # Policymaker Card
 with col3:
+    st.markdown("")
     st.markdown("""
         <div class="login-card">
             <div class="role-icon">🏛️</div>
